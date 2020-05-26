@@ -8,6 +8,9 @@ import user from './views/nav1/user.vue'
 import Page4 from './views/nav2/Page4.vue'
 import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
+
+import Case from './views/Case.vue'
+import Project from './views/Project.vue'
 import echarts from './views/charts/echarts.vue'
 
 let routes = [
@@ -31,7 +34,7 @@ let routes = [
         iconCls: 'fa fa-product-hunt',//图标样式class
         children: [
             { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
+            { path: '/project', component: Project, name: '我的项目' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
         ]
@@ -43,7 +46,7 @@ let routes = [
         iconCls: 'fa fa-briefcase',
         leaf: true,
         children: [
-            { path: '/page4', component: Page4, name: '接口管理' }
+            { path: '/case', component: Case, name: '接口管理' }
         ]
     },
     {
@@ -93,7 +96,8 @@ let routes = [
         iconCls: 'fa fa-gears',
         children: [
             { path: '/page4', component: Page4, name: '函数仓库' },
-            { path: '/page5', component: Page5, name: '环境配置' }
+            { path: '/page5', component: Page5, name: '环境配置' },
+            { path: '/page5', component: Page5, name: '定时任务' }
         ]
     },
     {
