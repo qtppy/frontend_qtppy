@@ -4,7 +4,7 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-input v-model="filters.name" placeholder="项目名称"></el-input>
+					<el-input v-model="filters.p_name" placeholder="项目名称"></el-input>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" v-on:click="getProjects">查询</el-button>
@@ -72,7 +72,7 @@
 		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="项目名称" prop="p_name">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
+					<el-input v-model="addForm.p_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="描述">
 					<el-input type="textarea" v-model="addForm.p_desc"></el-input>
@@ -89,13 +89,13 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { getUserListPage, removeUser, batchRemoveUser, editProject, deleteProject, createProject, getProjectList} from '@/api/api';
+	import { getUserListPage, removeUser, editProject, deleteProject, createProject, getProjectList} from '@/api/api';
 
 	export default {
 		data() {
 			return {
 				filters: {
-					name: ''
+					p_name: ''
 				},
 				users: [],
 				total: 0,
@@ -128,8 +128,8 @@
 				},
 				//新增界面数据
 				addForm: {
-					name: '',
-					desc: ''
+					p_name: '',
+					p_desc: ''
 				}
 
 			}
@@ -151,7 +151,7 @@
 			getProjects() {
 				let para = {
 					page: this.page,
-					// name: this.filters.name
+					p_name: this.filters.p_name
 				};
 				this.listLoading = true;
 				//NProgress.start();
@@ -195,8 +195,8 @@
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
-					name: '',
-					desc: ''
+					p_name: '',
+					p_desc: ''
 				};
 			},
 			//编辑
