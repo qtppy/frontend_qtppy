@@ -18,4 +18,14 @@ export const editUser = params => { return axios.get(`${base}/user/edit`, { para
 
 export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
 
-export const createProject = params => {return axios.post(`${tmp_ip}/project/create`, params).then(res => res.data);};
+
+
+export const createProject = params => { return axios.post(`/api/project/create`, params); };
+
+export const getProjectList = params => { return axios.post(`/api/project/getlist`, params) };
+
+export const editProject = params => { return axios.post('/api/project/update',  params) };
+
+export const deleteProject = params => { return axios.post('/api/project/delete', params) };
+
+export const reqLogin = params => { return axios.post(`/api/auth/login`, params).then(res => res.data); };
