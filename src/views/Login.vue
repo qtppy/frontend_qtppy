@@ -10,13 +10,14 @@
     <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
     <el-form-item style="width:100%;">
       <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
-      <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->
+      <!-- <el-button @click.native.prevent="handleReset2">重置</el-button> -->
     </el-form-item>
   </el-form>
 </template>
 
 <script>
-  import { requestLogin } from '../api/api';
+  import { requestLogin, reqLogin } from '../api/api';
+
   //import NProgress from 'nprogress'
   export default {
     data() {
@@ -51,20 +52,23 @@
             this.logining = true;
             //NProgress.start();
             var loginParams = { username: this.ruleForm2.account, password: this.ruleForm2.checkPass };
-            requestLogin(loginParams).then(data => {
+
+            // 登录请求，成功跳转到首页/
+            reqLogin(loginParams).then(data => {
               this.logining = false;
               //NProgress.done();
-              let { msg, code, user } = data;
-              if (code !== 200) {
+              let {  errcode, errmsg, res} = data;
+              if (errcode !== 0) {
                 this.$message({
-                  message: msg,
+                  message: errmsg,
                   type: 'error'
                 });
               } else {
-                sessionStorage.setItem('user', JSON.stringify(user));
-                this.$router.push({ path: '/table' });
+                sessionStorage.setItem('user', JSON.stringify(res));
+                this.$router.push({ path: '/' });
               }
             });
+
           } else {
             console.log('error submit!!');
             return false;
