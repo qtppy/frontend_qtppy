@@ -10,6 +10,7 @@ import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 
 import Case from './views/Case.vue'
+import Suite from './views/suite.vue'
 import Project from './views/Project.vue'
 import echarts from './views/charts/echarts.vue'
 
@@ -52,21 +53,21 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '测试计划',
-        iconCls: 'fa fa-plane',
+        name: '测试集合',
+        iconCls: 'fa fa-suitcase',
         leaf: true,//只有一个节点
         children: [
-            { path: '/page6', component: Page6, name: '测试计划' }
+            { path: '/suite', component: Suite, name: '测试集合' }
         ]
     },
     {
         path: '/',
         component: Home,
-        name: '测试集合',
-        iconCls: 'fa fa-suitcase',
+        name: '测试计划',
+        iconCls: 'fa fa-plane',
         leaf: true,//只有一个节点
         children: [
-            { path: '/page6', component: Page6, name: '测试集合' }
+            { path: '/page6', component: Page6, name: '测试计划' }
         ]
     },
     {

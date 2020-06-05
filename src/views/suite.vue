@@ -4,6 +4,40 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
+					<el-select v-model="value" filterable placeholder="请选择项目">
+						<el-option
+						v-for="item in options"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value">
+						</el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item>
+					<el-select v-model="value" filterable placeholder="请选择模块">
+						<el-option
+						v-for="item in options"
+						:key="item.value"
+						:label="item.label"
+						:value="item.value">
+						</el-option>
+					</el-select>
+				</el-form-item>
+				<el-form-item>
+					<el-tooltip placement="top">
+						<div slot="content">新增模块</div>
+						<el-button type="primary" @click="handleAdd">新增</el-button>
+					</el-tooltip>
+				</el-form-item>
+				<el-form-item>
+					<el-tooltip placement="top">
+						<div slot="content">编辑测试集</div>
+						<el-button type="primary" @click="handleAdd">编辑</el-button>
+					</el-tooltip>
+				</el-form-item>
+			</el-form>
+			<!-- <el-form :inline="true" :model="filters">
+				<el-form-item>
 					<el-input v-model="filters.p_name" placeholder="项目名称"></el-input>
 				</el-form-item>
 				<el-form-item>
@@ -12,7 +46,7 @@
 				<el-form-item>
 					<el-button type="primary" @click="handleAdd">新增</el-button>
 				</el-form-item>
-			</el-form>
+			</el-form> -->
 		</el-col>
 
 		<!--列表-->
@@ -24,20 +58,20 @@
 			<el-table-column prop="p_id" label="项目ID" width="100" v-if="visible">
 			</el-table-column>
 			</el-table-column>
-			<el-table-column prop="p_name" label="项目名称" width="120" sortable>
+			<el-table-column prop="p_name" label="项目名称" width="120" >
 			</el-table-column>
-			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" sortable>
+			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" >
 			</el-table-column>
-			<el-table-column prop="p_creator" label="创建人" width="100" sortable>
+			<el-table-column prop="p_creator" label="创建人" width="100" >
 			</el-table-column>
-			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" sortable>
+			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" >
 			</el-table-column>
-			<el-table-column prop="p_desc" label="描述" min-width="180" sortable>
+			<el-table-column prop="p_desc" label="描述" min-width="180" >
 			</el-table-column>
-			<el-table-column label="操作" width="150">
+			<el-table-column label="操作" :render-header="renderHeader" width="150">
 				<template scope="scope">
-					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+					<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -147,6 +181,86 @@
 				this.page = val;
 				this.getProjects();
 			},
+			// 表头操作栏按钮
+ 			renderHeader(h, params) {
+                let a =  [
+					h('el-button-group',[
+						// 文字提示
+						h('el-tooltip',{
+							props: {
+								disabled: false,
+								content: "增加测试用例",
+								placement: "bottom",
+								effect: "light"
+
+							},
+						},
+						[
+							// 增加按钮
+							h('el-button', {
+								props: {
+									size: "mini",
+									type: "primary",
+									icon: "el-icon-add-location"
+								},
+								on: {
+									click: () => {
+										this.renderAddRow();
+									}
+								}
+							})
+						]),
+						
+						h('el-tooltip',{
+							props: {
+								disabled: false,
+								content: "全局变量",
+								placement: "bottom",
+								effect: "light"								
+							}
+						},
+						[
+							// 全局变量按钮
+							h('el-button', {
+								props: {
+									size: "mini",
+									type: "primary",
+									icon: "el-icon-share"
+								},
+								on: {
+									click: () => {
+										this.renderAddRow();
+									}
+								}
+							}),
+						]),
+						h('el-tooltip',{
+							props: {
+								disabled: false,
+								content: "系统函数",
+								placement: "bottom",
+								effect: "light"								
+							}
+						},
+						[
+							// 系统函数按钮
+							h('el-button', {
+								props: {
+									size: "mini",
+									type: "primary",
+									icon: "el-icon-share"
+								},
+								on: {
+									click: () => {
+										this.renderAddRow();
+									}
+								}
+							}),
+						]),
+					])
+				]
+                return h('div', a);
+            },
 			//获取用户列表
 			getProjects() {
 				let para = {
