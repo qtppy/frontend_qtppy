@@ -53,11 +53,11 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '测试集合',
+        name: '测试场景',
         iconCls: 'fa fa-suitcase',
         leaf: true,//只有一个节点
         children: [
-            { path: '/suite', component: Suite, name: '测试集合' }
+            { path: '/suite', component: Suite, name: '测试场景' }
         ]
     },
     {

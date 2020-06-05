@@ -4,9 +4,9 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-select v-model="value" filterable placeholder="请选择项目">
+					<el-select v-model="value" filterable placeholder="请选择项目" @visible-change="getProjects">
 						<el-option
-						v-for="item in options"
+						v-for="item in projectOptions"
 						:key="item.value"
 						:label="item.label"
 						:value="item.value">
@@ -25,14 +25,14 @@
 				</el-form-item>
 				<el-form-item>
 					<el-tooltip placement="top">
-						<div slot="content">新增模块</div>
-						<el-button type="primary" @click="handleAdd">新增</el-button>
+						<div slot="content">新增场景</div>
+						<el-button type="primary" @click="handleAddSuite">新增</el-button>
 					</el-tooltip>
 				</el-form-item>
 				<el-form-item>
 					<el-tooltip placement="top">
-						<div slot="content">编辑测试集</div>
-						<el-button type="primary" @click="handleAdd">编辑</el-button>
+						<div slot="content">编辑场景</div>
+						<el-button type="primary" @click="handleAddSuite">编辑</el-button>
 					</el-tooltip>
 				</el-form-item>
 			</el-form>
@@ -55,10 +55,10 @@
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
 			</el-table-column>
-			<el-table-column prop="p_id" label="项目ID" width="100" v-if="visible">
+			<el-table-column prop="p_id" label="场景ID" width="100" v-if="visible">
 			</el-table-column>
 			</el-table-column>
-			<el-table-column prop="p_name" label="项目名称" width="120" >
+			<el-table-column prop="p_name" label="场景名称" width="120" >
 			</el-table-column>
 			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" >
 			</el-table-column>
@@ -83,8 +83,8 @@
 			</el-pagination>
 		</el-col>
 
-		<!--编辑界面-->
-		<el-dialog title="编辑" :visible="editFormVisible" :close-on-click-modal="false">
+		<!-- 编辑界面
+		<el-dialog title="编辑" :visible="editFormVisible" :close-on-click-modal="false" @close="addFormVisible = false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="项目ID" prop="p_id">
 					<el-input v-model="editForm.p_id" auto-complete="off" :readonly="editProjectId"></el-input>
@@ -100,10 +100,10 @@
 				<el-button @click.native="editFormVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
 			</div>
-		</el-dialog>
+		</el-dialog> -->
 
 		<!--新增界面-->
-		<el-dialog title="新增" :visible="addFormVisible" :close-on-click-modal="false">
+		<!-- <el-dialog title="新增" :visible="addFormVisible" :close-on-click-modal="false" @close="addFormVisible = false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="项目名称" prop="p_name">
 					<el-input v-model="addForm.p_name" auto-complete="off"></el-input>
@@ -114,6 +114,22 @@
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click.native="addFormVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
+			</div>
+		</el-dialog> -->
+
+		<!-- 新增测试场景 -->
+		<el-dialog title="新增" :visible="addSuiteVisible" :close-on-click-modal="false" @close="addSuiteVisible = false">
+			<el-form :model="addSuite" label-width="80px" :rules="addFormRules" ref="addForm">
+				<el-form-item label="场景名称" prop="s_name">
+					<el-input v-model="addSuite.s_name" auto-complete="off"></el-input>
+				</el-form-item>
+				<el-form-item label="描述">
+					<el-input type="textarea" v-model="addSuite.s_desc"></el-input>
+				</el-form-item>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="addSuiteVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
 		</el-dialog>
@@ -152,7 +168,6 @@
 					name: '',
 					desc: ''
 				},
-
 				addFormVisible: false,//新增界面是否显示
 				addLoading: false,
 				addFormRules: {
@@ -164,7 +179,16 @@
 				addForm: {
 					p_name: '',
 					p_desc: ''
-				}
+				},
+				// 新增测试场景数据
+				addSuiteVisible: false, // 新增场景是否显示
+				addSuite: {
+					p_id: '',
+					s_name: '',
+					s_desc: ''
+				},
+				// 项目列表
+				projectOptions:[]
 
 			}
 		},
@@ -192,7 +216,6 @@
 								content: "增加测试用例",
 								placement: "bottom",
 								effect: "light"
-
 							},
 						},
 						[
@@ -260,7 +283,7 @@
 					])
 				]
                 return h('div', a);
-            },
+			},
 			//获取用户列表
 			getProjects() {
 				let para = {
@@ -276,6 +299,13 @@
 					this.next = res.data.res.next_page;
 					this.users = res.data.res.project;
 					this.listLoading = false;
+					var projectArr = res.data.res.project
+					for(var i=0; i<=projectArr.length; i++) {
+						this.options[i] = {
+							"value": projectArr[i].p_id,
+							"lable": projectArr[i].p_name
+						}
+					};
 					//NProgress.done();
 				});
 			},
@@ -313,6 +343,14 @@
 					p_desc: ''
 				};
 			},
+			handleAddSuite: function () {
+				this.addSuiteVisible = true, // 新增场景是否显示
+				this.addSuite = {
+					p_id: '',
+					s_name: '',
+					s_desc: ''
+				}
+			},
 			//编辑
 			editSubmit: function () {
 				this.$refs.editForm.validate((valid) => {
@@ -344,9 +382,9 @@
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.addLoading = true;
 							//NProgress.start();
-							let para = Object.assign({}, this.addForm);
+							let para = Object.assign({}, this.addSuite);
 							// para.create_time = (!para.create_time || para.create_time == '') ? '' : util.formatDate.format(new Date(para.create_time), 'yyyy-MM-dd');
-							createProject(para).then((res) => {
+							createSuite(para).then((res) => {
 								this.addLoading = false;
 								//NProgress.done();
 								this.$message({

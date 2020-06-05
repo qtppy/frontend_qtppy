@@ -28,4 +28,6 @@ export const editProject = params => { return axios.post('/api/project/update', 
 
 export const deleteProject = params => { return axios.post('/api/project/delete', params) };
 
+export const createSuite = params => { return axios.post(`/api/project/suite/create`); };
+
 export const reqLogin = params => { return axios.post(`/api/auth/login`, params).then(res => res.data); };
