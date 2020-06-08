@@ -2,7 +2,7 @@
 	<section>
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-			<el-form :inline="true" :model="filters">
+			<el-form :inline="true" :model="filters" ref="searchTool">
 				<el-form-item>
 					<el-select v-model="projectSelected" filterable placeholder="请选择项目" @change="getSuiteList">
 						<el-option
@@ -32,7 +32,7 @@
 				<el-form-item>
 					<el-tooltip placement="top">
 						<div slot="content">编辑场景</div>
-						<el-button type="primary" @click="handleAddSuite">编辑</el-button>
+						<el-button type="primary" @click="handleSuiteEdit">编辑</el-button>
 					</el-tooltip>
 				</el-form-item>
 			</el-form>
@@ -83,49 +83,33 @@
 			</el-pagination>
 		</el-col>
 
-		<!-- 编辑界面
-		<el-dialog title="编辑" :visible="editFormVisible" :close-on-click-modal="false" @close="addFormVisible = false">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
-				<el-form-item label="项目ID" prop="p_id">
-					<el-input v-model="editForm.p_id" auto-complete="off" :readonly="editProjectId"></el-input>
+		<!-- 编辑界面 -->
+		<el-dialog title="编辑" :visible="editSuitevisible" :close-on-click-modal="false" @close="editSuitevisible = false">
+			<el-form :model="editSuiteData" label-width="80px" :rules="editFormRules" ref="editForm">
+				<el-form-item label="场景ID" prop="sid">
+					<el-input v-model="editSuiteData.sid" auto-complete="off" :readonly="editSuiteSidVisible"></el-input>
 				</el-form-item>
-				<el-form-item label="项目名称" prop="p_name">
-					<el-input v-model="editForm.p_name" auto-complete="off"></el-input>
+				<el-form-item label="项目名称" prop="s_name">
+					<el-input v-model="editSuiteData.s_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="描述">
-					<el-input type="textarea" v-model="editForm.p_desc"></el-input>
+					<el-input type="textarea" v-model="editSuiteData.s_desc"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editFormVisible = false">取消</el-button>
+				<el-button @click.native="editSuitevisible = false">取消</el-button>
 				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
 			</div>
-		</el-dialog> -->
-
-		<!--新增界面-->
-		<!-- <el-dialog title="新增" :visible="addFormVisible" :close-on-click-modal="false" @close="addFormVisible = false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="项目名称" prop="p_name">
-					<el-input v-model="addForm.p_name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="描述">
-					<el-input type="textarea" v-model="addForm.p_desc"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
-			</div>
-		</el-dialog> -->
+		</el-dialog>
 
 		<!-- 新增测试场景 -->
 		<el-dialog title="新增" :visible="addSuiteVisible" :close-on-click-modal="false" @close="addSuiteVisible = false">
-			<el-form :model="addSuite" label-width="80px" :rules="addFormRules" ref="addForm">
+			<el-form :model="addSuiteData" label-width="80px" :rules="addFormRules" ref="addSuiteData">
 				<el-form-item label="场景名称" prop="s_name">
-					<el-input v-model="addSuite.s_name" auto-complete="off"></el-input>
+					<el-input v-model="addSuiteData.s_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="描述">
-					<el-input type="textarea" v-model="addSuite.s_desc"></el-input>
+					<el-input type="textarea" v-model="addSuiteData.s_desc"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
@@ -139,7 +123,7 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { getProjectAllList, getSuiteAllList, deleteProject, createProject, getProjectList} from '@/api/api';
+	import { getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getProjectList, getSuiteByID} from '@/api/api';
 
 	export default {
 		data() {
@@ -164,7 +148,7 @@
 				},
 				//编辑界面数据
 				editForm: {
-					p_id: 0,
+					sid: 0,
 					name: '',
 					desc: ''
 				},
@@ -180,18 +164,27 @@
 					p_name: '',
 					p_desc: ''
 				},
-				// 新增测试场景数据
-				addSuiteVisible: false, // 新增场景是否显示
-				addSuite: {
-					p_id: '',
-					s_name: '',
-					s_desc: ''
-				},
 				// 项目列表
 				projectOptions:[], //项目列表
 				projectSelected: '', //默认选择项目
 				suiteOptions: [], // Suite列表
-				suiteSelected: '' //默认选择测试集
+				suiteSelected: '', //默认选择测试集
+				// 新增测试场景数据
+				addSuiteVisible: false, // 新增场景是否显示
+				// 新增测试集数据
+				addSuiteData: {
+					s_name: '',
+					s_desc: '',
+					project_id: ''
+				},
+				// 场景编辑
+				editSuitevisible: false, //场景编辑是否显示
+				editSuiteSidVisible: true,
+				editSuiteData: {
+					sid: '',
+					s_desc: '',
+					s_name: ''
+				}
 
 			}
 		},
@@ -293,6 +286,7 @@
 			},
 			// 获取项目
 			getProjectSelect () {
+				this.projectOptions = [] //初始化列表
 				getProjectAllList().then(res => {
 					console.log(res.data);
 					let projectArr = res.data.res.project
@@ -311,6 +305,8 @@
 				let para = {
 					"p_id": value
 				};
+				this.suiteSelected = '' // 初始化默认选择项目
+				this.suiteOptions = [] //每次初始化
 				getSuiteAllList(para).then(res => {
 					let suiteArr = res.data.res.suite
 					for(let i=0; i<suiteArr.length; i++){
@@ -341,6 +337,7 @@
 					//NProgress.done();
 				});
 			},
+
 			//删除
 			handleDel: function (index, row) {
 				this.$confirm('确认删除该记录吗?', '提示', {
@@ -362,25 +359,35 @@
 
 				});
 			},
+
 			//显示编辑界面
 			handleEdit: function (index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
 			},
-			//显示新增界面
-			handleAdd: function () {
-				this.addFormVisible = true;
-				this.addForm = {
-					p_name: '',
-					p_desc: ''
+			// 显示场景编辑
+			handleSuiteEdit: function () {
+				let para = {
+					"sid": this.suiteSelected
 				};
+				getSuiteByID(para).then(res => {
+					let data = res.data.res
+					this.editSuiteData = {
+						sid: data.sid,
+						s_name: data.s_name,
+						s_desc: data.s_desc
+					}
+				});
+				this.editSuitevisible = true
+
 			},
+			//显示新增界面
 			handleAddSuite: function () {
 				this.addSuiteVisible = true, // 新增场景是否显示
-				this.addSuite = {
-					p_id: '',
-					s_name: '',
-					s_desc: ''
+				this.addSuiteData = {
+					project_id: '',
+					p_name: '',
+					p_desc: ''
 				}
 			},
 			//编辑
@@ -390,9 +397,9 @@
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
 							//NProgress.start();
-							let para = Object.assign({}, this.editForm);
+							let para = Object.assign({}, this.editSuiteData);
 							para.create_time = (!para.create_time || para.create_time == '') ? '' : util.formatDate.format(new Date(para.create_time), 'yyyy-MM-dd');
-							editProject(para).then((res) => {
+							updateSuiteInfo(para).then((res) => {
 								this.editLoading = false;
 								//NProgress.done();
 								this.$message({
@@ -400,8 +407,8 @@
 									type: 'success'
 								});
 								this.$refs['editForm'].resetFields();
-								this.editFormVisible = false;
-								this.getProjects();
+								this.editSuitevisible = false;
+								getSuiteList(this.projectSelected);
 							});
 						});
 					}
@@ -409,12 +416,13 @@
 			},
 			//新增
 			addSubmit: function () {
-				this.$refs.addForm.validate((valid) => {
+				this.$refs.addSuiteData.validate((valid) => {
 					if (valid) {
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.addLoading = true;
 							//NProgress.start();
-							let para = Object.assign({}, this.addSuite);
+							this.addSuiteData.project_id = this.projectSelected;
+							let para = Object.assign({}, this.addSuiteData);
 							// para.create_time = (!para.create_time || para.create_time == '') ? '' : util.formatDate.format(new Date(para.create_time), 'yyyy-MM-dd');
 							createSuite(para).then((res) => {
 								this.addLoading = false;
@@ -423,9 +431,14 @@
 									message: '提交成功',
 									type: 'success'
 								});
-								this.$refs['addForm'].resetFields();
-								this.addFormVisible = false;
-								this.getProjects();
+								// 设置新增对话框隐藏，重新初始化测试集列表数据
+								this.addSuiteVisible = false;
+								this.suiteOptions.push({
+									label: res.data.res.s_name,
+									value: res.data.res.sid
+								});
+								// 重新获取所有测试集
+								this.getSuiteList(this.projectSelected);
 							});
 						});
 					}

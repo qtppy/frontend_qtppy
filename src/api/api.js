@@ -28,10 +28,20 @@ export const editProject = params => { return axios.post('/api/project/update', 
 
 export const deleteProject = params => { return axios.post('/api/project/delete', params) };
 
-export const createSuite = params => { return axios.post(`/api/project/suite/create`); };
+// 新建测试集
+export const createSuite = params => { return axios.post(`/api/project/suite/create`, params); };
 
+// 获取该用户下的所有项目
 export const getProjectAllList = params => { return axios.post(`/api/project/getAllList`); };
 
+// 根据项目ID获取所有测试集
 export const getSuiteAllList = params => { return axios.post(`/api/project/suite/getlistbyId`, params); };
 
+// 根据sid获取测试集
+export const getSuiteByID = params => { return axios.post(`/api/project/suite/getSuitebySid`, params); };
+
+// 修改测试集
+export const updateSuiteInfo = params => { return axios.post(`/api/project/suite/update`, params); };
+
+// qtppy登录
 export const reqLogin = params => { return axios.post(`/api/auth/login`, params).then(res => res.data); };

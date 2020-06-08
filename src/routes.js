@@ -43,11 +43,11 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '接口管理',
+        name: '用例管理',
         iconCls: 'fa fa-briefcase',
         leaf: true,
         children: [
-            { path: '/case', component: Case, name: '接口管理' }
+            { path: '/case', component: Case, name: '用例管理' }
         ]
     },
     {
