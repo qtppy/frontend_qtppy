@@ -406,7 +406,6 @@
 									message: '提交成功',
 									type: 'success'
 								});
-								this.$refs['editForm'].resetFields();
 								this.editSuitevisible = false;
 								getSuiteList(this.projectSelected);
 							});
