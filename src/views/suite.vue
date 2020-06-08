@@ -4,7 +4,7 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-select v-model="value" filterable placeholder="请选择项目" @visible-change="getProjects">
+					<el-select v-model="projectSelected" filterable placeholder="请选择项目" @change="getSuiteList">
 						<el-option
 						v-for="item in projectOptions"
 						:key="item.value"
@@ -14,9 +14,9 @@
 					</el-select>
 				</el-form-item>
 				<el-form-item>
-					<el-select v-model="value" filterable placeholder="请选择模块">
+					<el-select v-model="suiteSelected" filterable placeholder="请选择模块">
 						<el-option
-						v-for="item in options"
+						v-for="item in suiteOptions"
 						:key="item.value"
 						:label="item.label"
 						:value="item.value">
@@ -139,7 +139,7 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { getUserListPage, removeUser, editProject, deleteProject, createProject, getProjectList} from '@/api/api';
+	import { getProjectAllList, getSuiteAllList, deleteProject, createProject, getProjectList} from '@/api/api';
 
 	export default {
 		data() {
@@ -188,9 +188,16 @@
 					s_desc: ''
 				},
 				// 项目列表
-				projectOptions:[]
+				projectOptions:[], //项目列表
+				projectSelected: '', //默认选择项目
+				suiteOptions: [], // Suite列表
+				suiteSelected: '' //默认选择测试集
 
 			}
+		},
+		created() {
+			this.getProjectSelect(), //初始化加载项目列表
+			this.projectSelected = this.projectOptions[0].p_id
 		},
 		methods: {
 			// 项目创建日期转换
@@ -284,6 +291,38 @@
 				]
                 return h('div', a);
 			},
+			// 获取项目
+			getProjectSelect () {
+				getProjectAllList().then(res => {
+					console.log(res.data);
+					let projectArr = res.data.res.project
+					for(let i=0; i<projectArr.length; i++){
+						this.projectOptions.push({
+							label: projectArr[i].p_name, 
+							value: projectArr[i].p_id
+						})
+					};
+					console.log(this.projectOptions)
+				});
+				
+			},
+			// 根据项目获取测试集
+			getSuiteList (value) {
+				let para = {
+					"p_id": value
+				};
+				getSuiteAllList(para).then(res => {
+					let suiteArr = res.data.res.suite
+					for(let i=0; i<suiteArr.length; i++){
+						this.suiteOptions.push({
+							label: suiteArr[i].s_name,
+							value: suiteArr[i].sid
+						})
+					};
+					console.log(this.suiteOptions)
+				});
+				this.suiteSelected = this.suiteOptions[0].s_id
+			},
 			//获取用户列表
 			getProjects() {
 				let para = {
@@ -299,13 +338,6 @@
 					this.next = res.data.res.next_page;
 					this.users = res.data.res.project;
 					this.listLoading = false;
-					var projectArr = res.data.res.project
-					for(var i=0; i<=projectArr.length; i++) {
-						this.options[i] = {
-							"value": projectArr[i].p_id,
-							"lable": projectArr[i].p_name
-						}
-					};
 					//NProgress.done();
 				});
 			},
