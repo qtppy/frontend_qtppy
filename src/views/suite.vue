@@ -89,7 +89,7 @@
 				<el-form-item label="场景ID" prop="sid">
 					<el-input v-model="editSuiteData.sid" auto-complete="off" :readonly="editSuiteSidVisible"></el-input>
 				</el-form-item>
-				<el-form-item label="项目名称" prop="s_name">
+				<el-form-item label="场景名称" prop="s_name">
 					<el-input v-model="editSuiteData.s_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="描述">
