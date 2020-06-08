@@ -72,8 +72,15 @@
 			</el-table-column>
 			<el-table-column label="操作" :render-header="renderHeader" width="150">
 				<template scope="scope">
-					<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
-					<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+					<el-tooltip content="编辑" placement="bottom" effect="light">
+						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
+					<el-tooltip content="详情" placement="bottom" effect="light">
+						<el-button type="primary" icon="el-icon-chat-line-round" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
+					<el-tooltip content="删除" placement="bottom" effect="light">
+						<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -226,7 +233,7 @@
 								props: {
 									size: "mini",
 									type: "primary",
-									icon: "el-icon-add-location"
+									icon: "el-icon-document-add"
 								},
 								on: {
 									click: () => {
@@ -273,7 +280,7 @@
 								props: {
 									size: "mini",
 									type: "primary",
-									icon: "el-icon-share"
+									icon: "el-icon-s-flag"
 								},
 								on: {
 									click: () => {
