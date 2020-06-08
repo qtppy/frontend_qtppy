@@ -4,7 +4,8 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters" ref="searchTool">
 				<el-form-item>
-					<el-select v-model="projectSelected" filterable placeholder="请选择项目" @change="getSuiteList">
+					<el-link type="primary" icon="el-icon-cpu" :underline="false">项目:</el-link>
+					<el-select v-model="projectSelected" filterable  size="small" placeholder="请选择项目" @change="getSuiteList">
 						<el-option
 						v-for="item in projectOptions"
 						:key="item.value"
@@ -14,7 +15,8 @@
 					</el-select>
 				</el-form-item>
 				<el-form-item>
-					<el-select v-model="suiteSelected" filterable placeholder="请选择模块">
+					<el-link type="primary" icon="el-icon-guide" :underline="false">场景:</el-link>
+					<el-select v-model="suiteSelected" filterable size="small" placeholder="请选择场景">
 						<el-option
 						v-for="item in suiteOptions"
 						:key="item.value"
@@ -26,13 +28,13 @@
 				<el-form-item>
 					<el-tooltip placement="top">
 						<div slot="content">新增场景</div>
-						<el-button type="primary" @click="handleAddSuite">新增</el-button>
+						<el-button type="primary" icon="el-icon-news" size="small" @click="handleAddSuite">新增</el-button>
 					</el-tooltip>
 				</el-form-item>
 				<el-form-item>
 					<el-tooltip placement="top">
 						<div slot="content">编辑场景</div>
-						<el-button type="primary" @click="handleSuiteEdit">编辑</el-button>
+						<el-button type="primary" icon="el-icon-edit" size="small" @click="handleSuiteEdit">编辑</el-button>
 					</el-tooltip>
 				</el-form-item>
 			</el-form>
