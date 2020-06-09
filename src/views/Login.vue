@@ -17,13 +17,13 @@
     </el-form>
 
     <!--注册界面-->
-    <el-dialog title="注册" :visible="regFormVisible" :close-on-click-modal="false" @close="regFormVisible = false">
+    <el-dialog title="注册" width="350px" :visible="regFormVisible"  :close-on-click-modal="false" @close="regFormVisible = false">
       <el-form :model="regFormData" label-width="80px" :rules="regRule" ref="regForm">
         <el-form-item label="用户名称" prop="username">
-          <el-input v-model="regFormData.username" auto-complete="off"></el-input>
+          <el-input v-model="regFormData.username" auto-complete="off" size="small"></el-input>
         </el-form-item>
         <el-form-item label="用户密码" prop="password">
-          <el-input type="password" v-model="regFormData.password" auto-complete="off"></el-input>
+          <el-input type="password" v-model="regFormData.password" auto-complete="off" size="small"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -84,12 +84,14 @@
             // 注册请求
             let para = this.regFormData
             registerUser(para).then(res => {
-              console.log(res.data);
               if (res.data.errcode !== 0){
                 this.$message({
                   message: res.data.errmsg,
                   type: 'error'
-                })
+                });
+                // 修改提交按钮状态重置注册数据
+                this.regLoading = false
+                this.regFormData = {}
               }else {
                 this.regFormVisible = false
                 this.$message({
