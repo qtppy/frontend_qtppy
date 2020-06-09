@@ -40,10 +40,10 @@
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
 					<el-tooltip content="编辑" placement="bottom" effect="light">
-						<el-button type="warning" size="small" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
 					</el-tooltip>
 					<el-tooltip content="删除" placement="bottom" effect="light">
-						<el-button type="danger" size="small" icon="el-icon-delete" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+						<el-button type="danger" size="mini" icon="el-icon-delete" @click="handleDel(scope.$index, scope.row)" circle></el-button>
 					</el-tooltip>
 				</template>
 			</el-table-column>
