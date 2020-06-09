@@ -4,13 +4,16 @@
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="filters">
 				<el-form-item>
-					<el-input v-model="filters.p_name" placeholder="项目名称"></el-input>
+					<el-link type="primary" icon="el-icon-guide" :underline="false">项目查询:</el-link>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" v-on:click="getProjects">查询</el-button>
+					<el-input v-model="filters.p_name" placeholder="项目名称" size="mini"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" @click="handleAdd">新增</el-button>
+					<el-button type="primary" icon="el-icon-search" v-on:click="getProjects" size="mini">查询</el-button>
+				</el-form-item>
+				<el-form-item>
+					<el-button type="primary" icon="el-icon-news" @click="handleAdd" size="mini">新增</el-button>
 				</el-form-item>
 			</el-form>
 		</el-col>
@@ -36,8 +39,12 @@
 			</el-table-column>
 			<el-table-column label="操作" width="150">
 				<template scope="scope">
-					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-tooltip content="编辑" placement="bottom" effect="light">
+						<el-button type="warning" size="small" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
+					<el-tooltip content="删除" placement="bottom" effect="light">
+						<el-button type="danger" size="small" icon="el-icon-delete" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -50,7 +57,7 @@
 		</el-col>
 
 		<!--编辑界面-->
-		<el-dialog title="编辑" :visible="editFormVisible" :close-on-click-modal="false">
+		<el-dialog title="编辑" :visible="editFormVisible" :close-on-click-modal="false" @close="editFormVisible=false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="项目ID" prop="p_id">
 					<el-input v-model="editForm.p_id" auto-complete="off" :readonly="editProjectId"></el-input>
@@ -69,7 +76,7 @@
 		</el-dialog>
 
 		<!--新增界面-->
-		<el-dialog title="新增" :visible="addFormVisible" :close-on-click-modal="false">
+		<el-dialog title="新增" :visible="addFormVisible" :close-on-click-modal="false" @close="addFormVisible=false">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="项目名称" prop="p_name">
 					<el-input v-model="addForm.p_name" auto-complete="off"></el-input>
