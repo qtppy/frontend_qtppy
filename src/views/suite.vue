@@ -115,6 +115,82 @@
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
 		</el-dialog>
+
+		<!-- 新增测试用例 -->
+		<el-dialog title="新增测试用例" fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false" :size="addCaseSize">
+			<el-form :model="addCaseData" label-width="3px" :rules="addFormRules" ref="addSuiteData">
+				<el-row>
+					<el-col span="2">
+						<el-form-item prop="method">
+								<el-select v-model="value" placeholder="请选择" :size="addCaseSize" style="width:120px;">
+									<el-option
+									v-for="item in options"
+									:key="item.value"
+									:label="item.label"
+									:value="item.value">
+									</el-option>
+								</el-select>
+						</el-form-item>
+					</el-col>
+					<el-col span="9">
+						<el-form-item  prop="url">
+							<el-input v-model="addCaseData.method" :size="addCaseSize" auto-complete="off"></el-input>
+						</el-form-item>
+					</el-col>
+					<el-col span="13">
+						<el-form-item>
+							<el-button type="primary" :size="addCaseSize" @click.native="addSubmit" :loading="addLoading">
+								调试
+								<i class="el-icon-share"></i>
+							</el-button>
+						</el-form-item>
+					</el-col>
+				</el-row>
+				<el-row>
+					<el-col span="24">
+						<el-tabs v-model="activeName" @tab-click="handleClick" :size="Paramsize">
+							<!-- Params参数 -->
+							<el-tab-pane label="Params" name="first">
+								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
+										<!-- <el-table-column
+										type="selection"
+										width="55">
+										</el-table-column> -->
+										<el-table-column prop="key" label="Key">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.key}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="value" label="Value">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.value}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.DESCRIPTION}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column label="操作" :render-header="renderHeader">
+											<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)"></el-link>
+										</el-table-column>
+									</el-table>
+
+							</el-tab-pane>
+							<el-tab-pane label="Headers" name="headers">Headers</el-tab-pane>
+							<el-tab-pane label="Body" name="body">Body</el-tab-pane>
+						</el-tabs>
+					</el-col>
+				</el-row>
+			</el-form>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click.native="addCaseVisible = false">取消</el-button>
+				<el-button type="primary" @click.native="addSubmit" :loading="addCaseLoading">提交</el-button>
+			</div>
+		</el-dialog>		
 	</section>
 </template>
 
@@ -182,8 +258,27 @@
 					sid: '',
 					s_desc: '',
 					s_name: ''
-				}
+				},
+				// 新增测试用例
+				addCaseLoading: false,
+				addCaseVisible: false,
+				addCaseSize: 'small',
+				// 新增测试用例数据
+				addCaseData: {
+					method: '',
+					url: '',
 
+				},
+				// table data
+				Paramsize: "mini",
+				tableData: [
+					{
+						key: '',
+						value: '',
+						DESCRIPTION: '',
+						edit: true,
+					},
+				]
 			}
 		},
 		created() {
@@ -191,6 +286,22 @@
 			this.projectSelected = this.projectOptions[0].p_id
 		},
 		methods: {
+			// 增加新行
+			addNewRow(index, row) {
+				if(index == this.tableData.length - 1) {
+					this.tableData.push({
+						key: '',
+						value: '',
+						DESCRIPTION: '',
+						edit: true,					
+					});
+				};
+
+			},
+			// 删除行
+			deleteRow(index, row) {
+				this.tableData.splice(index, 1);
+			},
 			// 项目创建日期转换
 			formatDateDMT: function (row, column) {
 				return util.formatDate.format(new Date(row.create_time), 'yyyy-MM-dd')
@@ -226,7 +337,7 @@
 								},
 								on: {
 									click: () => {
-										this.renderAddRow();
+										this.handleAddCaseDialog();
 									}
 								}
 							})
@@ -281,6 +392,10 @@
 					])
 				]
                 return h('div', a);
+			},
+			// 显示增加case
+			handleAddCaseDialog() {
+				this.addCaseVisible = true;
 			},
 			// 获取项目
 			getProjectSelect () {
