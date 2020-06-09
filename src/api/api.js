@@ -45,3 +45,6 @@ export const updateSuiteInfo = params => { return axios.post(`/api/project/suite
 
 // qtppy登录
 export const reqLogin = params => { return axios.post(`/api/auth/login`, params).then(res => res.data); };
+
+// 注册
+export const registerUser = params => { return axios.post(`/api/auth/register`, params); };
