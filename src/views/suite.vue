@@ -120,29 +120,19 @@
 		<el-dialog title="新增测试用例" fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false" :size="addCaseSize">
 			<el-form :model="addCaseData" label-width="3px" :rules="addFormRules" ref="addSuiteData">
 				<el-row>
-					<el-col span="2">
+					<el-col span="12">
 						<el-form-item prop="method">
-								<el-select v-model="value" placeholder="请选择" :size="addCaseSize" style="width:120px;">
+							<el-input placeholder="请输入请求URL" v-model="addCaseData.url" class="input-with-select" @change="baseUrlSet">
+								<el-select v-model="mechodSelectValue" placeholder="Method" slot="prepend" :size="addCaseSize" style="width:120px;">
 									<el-option
-									v-for="item in options"
+									v-for="item in methodOptions"
 									:key="item.value"
 									:label="item.label"
 									:value="item.value">
 									</el-option>
 								</el-select>
-						</el-form-item>
-					</el-col>
-					<el-col span="9">
-						<el-form-item  prop="url">
-							<el-input v-model="addCaseData.method" :size="addCaseSize" auto-complete="off"></el-input>
-						</el-form-item>
-					</el-col>
-					<el-col span="13">
-						<el-form-item>
-							<el-button type="primary" :size="addCaseSize" @click.native="addSubmit" :loading="addLoading">
-								调试
-								<i class="el-icon-share"></i>
-							</el-button>
+								<el-button slot="append" icon="el-icon-share" :loading="debugRequestLoading">调试</el-button>
+							</el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
@@ -152,30 +142,28 @@
 							<!-- Params参数 -->
 							<el-tab-pane label="Params" name="first">
 								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
-										<!-- <el-table-column
-										type="selection"
-										width="55">
-										</el-table-column> -->
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeader">
-											<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)"></el-link>
+										<el-table-column label="操作" :render-header="renderHeader" >
+											<template slot-scope="scope">
+												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+											</template>
 										</el-table-column>
 									</el-table>
 
@@ -267,6 +255,8 @@
 				addCaseData: {
 					method: '',
 					url: '',
+					urlIndex: 0,
+					baseUrl: '',
 
 				},
 				// table data
@@ -278,7 +268,73 @@
 						DESCRIPTION: '',
 						edit: true,
 					},
-				]
+				],
+
+				// method选项
+				methodOptions: [
+					{
+						value: 0,
+						label: 'POST'
+					},
+					{
+						value: 1,
+						label: 'GET'
+					},
+					{
+						value: 2,
+						label: 'PUT'
+					},
+					{
+						value: 3,
+						label: 'PATCH'
+					},
+					{
+						value: 4,
+						label: 'DELETE'
+					},
+					{
+						value: 5,
+						label: 'COPY'
+					},
+					{
+						value: 6,
+						label: 'HEAD'
+					},
+					{
+						value: 7,
+						label: 'OPTIONS'
+					},
+					{
+						value: 8,
+						label: 'LINK'
+					},
+					{
+						value: 9,
+						label: 'UNLINK'
+					},
+					{
+						value: 10,
+						label: 'PURGE'
+					},
+					{
+						value: 11,
+						label: 'LOCK'
+					},
+					{
+						value: 12,
+						label: 'UNLOCK'
+					},
+					{
+						value: 13,
+						label: 'PROPFIND'
+					},
+					{
+						value: 14,
+						label: 'VIEW'
+					}
+				],
+				mechodSelectValue: '',
+				debugRequestLoading: false,
 			}
 		},
 		created() {
@@ -286,7 +342,8 @@
 			this.projectSelected = this.projectOptions[0].p_id
 		},
 		methods: {
-			// 增加新行
+
+			// Params选项卡增加新行
 			addNewRow(index, row) {
 				if(index == this.tableData.length - 1) {
 					this.tableData.push({
@@ -296,12 +353,45 @@
 						edit: true,					
 					});
 				};
-
 			},
 			// 删除行
 			deleteRow(index, row) {
-				this.tableData.splice(index, 1);
+				if(index !== 0) {
+					this.tableData.splice(index, 1);
+				};
 			},
+			baseUrlSet() {
+				this.addCaseData.baseUrl = this.addCaseData.url;
+			},
+			// 输入框输入焦点
+			addUrlParams(index, row) {
+				let flag = 0;
+				let joinUrl = ''
+				// 初始化url
+				this.addCaseData.url = ''
+
+				for (let i=0; i<this.tableData.length-1; i++) {
+					if (this.tableData[i].key ==='' && this.tableData[i].value ==='') {
+						flag = 1
+						break
+					};
+				};
+
+				if (flag === 0) {
+					for (let i=0; i<this.tableData.length-1; i++) {
+						if (this.addCaseData.urlIndex === 0) {
+							joinUrl = '?' + this.tableData[i].key + '=' + this.tableData[i].value
+						} else {
+							joinUrl = joinUrl + '&' + this.tableData[i].key + '=' + this.tableData[i].value
+						}
+						this.addCaseData.urlIndex = i
+					}
+				};
+				this.addCaseData.urlIndex = 0
+				this.addCaseData.url = this.addCaseData.baseUrl + joinUrl
+			},
+
+
 			// 项目创建日期转换
 			formatDateDMT: function (row, column) {
 				return util.formatDate.format(new Date(row.create_time), 'yyyy-MM-dd')
