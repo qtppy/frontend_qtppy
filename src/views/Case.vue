@@ -168,7 +168,7 @@
 	import util from '@/common/js/util'
 
 	//import NProgress from 'nprogress'
-	import { getCaseList, removeUser, batchRemoveUser, editUser, addUser } from '@/api/api';
+	import { getCaseList, deleteCase, batchRemoveUser, editUser, addUser } from '@/api/api';
 
 	export default {
 		data() {
@@ -291,7 +291,12 @@
 			}
 		},
 		methods: {
-			// 表头操作栏按钮
+			/**
+			 * 用例列表，表头操作栏按钮
+			 * @param {*} h 表头对象
+			 * @param {*} params 表头参数
+			 * @returns div html
+			 */
  			renderHeader(h, params) {
                 let a =  [
 					h('el-button-group',[
@@ -370,11 +375,21 @@
 				]
                 return h('div', a);
 			},
-			// 显示增加case
+
+			/**
+			 * 显示增加case
+			 * @param {*} null
+			 * @returns null
+			 */
 			handleAddCaseDialog() {
 				this.addCaseVisible = true;
 			},
-			// Params选项卡增加新行
+
+			/**
+			 * Params选项卡增加新行
+			 * @param {*} index 操作行索引
+			 * @param {*} row 操作行对象
+			 */
 			addNewRow(index, row) {
 				if(index == this.tableData.length - 1) {
 					this.tableData.push({
@@ -385,17 +400,33 @@
 					});
 				};
 			},
-			// 删除行
+
+			/**
+			 * Params选项卡，table删除行
+			 * @param {*} index  table当前索引
+			 * @param {*} row 操作行对象
+			 */
 			deleteRow(index, row) {
 				if(index !== 0) {
 					this.tableData.splice(index, 1);
 					this.addUrlParams(index, row);
 				};
 			},
+
+			/**
+			 * 新增用例基础url赋值
+			 * @param {*} null
+			 * @returns null
+			 */
 			baseUrlSet() {
 				this.addCaseData.baseUrl = this.addCaseData.url;
 			},
-			// 输入框输入焦点
+
+			/**
+			 * Params新增测试用例，获取焦点时自动新增一空白行
+			 * @param {*} index table当前行索引
+			 * @param {*} row table当前行对象方便取值
+			 */
 			addUrlParams(index, row) {
 				let flag = 0; //key和value全填标记0全填1相反
 				let joinUrl = ''
@@ -426,6 +457,7 @@
 				this.addCaseData.urlIndex = 0
 				this.addCaseData.url = this.addCaseData.baseUrl + joinUrl
 			},
+
 			/**
 			日期类型转换
 			@param {*} row table当前行数据
@@ -434,6 +466,7 @@
 			formatDateDMT: function (row, column) {
 				return util.formatDate.format(new Date(row.createtime), 'yyyy-MM-dd hh:mm:ss')
 			},
+
 			/**
 			 * 翻页功能
 			 * @param {*} val 当前页码value
@@ -443,10 +476,11 @@
 				this.page = val;
 				this.getCase();
 			},
+
 			/** 
 			 * 获取测试用例列表
 			 * @param {*} 
-			 * @returns
+			 * @returns null
 			 */
 			getCase() {
 				let para = {
@@ -464,22 +498,28 @@
 					//NProgress.done();
 				});
 			},
-			//删除
+
+			/**
+			 * 物理删除测试用例
+			 * @param {*} index 用例行索引
+			 * @param {*} row 当前行对象
+			 * @returns null
+			 */
 			handleDel: function (index, row) {
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
 					//NProgress.start();
-					let para = { id: row.id };
-					removeUser(para).then((res) => {
+					let para = { id: [row.id] };
+					deleteCase(para).then((res) => {
 						this.listLoading = false;
 						//NProgress.done();
 						this.$message({
 							message: '删除成功',
 							type: 'success'
 						});
-						this.getUsers();
+						this.getCase();
 					});
 				}).catch(() => {
 
