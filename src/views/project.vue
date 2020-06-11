@@ -24,9 +24,7 @@
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
 			</el-table-column>
-			<el-table-column prop="p_id" label="项目ID" width="100" v-if="visible">
-			</el-table-column>
-			</el-table-column>
+			<el-table-column prop="p_id" label="项目ID" width="100" v-if="visible"></el-table-column>
 			<el-table-column prop="p_name" label="项目名称" width="120" sortable>
 			</el-table-column>
 			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" sortable>

@@ -168,7 +168,33 @@
 									</el-table>
 
 							</el-tab-pane>
-							<el-tab-pane label="Headers" name="headers">Headers</el-tab-pane>
+							<el-tab-pane label="Headers" name="headers">
+								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
+										<el-table-column prop="key" label="Key">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.key}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="value" label="Value">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.value}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.DESCRIPTION}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column label="操作" :render-header="renderHeader" >
+											<template slot-scope="scope">
+												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+											</template>
+										</el-table-column>
+									</el-table>
+							</el-tab-pane>
 							<el-tab-pane label="Body" name="body">Body</el-tab-pane>
 						</el-tabs>
 					</el-col>
@@ -358,6 +384,7 @@
 			deleteRow(index, row) {
 				if(index !== 0) {
 					this.tableData.splice(index, 1);
+					this.addUrlParams(index, row);
 				};
 			},
 			baseUrlSet() {
@@ -365,27 +392,31 @@
 			},
 			// 输入框输入焦点
 			addUrlParams(index, row) {
-				let flag = 0;
+				let flag = 0; //key和value全填标记0全填1相反
 				let joinUrl = ''
 				// 初始化url
 				this.addCaseData.url = ''
 
+				// key和value全填才执行拼接
 				for (let i=0; i<this.tableData.length-1; i++) {
 					if (this.tableData[i].key ==='' && this.tableData[i].value ==='') {
 						flag = 1
 						break
 					};
 				};
-
+				// 拼接
 				if (flag === 0) {
-					for (let i=0; i<this.tableData.length-1; i++) {
-						if (this.addCaseData.urlIndex === 0) {
-							joinUrl = '?' + this.tableData[i].key + '=' + this.tableData[i].value
-						} else {
-							joinUrl = joinUrl + '&' + this.tableData[i].key + '=' + this.tableData[i].value
+					for (let j=0; j<this.tableData.length; j++) {
+						if (this.tableData[j].key !=='' && this.tableData[j].value !=='') {
+							if (this.addCaseData.urlIndex === 0) {
+								joinUrl = '?' + this.tableData[j].key + '=' + this.tableData[j].value
+								this.addCaseData.urlIndex = 1
+							} else {
+								joinUrl = joinUrl + '&' + this.tableData[j].key + '=' + this.tableData[j].value
+							}
 						}
-						this.addCaseData.urlIndex = i
 					}
+					
 				};
 				this.addCaseData.urlIndex = 0
 				this.addCaseData.url = this.addCaseData.baseUrl + joinUrl
