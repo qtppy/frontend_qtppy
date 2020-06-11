@@ -21,14 +21,14 @@
 		<!--列表-->
 		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="selection" width="55"></el-table-column>
-			<el-table-column type="index" width="70" label="序号"></el-table-column>
+			<el-table-column type="index" width="100" label="序号" sortable></el-table-column>
 			<el-table-column prop="caseId" label="用例ID" width="120" v-if="visible"></el-table-column>
-			<el-table-column prop="name" label="用例名称" width="120" sortable></el-table-column>
-			<el-table-column prop="desc" label="用例描述" width="120"></el-table-column>
-			<el-table-column prop="sex" label="性别" width="100" :formatter="formatSex" sortable></el-table-column>
-			<el-table-column prop="age" label="年龄" width="100" sortable></el-table-column>
-			<el-table-column prop="birth" label="生日" width="120" sortable></el-table-column>
-			<el-table-column prop="addr" label="地址" min-width="180" sortable></el-table-column>
+			<el-table-column prop="name" label="名称" width="120" sortable></el-table-column>
+			<el-table-column prop="url" label="地址" width="120"></el-table-column>
+			<el-table-column prop="method" label="方法" width="100" :formatter="formatSex"></el-table-column>
+			<el-table-column prop="desc" label="描述" width="200" ></el-table-column>
+			<el-table-column prop="createtime" label="创建时间" width="100" ></el-table-column>
+			<el-table-column prop="creator" label="创建者" min-width="100"></el-table-column>
 			<el-table-column label="操作" width="150" :render-header="renderHeader">
 				<template scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
