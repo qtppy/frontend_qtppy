@@ -43,8 +43,15 @@ export const getSuiteByID = params => { return axios.post(`/api/project/suite/ge
 // 修改测试集
 export const updateSuiteInfo = params => { return axios.post(`/api/project/suite/update`, params); };
 
+// 获取测试用例
+export const getCaseList = params => { return axios.post(`/api/case/getcaselist`, params); };
+
+
 // qtppy登录
 export const reqLogin = params => { return axios.post(`/api/auth/login`, params).then(res => res.data); };
 
 // 注册
 export const registerUser = params => { return axios.post(`/api/auth/register`, params); };
+
+// 登出
+export const logout = params => { return axios.post('/api/auth/logout'); }; 

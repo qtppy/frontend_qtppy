@@ -72,6 +72,7 @@
 </template>
 
 <script>
+	import { logout } from '@/api/api'
 	export default {
 		data() {
 			return {
@@ -109,6 +110,7 @@
 				this.$confirm('确认退出吗?', '提示', {
 					//type: 'warning'
 				}).then(() => {
+					logout();
 					sessionStorage.removeItem('user');
 					_this.$router.push('/login');
 				}).catch(() => {

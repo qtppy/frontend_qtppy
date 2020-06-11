@@ -13,21 +13,21 @@
 					<el-button type="primary" icon="el-icon-search" size="mini" v-on:click="getUsers">查询</el-button>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAdd">新增</el-button>
+					<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAddCaseDialog">新增</el-button>
 				</el-form-item>
 			</el-form>
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="casesData" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="selection" width="55"></el-table-column>
 			<el-table-column type="index" width="100" label="序号" sortable></el-table-column>
-			<el-table-column prop="caseId" label="用例ID" width="120" v-if="visible"></el-table-column>
+			<el-table-column prop="id" label="用例ID" width="120" v-if="visible"></el-table-column>
 			<el-table-column prop="name" label="名称" width="120" sortable></el-table-column>
 			<el-table-column prop="url" label="地址" width="120"></el-table-column>
-			<el-table-column prop="method" label="方法" width="100" :formatter="formatSex"></el-table-column>
+			<el-table-column prop="method" label="方法" width="100"></el-table-column>
 			<el-table-column prop="desc" label="描述" width="200" ></el-table-column>
-			<el-table-column prop="createtime" label="创建时间" width="100" ></el-table-column>
+			<el-table-column prop="createtime" label="创建时间" width="100" :formatter="formatDateDMT"></el-table-column>
 			<el-table-column prop="creator" label="创建者" min-width="100"></el-table-column>
 			<el-table-column label="操作" width="150" :render-header="renderHeader">
 				<template scope="scope">
@@ -40,7 +40,7 @@
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
 			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="float:right;">
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="per_page" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -72,34 +72,7 @@
 			</div>
 		</el-dialog>
 
-		<!--新增界面-->
-		<el-dialog title="新增" v-model="addFormVisible" :close-on-click-modal="false">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-				<el-form-item label="性别">
-					<el-radio-group v-model="addForm.sex">
-						<el-radio class="radio" :label="1">男</el-radio>
-						<el-radio class="radio" :label="0">女</el-radio>
-					</el-radio-group>
-				</el-form-item>
-				<el-form-item label="年龄">
-					<el-input-number v-model="addForm.age" :min="0" :max="200"></el-input-number>
-				</el-form-item>
-				<el-form-item label="生日">
-					<el-date-picker type="date" placeholder="选择日期" v-model="addForm.birth"></el-date-picker>
-				</el-form-item>
-				<el-form-item label="地址">
-					<el-input type="textarea" v-model="addForm.addr"></el-input>
-				</el-form-item>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addFormVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
-			</div>
-		</el-dialog>
-		<!-- 新增测试用例 -->
+		<!-- 新增测试用例界面 -->
 		<el-dialog title="新增测试用例" fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false" :size="addCaseSize">
 			<el-form :model="addCaseData" label-width="3px" :rules="addFormRules" ref="addSuiteData">
 				<el-row>
@@ -195,7 +168,7 @@
 	import util from '@/common/js/util'
 
 	//import NProgress from 'nprogress'
-	import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '@/api/api';
+	import { getCaseList, removeUser, batchRemoveUser, editUser, addUser } from '@/api/api';
 
 	export default {
 		data() {
@@ -203,9 +176,10 @@
 				filters: {
 					name: ''
 				},
-				users: [],
+				casesData: [],
 				total: 0,
 				page: 1,
+				per_page: 10,
 				listLoading: false,
 				sels: [],//列表选中列
 
@@ -226,25 +200,11 @@
 					addr: ''
 				},
 
-				addFormVisible: false,//新增界面是否显示
-				addLoading: false,
-				addFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					]
-				},
-				//新增界面数据
-				addForm: {
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
-				},
 				// 新增测试用例
 				addCaseLoading: false,
 				addCaseVisible: false,
 				addCaseSize: 'small',
+
 				// 新增测试用例数据
 				addCaseData: {
 					method: '',
@@ -328,7 +288,6 @@
 				],
 				mechodSelectValue: '',
 				debugRequestLoading: false,
-
 			}
 		},
 		methods: {
@@ -467,28 +426,43 @@
 				this.addCaseData.urlIndex = 0
 				this.addCaseData.url = this.addCaseData.baseUrl + joinUrl
 			},
-			//性别显示转换
-			formatSex: function (row, column) {
-				return row.sex == 1 ? '男' : row.sex == 0 ? '女' : '未知';
+			/**
+			日期类型转换
+			@param {*} row table当前行数据
+			@param {*} column table当前列数据
+			 */
+			formatDateDMT: function (row, column) {
+				return util.formatDate.format(new Date(row.createtime), 'yyyy-MM-dd hh:mm:ss')
 			},
+			/**
+			 * 翻页功能
+			 * @param {*} val 当前页码value
+			 * @returns null
+			*/
 			handleCurrentChange(val) {
 				this.page = val;
-				this.getUsers();
+				this.getCase();
 			},
-			//获取用户列表
-			getUsers() {
+			/** 
+			 * 获取测试用例列表
+			 * @param {*} 
+			 * @returns
+			 */
+			getCase() {
 				let para = {
 					page: this.page,
 					name: this.filters.name
 				};
-				// this.listLoading = true;
-				//NProgress.start();
-				// getUserListPage(para).then((res) => {
-				// 	this.total = res.data.total;
-				// 	this.users = res.data.users;
-				// 	this.listLoading = false;
-				// 	//NProgress.done();
-				// });
+				this.listLoading = true;
+				// NProgress.start();
+				getCaseList(para).then((res) => {
+					this.total = res.data.res.total;
+					this.per_page = res.data.res.per_page;
+					this.casesData = res.data.res.case;
+					this.listLoading = false;
+					console.log(this.casesData);
+					//NProgress.done();
+				});
 			},
 			//删除
 			handleDel: function (index, row) {
@@ -602,7 +576,7 @@
 			}
 		},
 		mounted() {
-			this.getUsers();
+			this.getCase();
 		}
 	}
 

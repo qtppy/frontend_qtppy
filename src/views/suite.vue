@@ -48,7 +48,6 @@
 			</el-table-column>
 			<el-table-column prop="p_id" label="场景ID" width="100" v-if="visible">
 			</el-table-column>
-			</el-table-column>
 			<el-table-column prop="p_name" label="场景名称" width="120" >
 			</el-table-column>
 			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" >
