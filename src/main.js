@@ -12,14 +12,16 @@ import Vuex from 'vuex'
 import routes from './routes'
 // import http from './api/http.js'
 import axios from 'axios'
-Vue.prototype.$axios = axios
-
-Vue.config.productionTip = false
-
 
 // import Mock from './mock'
 // Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
+
+
+
+Vue.prototype.$axios = axios
+
+Vue.config.productionTip = false
 
 Vue.use(ElementUI)
 Vue.use(VueRouter)
@@ -57,4 +59,3 @@ new Vue({
   //components: { App }
   render: h => h(App)
 }).$mount('#app')
-

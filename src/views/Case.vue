@@ -29,7 +29,7 @@
 			<el-table-column prop="desc" label="描述" width="200" ></el-table-column>
 			<el-table-column prop="createtime" label="创建时间" width="100" :formatter="formatDateDMT"></el-table-column>
 			<el-table-column prop="creator" label="创建者" min-width="100"></el-table-column>
-			<el-table-column label="操作" width="150" :render-header="renderHeader">
+			<el-table-column label="操作" width="150" :render-header="renderHeaderCaseList">
 				<template scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -97,16 +97,27 @@
 						<el-tabs v-model="activeName" @tab-click="handleClick" :size="Paramsize">
 							<!-- Params参数 -->
 							<el-tab-pane label="Params" name="first">
-								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
+								<el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="keyValueBthShow" @click="swapParamEditButton">Key-Value Edit</el-button>
+								<!-- 文本域展示 -->
+								<el-input
+									type="textarea"
+									:placeholder="placeholderReq"
+									v-model="paramsReqTextArea"
+									v-show="isParamTextAreaShow" 
+									:autosize="paramsTextAreaLimt"
+                  @change="paramTextAreaUrlJion">
+								</el-input>
+								<!-- Params参数table展示 -->
+								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isParamTableShow">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
@@ -116,25 +127,33 @@
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeader" >
+										<el-table-column label="操作" :render-header="renderHeaderCaseNew" >
 											<template slot-scope="scope">
 												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 									</el-table>
-
+								<el-link type="primary" :underline="false" disabled>Response</el-link>
+								<el-input
+									type="textarea"
+									:placeholder="placeholderRes"
+									v-model="paramsResTextArea"
+									v-show="true" 
+									:autosize="paramsTextAreaLimt"
+									disabled>
+								</el-input>
 							</el-tab-pane>
 							<el-tab-pane label="Headers" name="headers">
 								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
@@ -144,7 +163,7 @@
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeader" >
+										<el-table-column label="操作" :render-header="renderHeaderCaseNew">
 											<template slot-scope="scope">
 												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
 											</template>
@@ -168,7 +187,7 @@
 	import util from '@/common/js/util'
 
 	//import NProgress from 'nprogress'
-	import { getCaseList, deleteCase, batchRemoveUser, editUser, addUser } from '@/api/api';
+	import { getCaseList, deleteCase, batchRemoveUser, editUser, createCase } from '@/api/api';
 
 	export default {
 		data() {
@@ -214,7 +233,17 @@
 
 				},
 				// table data
-				Paramsize: "mini",
+				isParamTableShow: true, // Param显示table
+				isParamTextAreaShow: false, // Param显示textarea
+				isParamEditButtonShow: true,
+				isParamBulkEditButtonShow: false,
+				paramsReqTextArea : '', // param bulk edit内容 request
+				paramsResTextArea : '', // param bulk edit内容 response
+				paramsTextAreaLimt: { minRows: 7, maxRows: 8}, // param文本域限制
+				placeholderReq: "Rows are separated by new lines\nkeys and values are separated by :\nPrepend // to any row you want to add but keep disabled",
+				placeholderRes: "Hit Send to get a response",
+				keyValueBthShow: false,
+				Paramsize: "mini", // Params控年的size
 				tableData: [
 					{
 						key: '',
@@ -297,7 +326,7 @@
 			 * @param {*} params 表头参数
 			 * @returns div html
 			 */
- 			renderHeader(h, params) {
+ 			renderHeaderCaseList(h, params) {
                 let a =  [
 					h('el-button-group',[
 						// 文字提示
@@ -377,6 +406,57 @@
 			},
 
 			/**
+			 * 用例列表，增加用例Params选项卡按钮
+			 * @param {*} h 表头对象
+			 * @param {*} params 表头参数
+			 * @returns div html
+			 */
+ 			renderHeaderCaseNew(h, params) {
+                let a =  [
+					h('el-button-group',[
+						// 文字提示
+						h('el-tooltip',{
+							props: {
+								disabled: false,
+								content: "批量编辑",
+								placement: "bottom",
+								effect: "light"
+							},
+						},
+						[
+							// 批量编辑
+							h('el-button', {
+								props: {
+									size: "mini",
+									type: "primary",
+									icon: "el-icon-s-flag"
+								},
+								on: {
+									click: () => {
+										this.isParamTextAreaShow = true;
+										this.isParamTableShow = false;
+                    this.keyValueBthShow = true;
+                    this.resetValParamTextArea();
+									}
+								}
+							}, "Bulk Edit")
+						]),
+					])
+				]
+                return h('div', a);
+			},
+			/**
+			 * Params Bulk Edit 与 Key-Value Edit切换
+       * @param {*} null
+       * @returns null
+			 */
+			swapParamEditButton() {
+				this.isParamTextAreaShow = false;
+				this.isParamTableShow = true;
+				this.keyValueBthShow = false;
+			},
+
+			/**
 			 * 显示增加case
 			 * @param {*} null
 			 * @returns null
@@ -409,9 +489,23 @@
 			deleteRow(index, row) {
 				if(index !== 0) {
 					this.tableData.splice(index, 1);
-					this.addUrlParams(index, row);
+          this.addUrlParams();
 				};
-			},
+      },
+      
+      /**
+       * 重新给Param文本域赋值
+       */
+      resetValParamTextArea() {
+        let dt = this.tableData;
+        let txt = ''
+        for (let i=0; i<dt.length; i++) {
+          if (dt[i].key !== '' || dt[i].value !== '') {
+            txt = txt + dt[i].key + ':' + dt[i].value + '\n'
+          }
+        };
+        this.paramsReqTextArea = txt;
+      },
 
 			/**
 			 * 新增用例基础url赋值
@@ -420,14 +514,41 @@
 			 */
 			baseUrlSet() {
 				this.addCaseData.baseUrl = this.addCaseData.url;
-			},
+      },
+      
+      /**
+       * ParamTextarea  url拼接
+       * @param {*} null
+       * @returns null
+       */
+      paramTextAreaUrlJion() {
+        let dt = this.paramsReqTextArea.split('\n');
+
+        this.tableData = []
+        for (let i=0; i<dt.length; i++) {
+          let keyVal = dt[i].split(':');
+          this.tableData.push({
+            key: keyVal[0],
+            value: keyVal[1],
+            DESCRIPTION: '',
+            edit: true
+          });
+        };
+        this.tableData.push({
+          key: '',
+          value: '',
+          DESCRIPTION: '',
+          edit: true
+        });
+        this.addUrlParams();
+      },
 
 			/**
 			 * Params新增测试用例，获取焦点时自动新增一空白行
 			 * @param {*} index table当前行索引
 			 * @param {*} row table当前行对象方便取值
 			 */
-			addUrlParams(index, row) {
+			addUrlParams() {
 				let flag = 0; //key和value全填标记0全填1相反
 				let joinUrl = ''
 				// 初始化url
