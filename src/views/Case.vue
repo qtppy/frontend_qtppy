@@ -87,16 +87,16 @@
 									:value="item.value">
 									</el-option>
 								</el-select>
-								<el-button slot="append" icon="el-icon-share" :loading="debugRequestLoading">调试</el-button>
+								<el-button slot="append" icon="el-icon-share" :loading="debugRequestLoading" @click="sendRequest">调试</el-button>
 							</el-input>
 						</el-form-item>
 					</el-col>
 				</el-row>
 				<el-row>
 					<el-col span="24">
-						<el-tabs v-model="activeName" @tab-click="handleClick" :size="Paramsize">
+						<el-tabs v-model="activeName" @tab-click="handleCaseTabClick" :size="Paramsize">
 							<!-- Params参数 -->
-							<el-tab-pane label="Params" name="first">
+							<el-tab-pane label="Params" name="params">
 								<el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="keyValueBthShow" @click="swapParamEditButton">Key-Value Edit</el-button>
 								<!-- 文本域展示 -->
 								<el-input
@@ -105,25 +105,25 @@
 									v-model="paramsReqTextArea"
 									v-show="isParamTextAreaShow" 
 									:autosize="paramsTextAreaLimt"
-                  @change="paramTextAreaUrlJion">
+                  @change="setCaseRequestData(tableData, paramsReqTextArea, 0)">
 								</el-input>
 								<!-- Params参数table展示 -->
 								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isParamTableShow">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(0, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(0, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(0, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
@@ -133,44 +133,57 @@
 											</template>
 										</el-table-column>
 									</el-table>
-								<el-link type="primary" :underline="false" disabled>Response</el-link>
+							</el-tab-pane>
+              <!-- Header table展示 -->
+							<el-tab-pane label="Headers" name="headers">
+                <el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="isHeaderTextAreaButton" @click="sawpHeaderEditButton">Key-Value Edit</el-button>
+                <!-- 文本域展示 -->
 								<el-input
 									type="textarea"
-									:placeholder="placeholderRes"
-									v-model="paramsResTextArea"
-									v-show="true" 
+									:placeholder="placeholderReq"
+									v-model="headerTextArea"
+									v-show="isHeaderTextAreaShow" 
 									:autosize="paramsTextAreaLimt"
-									disabled>
+                  @change="setCaseRequestData(headerTableData, headerTextArea, 1)">
 								</el-input>
-							</el-tab-pane>
-							<el-tab-pane label="Headers" name="headers">
-								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
+								<el-table :data="headerTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isHeaderTabShowTable">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(1, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(1, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(1, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeaderCaseNew">
+										<el-table-column label="操作" :render-header="renderHeaderCaseHeader">
 											<template slot-scope="scope">
 												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
-									</el-table>
+								</el-table>
 							</el-tab-pane>
 							<el-tab-pane label="Body" name="body">Body</el-tab-pane>
+              <el-link type="primary" :underline="false" disabled v-show="ressponseShow">Response</el-link>
+              <el-input
+                type="textarea"
+                :placeholder="placeholderRes"
+                v-model="paramsResTextArea"
+                v-show="ressponseShow" 
+                :autosize="paramsTextAreaLimt"
+                disabled>
+              </el-input>
+              <el-tab-pane label="出参" name="output">output</el-tab-pane>
+              <el-tab-pane label="断言" name="assert">Assert</el-tab-pane>
 						</el-tabs>
 					</el-col>
 				</el-row>
@@ -192,6 +205,16 @@
 	export default {
 		data() {
 			return {
+        /**
+         * 用例列表
+         * @var filters: 用例列表筛选
+         * @var casesData: 存储列表数据
+         * @var total: 用例列表总条数
+         * @var page: 用例列表当前默认页
+         * @var per_page: 用例列表分页条数，后端传值
+         * @var listLoading: 用例列表加载时状态
+         * @var sels: 用例列表筛选数据存储
+         */
 				filters: {
 					name: ''
 				},
@@ -202,7 +225,10 @@
 				listLoading: false,
 				sels: [],//列表选中列
 
-				editFormVisible: false,//编辑界面是否显示
+        /**
+         * 编辑界面
+         */
+				editFormVisible: false,
 				editLoading: false,
 				editFormRules: {
 					name: [
@@ -219,31 +245,62 @@
 					addr: ''
 				},
 
-				// 新增测试用例
+        /**
+         * 新增测试用例界面配置
+         * @var addCaseLoading: 提交新增时按钮显示loading状态
+         * @var addCaseVisible: 新增用例胃里面dialog显示控制
+         * @var addCaseSize: 增加界面控件显示size控制
+         */
 				addCaseLoading: false,
 				addCaseVisible: false,
 				addCaseSize: 'small',
 
-				// 新增测试用例数据
+        /**
+         * 新增测试用例数据
+         * @var method: POST OR GET ...
+         * @var url: 请求url
+         * @var urlIndex: url初始化索引，第一拼接为0
+         * @var baseURl: 存储初始化url
+         * @var header: 请求头信息
+         */
 				addCaseData: {
 					method: '',
 					url: '',
 					urlIndex: 0,
-					baseUrl: '',
+          baseUrl: '',
+          header: '',
 
 				},
-				// table data
-				isParamTableShow: true, // Param显示table
-				isParamTextAreaShow: false, // Param显示textarea
+        /**
+         * 新增界面table的一些配置
+         * @var isParamTableShow: Param显示table
+         * @var isParamTextAreaShow: Param显示textarea
+         * @var isParamEditButtonShow: key-value模式下edit按钮显示
+         * @var isParamBulkEditButtonShow: 表格模式下BulkEdit按钮显示
+         * @var paramsReqTextArea: ParamsReqTextArea文本域内容
+         * @var paramsResTextArea: Resonpon内容
+         * @var paramsTextAreaLimt: 文本域大小限制
+         * @var placeholderReq: 文本域模式下默认展示内容
+         * @var placeholderRes: 文本域模式下Resonpon默认展示内容
+         * @var keyValueBthShow: key-value按钮显示控制
+         * @var Paramsize: Params控年的size
+         * @var tableData: Params内容
+         * @var ressponseShow: 响应textarea和lable
+         * @var caseTabindex: tab点击状态
+         */
+				isParamTableShow: true,
+				isParamTextAreaShow: false,
 				isParamEditButtonShow: true,
 				isParamBulkEditButtonShow: false,
-				paramsReqTextArea : '', // param bulk edit内容 request
-				paramsResTextArea : '', // param bulk edit内容 response
-				paramsTextAreaLimt: { minRows: 7, maxRows: 8}, // param文本域限制
+        paramsReqTextArea : '',
+        ressponseShow: true,
+        caseTabindex: 1,
+				paramsResTextArea : '',
+				paramsTextAreaLimt: { minRows: 7, maxRows: 8},
 				placeholderReq: "Rows are separated by new lines\nkeys and values are separated by :\nPrepend // to any row you want to add but keep disabled",
 				placeholderRes: "Hit Send to get a response",
 				keyValueBthShow: false,
-				Paramsize: "mini", // Params控年的size
+				Paramsize: "mini",
 				tableData: [
 					{
 						key: '',
@@ -251,8 +308,34 @@
 						DESCRIPTION: '',
 						edit: true,
 					},
-				],
-				// method选项
+        ],
+
+        /**
+         * 新增用例Header Tab数据存储
+         * @var headerTableData
+         * @var headerTextArea 请求头文本域内容存储
+         * @var isHeaderTextAreaShow 文本域是否显示
+         * @var isHeaderTabShowTable 请求header tab头table显示
+         */
+        isHeaderTextAreaButton: false,
+        isHeaderTabShowTable: true,
+        isHeaderTextAreaShow: false,
+        headerTextArea: '',
+        headerTableData: [
+          {
+            key: '',
+            value: '',
+            DESCRIPTION: '',
+            edit: true,
+          }
+        ],
+
+        /**
+         * method选项内容
+         * @var methodOptions: method列表内容
+         * @var mechodSelectValue: 列表默认值
+         * @var debugRequestLoading：点调试按钮加载状态
+         */
 				methodOptions: [
 					{
 						value: 0,
@@ -320,6 +403,13 @@
 			}
 		},
 		methods: {
+      /**
+       * 新增测试用例;调试功能
+       */
+      sendRequest() {
+        this.addCaseData.header = this.headerTableData;
+        console.log(this.addCaseData)
+      },
 			/**
 			 * 用例列表，表头操作栏按钮
 			 * @param {*} h 表头对象
@@ -433,18 +523,68 @@
 								},
 								on: {
 									click: () => {
-										this.isParamTextAreaShow = true;
-										this.isParamTableShow = false;
+                    this.isParamTextAreaShow = true;
+                    this.isParamTableShow = false;
                     this.keyValueBthShow = true;
-                    this.resetValParamTextArea();
+                    this.resetValParamTextArea(this.tableData, 0);
 									}
 								}
 							}, "Bulk Edit")
 						]),
 					])
 				]
-                return h('div', a);
-			},
+        return h('div', a);
+      },
+			/**
+			 * 用例列表，增加用例Params选项卡按钮
+			 * @param {*} h 表头对象
+			 * @param {*} params 表头参数
+			 * @returns div html
+			 */
+ 			renderHeaderCaseHeader(h, params) {
+                let a =  [
+					h('el-button-group',[
+						// 文字提示
+						h('el-tooltip',{
+							props: {
+								disabled: false,
+								content: "批量编辑",
+								placement: "bottom",
+								effect: "light"
+							},
+						},
+						[
+							// 批量编辑
+							h('el-button', {
+								props: {
+									size: "mini",
+									type: "primary",
+									icon: "el-icon-s-flag"
+								},
+								on: {
+									click: () => {
+                    this.isHeaderTextAreaShow = true;
+                    this.isHeaderTabShowTable = false;
+                    this.isHeaderTextAreaButton = true;
+                    this.resetValParamTextArea(this.headerTableData, 1);
+									}
+								}
+							}, "Bulk Edit")
+						]),
+					])
+				]
+        return h('div', a);
+      },
+      /**
+       * 新增用例tab切换
+       */
+      handleCaseTabClick(tab, event) {
+        if (tab.name === "assert" || tab.name === "output") {
+          this.ressponseShow = false;
+        }else{
+          this.ressponseShow = true;
+        };
+      },
 			/**
 			 * Params Bulk Edit 与 Key-Value Edit切换
        * @param {*} null
@@ -454,7 +594,18 @@
 				this.isParamTextAreaShow = false;
 				this.isParamTableShow = true;
 				this.keyValueBthShow = false;
-			},
+      },
+
+			/**
+			 * Header Bulk Edit 与 Key-Value Edit切换
+       * @param {*} null
+       * @returns null
+			 */
+      sawpHeaderEditButton() {
+        this.isHeaderTextAreaShow = false;
+        this.isHeaderTabShowTable = true;
+        this.isHeaderTextAreaButton = false;
+      },
 
 			/**
 			 * 显示增加case
@@ -469,16 +620,31 @@
 			 * Params选项卡增加新行
 			 * @param {*} index 操作行索引
 			 * @param {*} row 操作行对象
+       * @param {*} tabIndex
+       * 0: params
+       * 1: header
+       * 2: body
 			 */
-			addNewRow(index, row) {
-				if(index == this.tableData.length - 1) {
-					this.tableData.push({
-						key: '',
-						value: '',
-						DESCRIPTION: '',
-						edit: true,					
-					});
-				};
+			addNewRow(tabIndex, index, row) {
+        if(tabIndex === 0) {
+          if(index ==this.tableData.length - 1) {
+            this.tableData.push({
+              key: '',
+              value: '',
+              DESCRIPTION: '',
+              edit: true,					
+            });
+          };
+        } else if(tabIndex === 1) {
+          if(index ==this.headerTableData.length - 1) {
+            this.headerTableData.push({
+              key: '',
+              value: '',
+              DESCRIPTION: '',
+              edit: true,					
+            });
+          };
+        };
 			},
 
 			/**
@@ -495,16 +661,24 @@
       
       /**
        * 重新给Param文本域赋值
+       * @param dt 存储table数据变量this.tableData
+       * @param index 
+       * @var index 0:this.tabledata
+       * @var index 1:this.headerTableData
        */
-      resetValParamTextArea() {
-        let dt = this.tableData;
+      resetValParamTextArea(dt, index) {
         let txt = ''
         for (let i=0; i<dt.length; i++) {
           if (dt[i].key !== '' || dt[i].value !== '') {
             txt = txt + dt[i].key + ':' + dt[i].value + '\n'
           }
         };
-        this.paramsReqTextArea = txt;
+        if(index === 0) {
+          this.paramsReqTextArea = txt;
+        }else if(index === 1) {
+          this.headerTextArea = txt;
+        };
+        
       },
 
 			/**
@@ -513,34 +687,43 @@
 			 * @returns null
 			 */
 			baseUrlSet() {
-				this.addCaseData.baseUrl = this.addCaseData.url;
+        this.addCaseData.baseUrl = this.addCaseData.url;
       },
       
       /**
        * ParamTextarea  url拼接
-       * @param {*} null
+       * @param {*} tableObj params  header数据存储变量this.tabledata
+       * @param {*} index 0:this.tabledata; 1:this.header
        * @returns null
        */
-      paramTextAreaUrlJion() {
-        let dt = this.paramsReqTextArea.split('\n');
+      setCaseRequestData(tableObj, textarea, index) {
+        let dt = textarea.split('\n');
 
-        this.tableData = []
+        tableObj = []
         for (let i=0; i<dt.length; i++) {
           let keyVal = dt[i].split(':');
-          this.tableData.push({
-            key: keyVal[0],
-            value: keyVal[1],
-            DESCRIPTION: '',
-            edit: true
-          });
+          // keyVal长度大于1，才是有效值
+          if ( keyVal.length > 1) {
+            tableObj.push({
+              key: keyVal[0],
+              value: keyVal[1],
+              DESCRIPTION: '',
+              edit: true
+            });
+          };
         };
-        this.tableData.push({
+        tableObj.push({
           key: '',
           value: '',
           DESCRIPTION: '',
           edit: true
         });
-        this.addUrlParams();
+        if (index === 0) {
+          this.tableData = tableObj;
+          this.addUrlParams();
+        }else if(index === 1) {
+          this.headerTableData = tableObj;
+        };
       },
 
 			/**
