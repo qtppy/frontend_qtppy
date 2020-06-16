@@ -36,7 +36,7 @@
 			<el-table-column prop="p_desc" label="描述" min-width="180" sortable>
 			</el-table-column>
 			<el-table-column label="操作" width="150">
-				<template scope="scope">
+				<template slot-scope="scope">
 					<el-tooltip content="编辑" placement="bottom" effect="light">
 						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
 					</el-tooltip>

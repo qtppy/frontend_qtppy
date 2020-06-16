@@ -30,7 +30,7 @@
 			<el-table-column prop="createtime" label="创建时间" width="100" :formatter="formatDateDMT"></el-table-column>
 			<el-table-column prop="creator" label="创建者" min-width="100"></el-table-column>
 			<el-table-column label="操作" width="150" :render-header="renderHeaderCaseList">
-				<template scope="scope">
+				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
@@ -172,7 +172,43 @@
 										</el-table-column>
 								</el-table>
 							</el-tab-pane>
-							<el-tab-pane label="Body" name="body">Body</el-tab-pane>
+              <!-- Body tab -->
+							<el-tab-pane label="Body" name="body">
+                <el-row>
+                  <el-radio-group v-model="bodyRadio" size="mini" @change="bodyRadioChange">
+                    <el-radio :label="1">none</el-radio>
+                    <el-radio :label="2">form-data</el-radio>
+                    <el-radio :label="3">x-www-form-urlencoded</el-radio>
+                    <el-radio :label="4">raw</el-radio>
+                  </el-radio-group>
+                  <el-divider content-position="left"></el-divider>
+                </el-row>
+								<el-table :data="headerTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="bodyNoneLableVisable">
+										<el-table-column prop="key" label="Key">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(1, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.key}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="value" label="Value">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(1, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.value}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(1, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.DESCRIPTION}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column label="操作" :render-header="renderHeaderCaseHeader">
+											<template slot-scope="scope">
+												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+											</template>
+										</el-table-column>
+								</el-table>
+              </el-tab-pane>
               <el-link type="primary" :underline="false" disabled v-show="ressponseShow">Response</el-link>
               <el-input
                 type="textarea"
@@ -269,6 +305,7 @@
 					urlIndex: 0,
           baseUrl: '',
           header: '',
+          body: '',
 
 				},
         /**
@@ -329,7 +366,13 @@
             edit: true,
           }
         ],
-
+        /**
+         * Body
+         * @var bodyRadio el-radio-group v-model
+         * @var bodyNoneLable body none radio
+         */
+        bodyRadio: 1,
+        bodyNoneLableVisable: false,
         /**
          * method选项内容
          * @var methodOptions: method列表内容
@@ -404,12 +447,48 @@
 		},
 		methods: {
       /**
+       * body radio @change
+       * @var bodyNoneLableVisable 控制none内容显示
+       */
+      bodyRadioChange(label) {
+        if (label === 1) {
+          this.bodyNoneLableVisable = false;
+        }else{
+          this.bodyNoneLableVisable = true;
+        };
+        
+      },
+
+      /**
        * 新增测试用例;调试功能
        */
       sendRequest() {
-        this.addCaseData.header = this.headerTableData;
+        this.initRequestData();
         console.log(this.addCaseData)
       },
+      /**
+       * 整理请求头
+       * @description 请求Params数据无需整，已初始化到url中
+       */
+      initRequestData() {
+        // 请求头数据
+        let headerArr = this.headerTableData;
+        let headerMap = {};
+        for (let i=0; i<headerArr.length; i++) {
+          if (headerArr[i].key!=='') {
+            headerMap[headerArr[i].key] = headerArr[i].value;
+          };
+        };
+        this.addCaseData.header = headerMap;
+
+        // method数据
+        let obj = {};
+        obj = this.methodOptions.find((item) => {
+          return item.value === this.mechodSelectValue;
+        })
+        this.addCaseData.method = obj.label;
+      },
+
 			/**
 			 * 用例列表，表头操作栏按钮
 			 * @param {*} h 表头对象
