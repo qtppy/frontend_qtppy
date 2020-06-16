@@ -129,7 +129,7 @@
 										</el-table-column>
 										<el-table-column label="操作" :render-header="renderHeaderCaseNew" >
 											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(1, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 									</el-table>
@@ -167,7 +167,7 @@
 										</el-table-column>
 										<el-table-column label="操作" :render-header="renderHeaderCaseHeader">
 											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(2, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
@@ -212,7 +212,7 @@
 										</el-table-column>
 										<el-table-column label="操作" :render-header="renderHeaderCaseBody">
 											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(3, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
@@ -226,7 +226,34 @@
                 :autosize="paramsTextAreaLimt"
                 disabled>
               </el-input>
-              <el-tab-pane label="出参" name="output">output</el-tab-pane>
+              <!-- 出参 -->
+              <el-tab-pane label="出参" name="output">
+								<el-table :data="bodyTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
+										<el-table-column prop="key" label="Key">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.key}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="value" label="Value">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.value}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(2, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.DESCRIPTION}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column label="操作">
+											<template slot-scope="scope">
+												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+											</template>
+										</el-table-column>
+								</el-table>
+              </el-tab-pane>
               <el-tab-pane label="断言" name="assert">Assert</el-tab-pane>
 						</el-tabs>
 					</el-col>
@@ -397,7 +424,39 @@
         bodyTextArea: '',
         isbodyTextAreaShow: false, 
         isBodyTabShowTable: false,
-
+        /**
+         * 出参
+         */
+        outputArgsData: [
+          {
+            name: '',
+            exp: '',
+            match: '',
+            source: [
+              {
+                value: 0,
+                label: 'Body: TEXT'
+              },
+              {
+                value: 1,
+                label: 'Body: JSON'
+              },
+              {
+                value: 2,
+                label: 'Header: K/V'
+              },
+              {
+                value: 3,
+                label: 'Cookie: K/V'
+              },
+              {
+                value: 4,
+                label: '响应状态码'
+              }
+            ],
+            edit: true
+          }
+        ],
         /**
          * method选项内容
          * @var methodOptions: method列表内容
@@ -843,10 +902,16 @@
 			 * @param {*} index  table当前索引
 			 * @param {*} row 操作行对象
 			 */
-			deleteRow(index, row) {
+			deleteRow(tableIndex, index, row) {
 				if(index !== 0) {
-					this.tableData.splice(index, 1);
-          this.addUrlParams();
+          if (tableIndex === 1) {
+            this.tableData.splice(index, 1);
+            this.addUrlParams();
+          } else if(tableIndex === 2) {
+            this.headerTableData.splice(index, 1);
+          } else if(tableIndex === 3) {
+            this.bodyTableData.splice(index, 1);
+          };
 				};
       },
       
