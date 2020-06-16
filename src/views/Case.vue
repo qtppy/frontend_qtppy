@@ -901,6 +901,10 @@
 			 * Params选项卡，table删除行
 			 * @param {*} index  table当前索引
 			 * @param {*} row 操作行对象
+       * @param {*} tableIndex 
+       * @var tableIndex 1:Params
+       * @var tableIndex 2:Header
+       * @var tableIndex 3:Body
 			 */
 			deleteRow(tableIndex, index, row) {
 				if(index !== 0) {
@@ -914,7 +918,7 @@
           };
 				};
       },
-      
+
       /**
        * 重新给Param文本域赋值
        * @param dt 存储table数据变量this.tableData
