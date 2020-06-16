@@ -478,10 +478,20 @@
        */
       bodyRadioChange(label) {
         if (label === 1) {
-          this.bodyTableData = '';
           this.isBodyTabShowTable = false;
+          this.isbodyTextAreaShow = false;
+          this.isbodyTextAreaButton = false;
+
+        } else if(label === 4){
+          this.isBodyTabShowTable = false;
+          this.isbodyTextAreaShow = true;
+          this.isbodyTextAreaButton = false;
+          this.placeholderReq = '';
+
         }else{
           this.isBodyTabShowTable = true;
+          this.isbodyTextAreaShow = false;
+          this.isbodyTextAreaButton = false;
         };
         
       },
@@ -516,15 +526,19 @@
         this.addCaseData.method = obj.label;
 
         // body数据
-        let bodyArr = this.bodyTableData;
-        let bodyMap = {};
-        for (let i=0; i<bodyArr.length; i++) {
-          if (bodyArr[i].key!=='') {
-            bodyMap[bodyArr[i].key] = bodyArr[i].value;
+        if (this.bodyRadio === 4) {
+          this.addCaseData.body.body = this.bodyTextArea;
+        }else {
+          let bodyArr = this.bodyTableData;
+          let bodyMap = {};
+          for (let i=0; i<bodyArr.length; i++) {
+            if (bodyArr[i].key!=='') {
+              bodyMap[bodyArr[i].key] = bodyArr[i].value;
+            };
           };
+          this.addCaseData.body.body = bodyMap;
         };
-        this.addCaseData.body.body = bodyMap;
-        this.addCaseData.body.how = this.bodyRadio;    
+        this.addCaseData.body.how = this.bodyRadio;
       },
 
 			/**
@@ -699,7 +713,7 @@
 			 * @returns div html
 			 */
  			renderHeaderCaseBody(h, params) {
-                let a =  [
+        let a =  [
 					h('el-button-group',[
 						// 文字提示
 						h('el-tooltip',{
