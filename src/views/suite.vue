@@ -709,6 +709,6 @@
 
 </script>
 
-<style scoped>
+<style scoped-slot>
 
 </style>

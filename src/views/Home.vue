@@ -140,7 +140,7 @@
 
 </script>
 
-<style scoped lang="scss">
+<style scoped-slot lang="scss">
 	@import '~scss_vars';
 	
 	.container {

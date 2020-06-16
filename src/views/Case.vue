@@ -174,35 +174,43 @@
 							</el-tab-pane>
               <!-- Body tab -->
 							<el-tab-pane label="Body" name="body">
-                <el-row>
-                  <el-radio-group v-model="bodyRadio" size="mini" @change="bodyRadioChange">
-                    <el-radio :label="1">none</el-radio>
-                    <el-radio :label="2">form-data</el-radio>
-                    <el-radio :label="3">x-www-form-urlencoded</el-radio>
-                    <el-radio :label="4">raw</el-radio>
-                  </el-radio-group>
-                  <el-divider content-position="left"></el-divider>
-                </el-row>
-								<el-table :data="headerTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="bodyNoneLableVisable">
+                <el-radio-group v-model="bodyRadio" size="mini" @change="bodyRadioChange">
+                  <el-radio :label="1">none</el-radio>
+                  <el-radio :label="2">form-data</el-radio>
+                  <el-radio :label="3">x-www-form-urlencoded</el-radio>
+                  <el-radio :label="4">raw</el-radio>
+                </el-radio-group>
+                <el-divider content-position="left"></el-divider>
+                <el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="isbodyTextAreaButton" @click="sawpBodyEditButton">Key-Value Edit</el-button>
+                <!-- 文本域展示 -->
+								<el-input
+									type="textarea"
+									:placeholder="placeholderReq"
+									v-model="bodyTextArea"
+									v-show="isbodyTextAreaShow" 
+									:autosize="paramsTextAreaLimt"
+                  @change="setCaseRequestData(bodyTableData, bodyTextArea, 2)">
+								</el-input>
+								<el-table :data="bodyTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isBodyTabShowTable">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(1, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(1, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(1, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(2, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeaderCaseHeader">
+										<el-table-column label="操作" :render-header="renderHeaderCaseBody">
 											<template slot-scope="scope">
 												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
 											</template>
@@ -305,7 +313,10 @@
 					urlIndex: 0,
           baseUrl: '',
           header: '',
-          body: '',
+          body: {
+            how: '',
+            body: ''
+          },
 
 				},
         /**
@@ -322,7 +333,7 @@
          * @var keyValueBthShow: key-value按钮显示控制
          * @var Paramsize: Params控年的size
          * @var tableData: Params内容
-         * @var ressponseShow: 响应textarea和lable
+         * @var ressponseShow: 响应textarea和label
          * @var caseTabindex: tab点击状态
          */
 				isParamTableShow: true,
@@ -369,10 +380,24 @@
         /**
          * Body
          * @var bodyRadio el-radio-group v-model
-         * @var bodyNoneLable body none radio
+         * @var bodyTableData 请求body数据
+         * @var bodyTextArea body文本域内容
+         * @var isbodyTextAreaShow body文本域显示
+         * @var isBodyTabShowTable table显示
          */
         bodyRadio: 1,
-        bodyNoneLableVisable: false,
+        bodyTableData: [
+          {
+          key: '',
+          value: '',
+          DESCRIPTION: '',
+          edit: true,
+          }
+        ],
+        bodyTextArea: '',
+        isbodyTextAreaShow: false, 
+        isBodyTabShowTable: false,
+
         /**
          * method选项内容
          * @var methodOptions: method列表内容
@@ -382,11 +407,11 @@
 				methodOptions: [
 					{
 						value: 0,
-						label: 'POST'
+						label: 'GET'
 					},
 					{
 						value: 1,
-						label: 'GET'
+						label: 'POST'
 					},
 					{
 						value: 2,
@@ -441,20 +466,22 @@
 						label: 'VIEW'
 					}
 				],
-				mechodSelectValue: '',
+				mechodSelectValue: 0,
 				debugRequestLoading: false,
 			}
 		},
 		methods: {
       /**
        * body radio @change
-       * @var bodyNoneLableVisable 控制none内容显示
+       * @var isBodyTabShowTable 控制none内容显示
+       * @var label redio自动传的选择value
        */
       bodyRadioChange(label) {
         if (label === 1) {
-          this.bodyNoneLableVisable = false;
+          this.bodyTableData = '';
+          this.isBodyTabShowTable = false;
         }else{
-          this.bodyNoneLableVisable = true;
+          this.isBodyTabShowTable = true;
         };
         
       },
@@ -487,6 +514,17 @@
           return item.value === this.mechodSelectValue;
         })
         this.addCaseData.method = obj.label;
+
+        // body数据
+        let bodyArr = this.bodyTableData;
+        let bodyMap = {};
+        for (let i=0; i<bodyArr.length; i++) {
+          if (bodyArr[i].key!=='') {
+            bodyMap[bodyArr[i].key] = bodyArr[i].value;
+          };
+        };
+        this.addCaseData.body.body = bodyMap;
+        this.addCaseData.body.how = this.bodyRadio;    
       },
 
 			/**
@@ -654,6 +692,46 @@
 				]
         return h('div', a);
       },
+			/**
+			 * 用例列表，增加用例Params选项卡按钮
+			 * @param {*} h 表头对象
+			 * @param {*} params 表头参数
+			 * @returns div html
+			 */
+ 			renderHeaderCaseBody(h, params) {
+                let a =  [
+					h('el-button-group',[
+						// 文字提示
+						h('el-tooltip',{
+							props: {
+								disabled: false,
+								content: "批量编辑",
+								placement: "bottom",
+								effect: "light"
+							},
+						},
+						[
+							// 批量编辑
+							h('el-button', {
+								props: {
+									size: "mini",
+									type: "primary",
+									icon: "el-icon-s-flag"
+								},
+								on: {
+									click: () => {
+                    this.isbodyTextAreaShow = true;
+                    this.isBodyTabShowTable = false;
+                    this.isbodyTextAreaButton = true;
+                    this.resetValParamTextArea(this.bodyTableData, 2);
+									}
+								}
+							}, "Bulk Edit")
+						]),
+					])
+				]
+        return h('div', a);
+      },
       /**
        * 新增用例tab切换
        */
@@ -684,6 +762,17 @@
         this.isHeaderTextAreaShow = false;
         this.isHeaderTabShowTable = true;
         this.isHeaderTextAreaButton = false;
+      },
+
+      /**
+       * body Bulk Edit 与 key-Value Edit切换
+       * @param {*} null
+       * @returns null
+       */
+      sawpBodyEditButton() {
+        this.isbodyTextAreaShow = false;
+        this.isbodyTextAreaButton = false;
+        this.isBodyTabShowTable = true;
       },
 
 			/**
@@ -723,6 +812,15 @@
               edit: true,					
             });
           };
+        } else if(tabIndex === 2) {
+          if(index ==this.bodyTableData.length - 1) {
+            this.bodyTableData.push({
+              key: '',
+              value: '',
+              DESCRIPTION: '',
+              edit: true,					
+            });
+          };         
         };
 			},
 
@@ -756,6 +854,8 @@
           this.paramsReqTextArea = txt;
         }else if(index === 1) {
           this.headerTextArea = txt;
+        }else if(index === 2) {
+          this.bodyTextArea = txt;
         };
         
       },
@@ -802,6 +902,8 @@
           this.addUrlParams();
         }else if(index === 1) {
           this.headerTableData = tableObj;
+        }else if(index === 2) {
+          this.bodyTableData = tableObj;
         };
       },
 
@@ -1005,6 +1107,6 @@
 
 </script>
 
-<style scoped>
+<style scoped-slot>
 
 </style>
