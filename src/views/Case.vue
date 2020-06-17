@@ -294,7 +294,7 @@
                         </el-select>
 											</template>
 										</el-table-column>
-										<el-table-column prop="checkCondition" label="断言">
+										<el-table-column prop="checkCondition" label="断言条件">
 											<template slot-scope="scope">
                         <el-select v-model="scope.row.checkCondition" size="mini" @change="outArgsSelectChange">
                           <el-option
