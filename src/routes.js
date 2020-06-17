@@ -2,9 +2,9 @@ import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
 import Main from './views/Main.vue'
-import Page4 from './views/nav2/Page4.vue'
-import Page5 from './views/nav2/Page5.vue'
-import Page6 from './views/nav3/Page6.vue'
+// import Page4 from './views/nav2/Page4.vue'
+// import Page5 from './views/nav2/Page5.vue'
+// import Page6 from './views/nav3/Page6.vue'
 
 import Case from './views/Case.vue'
 import Suite from './views/suite.vue'
@@ -62,7 +62,7 @@ let routes = [
         iconCls: 'fa fa-plane',
         leaf: true,//只有一个节点
         children: [
-            { path: '/page6', component: Page6, name: '测试计划' }
+            { path: '/page6', component: echarts, name: '测试计划' }
         ]
     },
     {
@@ -72,7 +72,7 @@ let routes = [
         iconCls: 'fa fa-folder-open',
         leaf: true,
         children: [
-            { path: '/page4', component: Page4, name: '测试报告' }
+            { path: '/page5', component: echarts, name: '测试报告' }
         ]
     },
     {
@@ -81,8 +81,8 @@ let routes = [
         name: '测试服务',
         iconCls: 'fa fa-server',
         children: [
-            { path: '/page4', component: Page4, name: 'Mock' },
-            { path: '/page5', component: Page5, name: '页面5' }
+            { path: '/page4', component: echarts, name: 'Mock' },
+            { path: '/page3', component: echarts, name: '页面5' }
         ]
     },
     {
@@ -91,9 +91,9 @@ let routes = [
         name: '测试设置',
         iconCls: 'fa fa-gears',
         children: [
-            { path: '/page4', component: Page4, name: '函数仓库' },
-            { path: '/page5', component: Page5, name: '环境配置' },
-            { path: '/page5', component: Page5, name: '定时任务' }
+            { path: '/page2', component: echarts, name: '函数仓库' },
+            { path: '/page1', component: echarts, name: '环境配置' },
+            { path: '/page0', component: echarts, name: '定时任务' }
         ]
     },
     {

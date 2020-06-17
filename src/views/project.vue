@@ -19,12 +19,12 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="projects" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
 			</el-table-column>
-			<el-table-column prop="p_id" label="项目ID" width="100" v-if="visible"></el-table-column>
+			<el-table-column prop="p_id" label="项目ID" width="100" v-if="projectIDvisible"></el-table-column>
 			<el-table-column prop="p_name" label="项目名称" width="120" sortable>
 			</el-table-column>
 			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" sortable>
@@ -94,44 +94,60 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { getUserListPage, removeUser, editProject, deleteProject, createProject, getProjectList} from '@/api/api';
+	import { editProject, deleteProject, createProject, getProjectList} from '@/api/api';
 
 	export default {
 		data() {
 			return {
+				/**
+				 * 项目list变量
+				 * @var filters list按名称搜索
+				 * @var projects 用来存储项目ID
+				 * @var total 项目总数
+				 * @var per_page 分页条数
+				 * @var page 当前页
+				 * @var listLoading 项目list，显示加载状态
+				 * @var sels 用来存储list复选框选中项目
+				 * @var projectIDvisible 项目ID列在list中是否显示
+				 * @var editFormVisible 编辑界面是否显示
+				 * @var editLoading 编辑界面提交按钮加载状态
+				 * @var editFormRules 编辑界面输入规则
+				 * @var editForm 编辑界面存储数据
+				 * @var addFormVisible 新增项目dialog显示
+				 * @var addLoading 新增提交按钮加载状态
+				 * @var addFormRules 新增界面输入项目规则
+				 * @var addForm 新增界面数据
+				 */
 				filters: {
 					p_name: ''
 				},
-				users: [],
+				projects: [],
 				total: 0,
 				per_page: 10,
 				page: 1,
 				listLoading: false,
-				sels: [],//列表选中列
-				projectIdShow: "visible", //项目Id列是否显示
-				editProjectId: true, //编辑界面项目Id是否只读 true只读
-				editFormVisible: false,//编辑界面是否显示
+				sels: [],
+				projectIDvisible: false, 
+				editProjectId: true,
+				editFormVisible: false,
 				editLoading: false,
 				editFormRules: {
 					name: [
 						{ required: true, message: '请输入项目名称', trigger: 'blur' }
 					]
 				},
-				//编辑界面数据
 				editForm: {
 					p_id: 0,
 					name: '',
 					desc: ''
 				},
-
-				addFormVisible: false,//新增界面是否显示
+				addFormVisible: false,
 				addLoading: false,
 				addFormRules: {
 					name: [
 						{ required: true, message: '请输入项目名称', trigger: 'blur' }
 					]
 				},
-				//新增界面数据
 				addForm: {
 					p_name: '',
 					p_desc: ''
@@ -140,19 +156,42 @@
 			}
 		},
 		methods: {
-			// 项目创建日期转换
+			/**
+			 * 项目创建日期转换
+			 * @param {*} row table行数据
+			 * @param {*} column table列数据
+			 * @returns 格式化日期：2020-06-17 10:00:01
+			 */
 			formatDateDMT: function (row, column) {
 				return util.formatDate.format(new Date(row.create_time), 'yyyy-MM-dd')
 			},
-			//项目状态转换
+
+			/**
+			 * 项目状态转换
+			 * @param {*} row table行数据
+			 * @param {*} column table列数据
+			 * @returns null
+			 */
 			formatStatus: function (row, column) {
 				return row.p_status == 1 ? '已使用' : row.p_status == 0 ? '未使用' : '未知';
 			},
+
+			/**
+			 * 切换分页，页码,重新获取项目list@current-change
+			 * @param {*} val 当前页码
+			 * @function getProjectList 获取分页项目后台接口
+			 * @returns null
+			 */
 			handleCurrentChange(val) {
 				this.page = val;
 				this.getProjects();
 			},
-			//获取用户列表
+
+			/**
+			 * 获取用户列表,list展示数据
+			 * @param {*} null
+			 * @returns null
+			 */
 			getProjects() {
 				let para = {
 					page: this.page,
@@ -165,12 +204,19 @@
 					this.per_page = res.data.res.per_page;
 					this.page = res.data.res.page;
 					this.next = res.data.res.next_page;
-					this.users = res.data.res.project;
+					this.projects = res.data.res.project;
 					this.listLoading = false;
 					//NProgress.done();
 				});
 			},
-			//删除
+
+			/**
+			 * 删除项目列表，项目
+			 * @param {*} index 当前行索引
+			 * @param {*} row 当前行数据
+			 * @function deleteProject 删除项目后台接口
+			 * @returns null
+			 */
 			handleDel: function (index, row) {
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
@@ -191,12 +237,23 @@
 
 				});
 			},
-			//显示编辑界面
+
+			/**
+			 * 显示编辑界面
+			 * @param {*} index 项目列表当前选择行索引
+			 * @param {*} row 项目列表当前行数据
+			 * @returns null
+			 */
 			handleEdit: function (index, row) {
 				this.editFormVisible = true;
 				this.editForm = Object.assign({}, row);
 			},
-			//显示新增界面
+
+			/**
+			 * 显示新增界面,初始化界面控件内容
+			 * @param {*} null
+			 * @returns null
+			 */
 			handleAdd: function () {
 				this.addFormVisible = true;
 				this.addForm = {
@@ -204,7 +261,14 @@
 					p_desc: ''
 				};
 			},
-			//编辑
+
+			/**
+			 * 编辑项目
+			 * @param {*} null
+			 * @function editProject 调用后台编辑项目接口
+			 * @function getProjects 调用重新获取项目数据
+			 * @returns null
+			 */
 			editSubmit: function () {
 				this.$refs.editForm.validate((valid) => {
 					if (valid) {
@@ -228,7 +292,14 @@
 					}
 				});
 			},
-			//新增
+
+			/**
+			 * 新增项目
+			 * @param {*} null
+			 * @function createProject 调用后台创建项目接口
+			 * @function getProjects 调用获取项目接口
+			 * @returns null
+			 */
 			addSubmit: function () {
 				this.$refs.addForm.validate((valid) => {
 					if (valid) {
@@ -252,10 +323,22 @@
 					}
 				});
 			},
+			/**
+			 * 项目列表，勾选复选框，获取勾选数据
+			 * @param {*} null
+			 * @returns null
+			 */
 			selsChange: function (sels) {
 				this.sels = sels;
 			},
-			//批量删除
+
+			/**
+			 * 批量删除项目
+			 * @param {*} null
+			 * @function deleteProject 调用后台删除项目接口
+			 * @function getProjects 调用后台获取分页项目接口
+			 * @returns null
+			 */
 			batchRemove: function () {
 				var ids = this.sels.map(item => item.p_id);
 				this.$confirm('确认删除选中记录吗？', '提示', {

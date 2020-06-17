@@ -10,7 +10,7 @@
 					<el-input v-model="filters.name" placeholder="用例名称" size="mini"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" icon="el-icon-search" size="mini" v-on:click="getUsers">查询</el-button>
+					<el-button type="primary" icon="el-icon-search" size="mini" v-on:click="getCase">查询</el-button>
 				</el-form-item>
 				<el-form-item>
 					<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAddCaseDialog">新增</el-button>
@@ -228,33 +228,97 @@
               </el-input>
               <!-- 出参 -->
               <el-tab-pane label="出参" name="output">
-								<el-table :data="bodyTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
-										<el-table-column prop="key" label="Key">
+								<el-table :data="outputArgsData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
+										<el-table-column prop="name" label="出参名">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.key}}</span>
+												<el-input v-if="scope.row.edit" v-model="scope.row.name" placeholder="Key" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.name}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column prop="value" label="Value">
+										<el-table-column prop="source" label="来源">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.value}}</span>
+                        <el-select v-model="scope.row.source" size="mini" @change="outArgsSelectChange">
+                          <el-option
+                            v-for="item in outPutArgsOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
 											</template>
 										</el-table-column>
-										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
+										<el-table-column prop="exp" label="解析表达式">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(2, scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.DESCRIPTION}}</span>
+												<el-input v-if="scope.row.edit" v-model="scope.row.exp" placeholder="输入出参提取表达式" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.exp}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="match" label="第几个匹配">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.match" placeholder="" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.match}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column label="操作">
 											<template slot-scope="scope">
-												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
+												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(4, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
               </el-tab-pane>
-              <el-tab-pane label="断言" name="assert">Assert</el-tab-pane>
+              <el-tab-pane label="断言" name="assert">
+								<el-table :data="assertData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
+										<el-table-column prop="checkType" label="断言类型">
+											<template slot-scope="scope">
+                        <el-select v-model="scope.row.checkType" size="mini" @change="assertSelectChange(scope.$index, scope.row)">
+                          <el-option
+                            v-for="item in assertTypeOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+											</template>
+										</el-table-column>
+										<el-table-column prop="checkObject" label="断言对象">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.checkObject" placeholder="请输入断言对象" v-show="assertCheckobjectShow" :disabled="assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.checkObject}}</span>
+                        <el-select v-model="scope.row.value" size="mini" v-show="assertCheckobjectOptionShow">
+                          <el-option
+                            v-for="item in assertCheckobjectOutArgs"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+											</template>
+										</el-table-column>
+										<el-table-column prop="checkCondition" label="断言">
+											<template slot-scope="scope">
+                        <el-select v-model="scope.row.checkCondition" size="mini" @change="outArgsSelectChange">
+                          <el-option
+                            v-for="item in assertCondiationOptions"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                          </el-option>
+                        </el-select>
+											</template>
+										</el-table-column>
+										<el-table-column prop="checkContent" label="断言内容">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.edit" v-model="scope.row.checkContent" placeholder="输入出参提取表达式" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.checkContent}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column label="操作">
+											<template slot-scope="scope">
+												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(4, scope.$index, scope.row)" circle></el-link>
+											</template>
+										</el-table-column>
+								</el-table>
+              </el-tab-pane>
 						</el-tabs>
 					</el-col>
 				</el-row>
@@ -285,6 +349,7 @@
          * @var per_page: 用例列表分页条数，后端传值
          * @var listLoading: 用例列表加载时状态
          * @var sels: 用例列表筛选数据存储
+         * @var editFormVisible 编辑界而显示
          */
 				filters: {
 					name: ''
@@ -294,11 +359,7 @@
 				page: 1,
 				per_page: 10,
 				listLoading: false,
-				sels: [],//列表选中列
-
-        /**
-         * 编辑界面
-         */
+				sels: [],
 				editFormVisible: false,
 				editLoading: false,
 				editFormRules: {
@@ -306,7 +367,6 @@
 						{ required: true, message: '请输入姓名', trigger: 'blur' }
 					]
 				},
-				//编辑界面数据
 				editForm: {
 					id: 0,
 					name: '',
@@ -426,35 +486,133 @@
         isBodyTabShowTable: false,
         /**
          * 出参
+         * @var outPutArgsOptions 出参来源下拉列表
+         * @var outputArgsData 出参数据
          */
+        outPutArgsOptions: [
+          {
+            value: 0,
+            label: 'Body: TEXT'
+          },
+          {
+            value: 1,
+            label: 'Body: JSON'
+          },
+          {
+            value: 2,
+            label: 'Header: K/V'
+          },
+          {
+            value: 3,
+            label: 'Cookie: K/V'
+          },
+          {
+            value: 4,
+            label: '响应状态码'
+          }
+        ],
         outputArgsData: [
           {
             name: '',
             exp: '',
             match: '',
-            source: [
-              {
-                value: 0,
-                label: 'Body: TEXT'
-              },
-              {
-                value: 1,
-                label: 'Body: JSON'
-              },
-              {
-                value: 2,
-                label: 'Header: K/V'
-              },
-              {
-                value: 3,
-                label: 'Cookie: K/V'
-              },
-              {
-                value: 4,
-                label: '响应状态码'
-              }
-            ],
-            edit: true
+            edit: true,
+            source: 0,
+          },
+        ],
+        /**
+         * 断言
+         * @var assertData 检查点数据
+         */
+        assertData: [
+          {
+            type: 0,
+            checkObject: '',
+            checkCondition: 0,
+            checkContent: '',
+            checkType: '',
+            edit: true,
+          },
+        ],
+        assertTypeOptions: [
+          {
+            value: 0,
+            label: '响应header'
+          },          
+          {
+            value: 1,
+            label: '响应状态码'
+          },          
+          {
+            value: 2,
+            label: '响应body'
+          },          
+          {
+            value: 3,
+            label: '出参'
+          }
+        ],
+        assertCondiationOptions: [
+          {
+            value: 0,
+            label: '大于'
+          },
+          {
+            value: 1,
+            label: '大于等于'
+          },
+          {
+            value: 2,
+            label: '小于'
+          },
+          {
+            value: 3,
+            label: '小于等于'
+          },
+          {
+            value: 4,
+            label: '等于'
+          },
+          {
+            value: 5,
+            label: '不等于'
+          },
+          {
+            value: 6,
+            label: '包含'
+          },
+          {
+            value: 7,
+            label: '不包含'
+          },
+          {
+            value: 8,
+            label: '属于'
+          },
+          {
+            value: 9,
+            label: '不属于'
+          },
+          {
+            value: 10,
+            label: '存在'
+          },
+          {
+            value: 11,
+            label: '不存在'
+          },
+          {
+            value: 12,
+            label: '正则匹配'
+          }
+        ],
+        assertCheckobjectDisabled: false,
+        assertCheckobjectOptionShow: false,
+        assertCheckobjectShow: true,
+        assertCheckobjectOutArgs: [
+          {
+            value: 0,
+            label: 'code'
           }
         ],
         /**
@@ -530,6 +688,27 @@
 			}
 		},
 		methods: {
+      /**
+       * 断言类型@change
+       */
+      assertSelectChange(index, row) {
+        // row.checkType 0
+        if (row.checkType === 1) {
+          row.checkObject = '状态码';
+          this.assertCheckobjectDisabled = true;
+          this.assertCheckobjectOptionShow = false;
+        };
+        if (row.checkType === 2) {
+          this.assertCheckobjectShow = true;
+          row.checkObject = '整个body';
+          this.assertCheckobjectDisabled = true;
+          this.assertCheckobjectOptionShow = false;
+        };
+        if (row.checkType === 3) {
+          this.assertCheckobjectShow = false;
+          this.assertCheckobjectOptionShow = true;
+        };
+      },
       /**
        * body radio @change
        * @var isBodyTabShowTable 控制none内容显示
@@ -895,6 +1074,17 @@
             });
           };         
         };
+        if (tabIndex === 3) {
+          if(index ==this.outputArgsData.length - 1) {
+            this.outputArgsData.push({
+              name: '',
+              exp: '',
+              match: '',
+              edit: true,
+              source: 0,              
+            })
+          };
+        };
 			},
 
 			/**
@@ -915,6 +1105,9 @@
             this.headerTableData.splice(index, 1);
           } else if(tableIndex === 3) {
             this.bodyTableData.splice(index, 1);
+          };
+          if (tableIndex === 4) {
+            this.outputArgsData.splice(index, 1)
           };
 				};
       },
@@ -1127,7 +1320,7 @@
 								});
 								this.$refs['editForm'].resetFields();
 								this.editFormVisible = false;
-								this.getUsers();
+								this.getCase();
 							});
 						});
 					}
@@ -1151,7 +1344,7 @@
 								});
 								this.$refs['addForm'].resetFields();
 								this.addFormVisible = false;
-								this.getUsers();
+								this.getCase();
 							});
 						});
 					}
@@ -1176,7 +1369,7 @@
 							message: '删除成功',
 							type: 'success'
 						});
-						this.getUsers();
+						this.getCase();
 					});
 				}).catch(() => {
 
