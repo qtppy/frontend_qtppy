@@ -91,8 +91,9 @@ let routes = [
         name: '测试设置',
         iconCls: 'fa fa-gears',
         children: [
-            { path: '/page2', component: echarts, name: '函数仓库' },
-            { path: '/page1', component: echarts, name: '环境配置' },
+            { path: '/page2', component: echarts, name: '参数列表' },
+            { path: '/page1', component: echarts, name: '系统函数' },
+            { path: '/page1', component: echarts, name: '数据源管理' },
             { path: '/page0', component: echarts, name: '定时任务' }
         ]
     },

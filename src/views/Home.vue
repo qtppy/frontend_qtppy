@@ -22,6 +22,7 @@
 		</el-col>
 		<el-col :span="24" class="main">
 			<aside :class="collapsed?'menu-collapsed':'menu-expanded'">
+				<el-scrollbar style="height: 100%">
 				<!--导航菜单-->
 				<el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose" @select="handleselect"
 					 unique-opened router v-show="!collapsed">
@@ -33,6 +34,7 @@
 						<el-menu-item v-if="item.leaf&&item.children.length>0" :index="item.children[0].path"><i :class="item.iconCls"></i>{{item.children[0].name}}</el-menu-item>
 					</template>
 				</el-menu>
+				</el-scrollbar>
 				<!--导航菜单-折叠后-->
 				<ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">
 					<li v-for="(item,index) in $router.options.routes" v-if="!item.hidden" class="el-submenu item">
@@ -142,7 +144,11 @@
 
 <style scoped-slot lang="scss">
 	@import '~scss_vars';
-	
+	// 不显示左侧边栏横向滚动条
+	.el-scrollbar__wrap {
+		overflow-x: hidden;
+	}
+		
 	.container {
 		position: absolute;
 		top: 0px;
