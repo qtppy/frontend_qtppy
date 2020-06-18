@@ -336,7 +336,7 @@
 	import util from '@/common/js/util'
 
 	//import NProgress from 'nprogress'
-	import { getCaseList, deleteCase, batchRemoveUser, editUser, createCase } from '@/api/api';
+	import { getCaseList, deleteCase, batchRemoveUser, editUser, createCase, debugCase } from '@/api/api';
 
 	export default {
 		data() {
@@ -405,6 +405,8 @@
             how: '',
             body: ''
           },
+          outParam: '',
+          assertData: '',
 
 				},
         /**
@@ -754,6 +756,17 @@
       sendRequest() {
         this.initRequestData();
         console.log(this.addCaseData)
+        this.debugRequest();
+      },
+      /**
+       * debug单接口
+       */
+      debugRequest() {
+        let param = this.addCaseData;
+        debugCase(param).then((res) => {
+          console.log(res.data);
+          this.paramsResTextArea = res.data;
+        })
       },
       /**
        * 整理请求头
@@ -791,6 +804,12 @@
           this.addCaseData.body.body = bodyMap;
         };
         this.addCaseData.body.how = this.bodyRadio;
+
+        // 出参数据
+        this.addCaseData.outParam = this.outputArgsData;
+
+        // 断言数据
+        this.addCaseData.assertData = this.assertData;
       },
 
 			/**

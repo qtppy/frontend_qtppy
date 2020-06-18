@@ -52,6 +52,9 @@ export const deleteCase = params => { return axios.post('/api/case/delete', para
 // 新建测试用例
 export const createCase = params => { return axios.post('/api/case/create', params) };
 
+// debug测试用例
+export const debugCase = params => { return axios.post(`/api/run/debug`, params); };
+
 // qtppy登录
 export const reqLogin = params => { return axios.post(`/api/auth/login`, params).then(res => res.data); };
 
