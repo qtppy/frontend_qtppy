@@ -266,6 +266,7 @@
 										</el-table-column>
 								</el-table>
               </el-tab-pane>
+              <!-- 断言tab -->
               <el-tab-pane label="断言" name="assert">
 								<el-table :data="assertData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
 										<el-table-column prop="checkType" label="断言类型">
@@ -282,9 +283,9 @@
 										</el-table-column>
 										<el-table-column prop="checkObject" label="断言对象">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.checkObject" placeholder="请输入断言对象" v-show="assertCheckobjectShow" :disabled="assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.checkObject" placeholder="请输入断言对象" v-show="scope.row.assertCheckobjectShow" :disabled="scope.row.assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.checkObject}}</span>
-                        <el-select v-model="scope.row.value" size="mini" v-show="assertCheckobjectOptionShow">
+                        <el-select v-model="scope.row.checkObject" size="mini" v-show="scope.row.assertCheckobjectOptionShow">
                           <el-option
                             v-for="item in assertCheckobjectOutArgs"
                             :key="item.value"
@@ -314,7 +315,7 @@
 										</el-table-column>
 										<el-table-column label="操作">
 											<template slot-scope="scope">
-												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(4, scope.$index, scope.row)" circle></el-link>
+												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(5, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
@@ -532,6 +533,9 @@
             checkContent: '',
             checkType: '',
             edit: true,
+            assertCheckobjectDisabled: false,
+            assertCheckobjectOptionShow: false,
+            assertCheckobjectShow: true
           },
         ],
         assertTypeOptions: [
@@ -690,24 +694,34 @@
 		methods: {
       /**
        * 断言类型@change
+       * @param {*} index table行索引
+       * @param {*} row table行数据
+       * @function addNewRow 增加新行数据
        */
       assertSelectChange(index, row) {
         // row.checkType 0
         if (row.checkType === 1) {
           row.checkObject = '状态码';
-          this.assertCheckobjectDisabled = true;
-          this.assertCheckobjectOptionShow = false;
+          row.assertCheckobjectDisabled = true;
+          row.assertCheckobjectOptionShow = false;
         };
         if (row.checkType === 2) {
-          this.assertCheckobjectShow = true;
+          row.assertCheckobjectShow = true;
           row.checkObject = '整个body';
-          this.assertCheckobjectDisabled = true;
-          this.assertCheckobjectOptionShow = false;
+          row.assertCheckobjectDisabled = true;
+          row.assertCheckobjectOptionShow = false;
         };
         if (row.checkType === 3) {
-          this.assertCheckobjectShow = false;
-          this.assertCheckobjectOptionShow = true;
+          row.assertCheckobjectShow = false;
+          row.assertCheckobjectOptionShow = true;
         };
+        if (row.checkType === 4) {
+          row.assertCheckobjectShow = false;
+          row.assertCheckobjectOptionShow = true;
+        };
+        console.log(this.assertData)
+        console.log(row)
+        this.addNewRow(4, index, row);
       },
       /**
        * body radio @change
@@ -1085,6 +1099,21 @@
             })
           };
         };
+        if (tabIndex === 4) {
+          if(index ==this.assertData.length - 1) {
+            this.assertData.push({
+              type: 0,
+              checkObject: '',
+              checkCondition: 0,
+              checkContent: '',
+              checkType: '',
+              edit: true,
+              assertCheckobjectDisabled: false,
+              assertCheckobjectOptionShow: false,
+              assertCheckobjectShow: true         
+            })
+          };
+        };
 			},
 
 			/**
@@ -1108,6 +1137,9 @@
           };
           if (tableIndex === 4) {
             this.outputArgsData.splice(index, 1)
+          };
+          if (tableIndex === 5) {
+            this.assertData.splice(index, 1)
           };
 				};
       },
