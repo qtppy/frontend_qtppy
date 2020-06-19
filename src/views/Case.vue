@@ -194,14 +194,35 @@
 								<el-table :data="bodyTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isBodyTabShowTable">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.key}}</span>
+                        <el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)">
+                          <el-select v-model="scope.row.fromSelect" slot="append" style="width: 70px;" @change="formDataSelectChange(scope.$index, scope.row)">
+                            <el-option
+                              v-for="item in formDataOptions"
+                              :key="item.value"
+                              :label="item.label"
+                              :value="item.value">
+                            </el-option>
+                          </el-select>
+                        </el-input>
+                        <span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.valueEdit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.value}}</span>
+                        <!-- 上传 -->
+                        <el-upload
+                          class="upload-demo"
+                          action="temp"
+                          :auto-upload="false"
+                          :limit="1"
+                          :on-remove="file => handleRemove(file, scope.row)"
+                          :on-exceed="handleExceed"
+                          :on-change="file => handleChange(file, scope.row)"
+                          v-if="scope.row.fromValSelect">
+                          <el-button type="info" size="mini">选择文件</el-button>
+                        </el-upload>
 											</template>
 										</el-table-column>
 										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
@@ -475,6 +496,16 @@
          * @var isbodyTextAreaShow body文本域显示
          * @var isBodyTabShowTable table显示
          */
+        formDataOptions: [
+          {
+            value: 1,
+            label: 'Text'
+          },
+          {
+            value: 2,
+            label: 'File'
+          }
+        ],
         bodyRadio: 1,
         bodyTableData: [
           {
@@ -482,11 +513,16 @@
           value: '',
           DESCRIPTION: '',
           edit: true,
+          fromSelect: 1,
+          fromValSelect: false,
+          valueEdit: true,
+          file: '',
           }
         ],
         bodyTextArea: '',
         isbodyTextAreaShow: false, 
         isBodyTabShowTable: false,
+        fromDataCurrentRowIndex: '',
         /**
          * 出参
          * @var outPutArgsOptions 出参来源下拉列表
@@ -695,6 +731,52 @@
 		},
 		methods: {
       /**
+       * 上传文件
+       */
+      handleChange(file, row) {
+
+        let reader = new FileReader();
+        reader.readAsDataURL(file.raw);
+
+        reader.onload=()=>{
+          row.file = reader.result;
+        }
+        console.log(this.bodyTableData);
+      },
+      /**
+       * 移除上传文件
+       */
+      handleRemove(file, row) {
+        console.log(file.raw);
+        row.file = '';
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      handleExceed(files, fileList) {
+        this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      },
+      beforeRemove(file, fileList) {
+        return this.$confirm(`确定移除 ${ file.name }？`);
+      },
+
+      /**
+       * form-data,选择类型
+       * @param {*} index 行索引
+       * @param {*} row 行数据
+       * @var row.fromSelect 1  Text类型
+       * @var row.fromSelect 2  File类型
+       */
+      formDataSelectChange(index, row) {
+        if (row.fromSelect === 2) {
+          row.fromValSelect = true;
+          row.valueEdit = false;
+        } else {
+          row.fromValSelect = false;
+          row.valueEdit = true;
+        };
+      },
+      /**
        * 断言类型@change
        * @param {*} index table行索引
        * @param {*} row table行数据
@@ -795,10 +877,18 @@
           this.addCaseData.body.body = this.bodyTextArea;
         }else {
           let bodyArr = this.bodyTableData;
-          let bodyMap = {};
+          let bodyMap = {
+            data: {},
+            files: []
+          };
           for (let i=0; i<bodyArr.length; i++) {
-            if (bodyArr[i].key!=='') {
-              bodyMap[bodyArr[i].key] = bodyArr[i].value;
+            if (bodyArr[i].key!=='' && bodyArr[i].file==='') {
+              bodyMap['data'][bodyArr[i].key] = bodyArr[i].value;
+            };
+            if (bodyArr[i].key!=='' && bodyArr[i].file!=='') {
+              bodyMap['files'].push({
+                  file: bodyArr[i].file
+                });
             };
           };
           this.addCaseData.body.body = bodyMap;
@@ -1103,7 +1193,11 @@
               key: '',
               value: '',
               DESCRIPTION: '',
-              edit: true,					
+              edit: true,
+              fromSelect: 1,
+              fromValSelect: false,
+              valueEdit: true,
+              file: '',	
             });
           };         
         };
