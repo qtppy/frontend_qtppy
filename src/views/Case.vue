@@ -214,12 +214,12 @@
                         <!-- 上传 -->
                         <el-upload
                           class="upload-demo"
-                          action="temp"
-                          :auto-upload="false"
+                          action="/api/case/upload"
+                          :auto-upload="true"
                           :limit="1"
                           :on-remove="file => handleRemove(file, scope.row)"
                           :on-exceed="handleExceed"
-                          :on-change="file => handleChange(file, scope.row)"
+                          :on-success="response => handleSuccess(response, scope.row)"
                           v-if="scope.row.fromValSelect">
                           <el-button type="info" size="mini">选择文件</el-button>
                         </el-upload>
@@ -416,20 +416,20 @@
          * @var baseURl: 存储初始化url
          * @var header: 请求头信息
          */
-				addCaseData: {
-					method: '',
-					url: '',
-					urlIndex: 0,
-          baseUrl: '',
-          header: '',
-          body: {
-            how: '',
-            body: ''
-          },
-          outParam: '',
-          assertData: '',
+		addCaseData: {
+			method: '',
+			url: '',
+			urlIndex: 0,
+      baseUrl: '',
+      header: '',
+      body: {
+        how: '',
+        body: ''
+      },
+      outParam: '',
+      assertData: '',
 
-				},
+    },
         /**
          * 新增界面table的一些配置
          * @var isParamTableShow: Param显示table
@@ -516,7 +516,10 @@
           fromSelect: 1,
           fromValSelect: false,
           valueEdit: true,
-          file: '',
+          file: {
+            key: '',
+            name: ''
+          },
           }
         ],
         bodyTextArea: '',
@@ -663,84 +666,90 @@
          * @var mechodSelectValue: 列表默认值
          * @var debugRequestLoading：点调试按钮加载状态
          */
-				methodOptions: [
-					{
-						value: 0,
-						label: 'GET'
-					},
-					{
-						value: 1,
-						label: 'POST'
-					},
-					{
-						value: 2,
-						label: 'PUT'
-					},
-					{
-						value: 3,
-						label: 'PATCH'
-					},
-					{
-						value: 4,
-						label: 'DELETE'
-					},
-					{
-						value: 5,
-						label: 'COPY'
-					},
-					{
-						value: 6,
-						label: 'HEAD'
-					},
-					{
-						value: 7,
-						label: 'OPTIONS'
-					},
-					{
-						value: 8,
-						label: 'LINK'
-					},
-					{
-						value: 9,
-						label: 'UNLINK'
-					},
-					{
-						value: 10,
-						label: 'PURGE'
-					},
-					{
-						value: 11,
-						label: 'LOCK'
-					},
-					{
-						value: 12,
-						label: 'UNLOCK'
-					},
-					{
-						value: 13,
-						label: 'PROPFIND'
-					},
-					{
-						value: 14,
-						label: 'VIEW'
-					}
-				],
-				mechodSelectValue: 0,
-				debugRequestLoading: false,
+			methodOptions: [
+				{
+					value: 0,
+					label: 'GET'
+				},
+				{
+					value: 1,
+					label: 'POST'
+				},
+				{
+					value: 2,
+					label: 'PUT'
+				},
+				{
+					value: 3,
+					label: 'PATCH'
+				},
+				{
+					value: 4,
+					label: 'DELETE'
+				},
+				{
+					value: 5,
+					label: 'COPY'
+				},
+				{
+					value: 6,
+					label: 'HEAD'
+				},
+				{
+					value: 7,
+					label: 'OPTIONS'
+				},
+				{
+					value: 8,
+					label: 'LINK'
+				},
+				{
+					value: 9,
+					label: 'UNLINK'
+				},
+				{
+					value: 10,
+					label: 'PURGE'
+				},
+				{
+					value: 11,
+					label: 'LOCK'
+				},
+				{
+					value: 12,
+					label: 'UNLOCK'
+				},
+				{
+					value: 13,
+					label: 'PROPFIND'
+				},
+				{
+					value: 14,
+					label: 'VIEW'
+				}
+			],
+			mechodSelectValue: 0,
+			debugRequestLoading: false,
 			}
 		},
 		methods: {
       /**
        * 上传文件
        */
-      handleChange(file, row) {
+      handleSuccess(response, row) {
+        console.log(response)
+        if (response.errcode === 0) {
+          row.file.key = row.key;
+          row.file.name = response.res.filename;
+        } else {
+          this.$message({
+            message: response.errmsg,
+            type: 'warning'
+          })
+          row.file = '';
+        };
 
-        let reader = new FileReader();
-        reader.readAsDataURL(file.raw);
 
-        reader.onload=()=>{
-          row.file = reader.result;
-        }
         console.log(this.bodyTableData);
       },
       /**
@@ -881,16 +890,20 @@
             data: {},
             files: []
           };
+          console.log('------------------------')
+          console.log(this.bodyTableData);
           for (let i=0; i<bodyArr.length; i++) {
-            if (bodyArr[i].key!=='' && bodyArr[i].file==='') {
+            if (bodyArr[i].key!=='' && bodyArr[i].file.key==='') {
               bodyMap['data'][bodyArr[i].key] = bodyArr[i].value;
             };
-            if (bodyArr[i].key!=='' && bodyArr[i].file!=='') {
+            if (bodyArr[i].key!=='' && bodyArr[i].file!=='' && bodyArr[i].file.key !=='' && bodyArr[i].file.name !=='') {
               bodyMap['files'].push({
                   file: bodyArr[i].file
                 });
             };
           };
+          console.log('------------------------')
+          console.log(bodyMap);
           this.addCaseData.body.body = bodyMap;
         };
         this.addCaseData.body.how = this.bodyRadio;
@@ -1147,7 +1160,12 @@
       sawpBodyEditButton() {
         this.isbodyTextAreaShow = false;
         this.isbodyTextAreaButton = false;
-        this.isBodyTabShowTable = true;
+		this.isBodyTabShowTable = true;
+		// 重写状态
+		for(let i=0; i<this.bodyTableData.length; i++) {
+			this.bodyTableData.fromSelect = 1;
+		}
+		
       },
 
 			/**
@@ -1197,7 +1215,10 @@
               fromSelect: 1,
               fromValSelect: false,
               valueEdit: true,
-              file: '',	
+              file: {
+                key: '',
+                name: ''
+              },	
             });
           };         
         };
