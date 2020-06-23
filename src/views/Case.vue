@@ -943,6 +943,10 @@
         let param = this.addCaseData;
         debugCase(param).then((res) => {
           console.log(res.data);
+          // 初始化响应数据，否则调用多次会累加
+          this.paramsResTextArea = '';
+          this.responseHeaderData = [];
+
           this.paramsResTextArea = JSON.stringify(res.data.res.data);
           let headersMap = res.data.res.headers;
           for (let key in headersMap) {
