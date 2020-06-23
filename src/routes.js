@@ -93,7 +93,7 @@ let routes = [
         children: [
             { path: '/page2', component: echarts, name: '参数列表' },
             { path: '/page1', component: echarts, name: '系统函数' },
-            { path: '/page1', component: echarts, name: '数据源管理' },
+            { path: '/page23', component: echarts, name: '数据源管理' },
             { path: '/page0', component: echarts, name: '定时任务' }
         ]
     },

@@ -19,7 +19,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="projects" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="projects" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;" size="mini">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
@@ -48,9 +48,9 @@
 		</el-table>
 
 		<!--工具条-->
-		<el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="per_page" :total="total" style="float:right;">
+		<el-col :span="24" class="toolbar" size="mini">
+			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0" size="mini">批量删除</el-button>
+			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="per_page" :total="total" style="float:right;" size="mini">
 			</el-pagination>
 		</el-col>
 

@@ -19,7 +19,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="casesData" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table :data="casesData" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;" size="mini">
 			<el-table-column type="selection" width="55"></el-table-column>
 			<el-table-column type="index" width="100" label="序号" sortable></el-table-column>
 			<el-table-column prop="id" label="用例ID" width="120" v-if="visible"></el-table-column>
@@ -29,7 +29,20 @@
 			<el-table-column prop="desc" label="描述" width="200" ></el-table-column>
 			<el-table-column prop="createtime" label="创建时间" width="100" :formatter="formatDateDMT"></el-table-column>
 			<el-table-column prop="creator" label="创建者" min-width="100"></el-table-column>
-			<el-table-column label="操作" width="150" :render-header="renderHeaderCaseList">
+			<el-table-column label="操作" width="150">
+        <template slot="header" slot-scope>
+          <el-button-group>
+            <el-tooltip :disabled="false" placement="bottom" effect="light" content="增加测试用例">
+              <el-button size="mini" type="primary" icon="el-icon-document-add" @click="caseListClick"></el-button>
+            </el-tooltip>
+            <el-tooltip :disabled="false" placement="bottom" effect="light" content="全局变量">
+              <el-button size="mini" type="primary" icon="el-icon-share" @click="caseListClick"></el-button>
+            </el-tooltip>
+            <el-tooltip :disabled="false" placement="bottom" effect="light" content="系统函数">
+              <el-button size="mini" type="primary" icon="el-icon-s-flag" @click="caseListClick"></el-button>
+            </el-tooltip>
+          </el-button-group>  
+        </template>
 				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
 					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
@@ -44,7 +57,7 @@
 			</el-pagination>
 		</el-col>
 
-		<!--编辑界面-->
+		<!-- 编辑界面
 		<el-dialog title="编辑" v-model="editFormVisible" :close-on-click-modal="false">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="姓名" prop="name">
@@ -70,16 +83,16 @@
 				<el-button @click.native="editFormVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
 			</div>
-		</el-dialog>
+		</el-dialog> -->
 
 		<!-- 新增测试用例界面 -->
-		<el-dialog title="新增测试用例" fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false" :size="addCaseSize">
-			<el-form :model="addCaseData" label-width="3px" :rules="addFormRules" ref="addSuiteData">
+		<el-dialog title="新增测试用例" :fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false">
+			<el-form :model="addCaseData" label-width="3px" ref="addSuiteData">
 				<el-row>
-					<el-col span="12">
+					<el-col :span="12">
 						<el-form-item prop="method">
 							<el-input placeholder="请输入请求URL" v-model="addCaseData.url" class="input-with-select" @change="baseUrlSet">
-								<el-select v-model="mechodSelectValue" placeholder="Method" slot="prepend" :size="addCaseSize" style="width:120px;">
+								<el-select v-model="mechodSelectValue" placeholder="Method" slot="prepend" style="width:120px;">
 									<el-option
 									v-for="item in methodOptions"
 									:key="item.value"
@@ -93,8 +106,8 @@
 					</el-col>
 				</el-row>
 				<el-row>
-					<el-col span="24">
-						<el-tabs v-model="activeName" @tab-click="handleCaseTabClick" :size="Paramsize">
+					<el-col :span="24">
+						<el-tabs v-model="requestBodyTab" @tab-click="handleCaseTabClick" :size="Paramsize">
 							<!-- Params参数 -->
 							<el-tab-pane label="Params" name="params">
 								<el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="keyValueBthShow" @click="swapParamEditButton">Key-Value Edit</el-button>
@@ -108,7 +121,7 @@
                   @change="setCaseRequestData(tableData, paramsReqTextArea, 0)">
 								</el-input>
 								<!-- Params参数table展示 -->
-								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isParamTableShow">
+								<el-table :data="tableData" border stripe style="width: 100%;" size="mini" v-show="isParamTableShow">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
 												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams()" @input="addNewRow(0, scope.$index, scope.row)"></el-input>
@@ -127,7 +140,13 @@
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeaderCaseNew" >
+										<el-table-column label="操作">
+                      <template slot="header" slot-scope>
+                        <el-button-group>
+                          <el-tooltip :disabled="false" placement="bottom" effect="light">批量编辑</el-tooltip>
+                          <el-button size="mini" type="primary" icon="el-icon-s-flag" @click="paramBulkEditClick">Bulk Edit</el-button>
+                        </el-button-group>  
+                      </template>
 											<template slot-scope="scope">
 												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(1, scope.$index, scope.row)" circle></el-link>
 											</template>
@@ -165,7 +184,13 @@
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeaderCaseHeader">
+										<el-table-column label="操作">
+                      <template slot="header" slot-scope>
+                        <el-button-group>
+                          <el-tooltip :disabled="false" placement="bottom" effect="light">批量编辑</el-tooltip>
+                          <el-button size="mini" type="primary" icon="el-icon-s-flag" @click="headerBulkEditClick">Bulk Edit</el-button>
+                        </el-button-group>                       
+                      </template>
 											<template slot-scope="scope">
 												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(2, scope.$index, scope.row)" circle></el-link>
 											</template>
@@ -174,14 +199,14 @@
 							</el-tab-pane>
               <!-- Body tab -->
 							<el-tab-pane label="Body" name="body">
-                <el-radio-group v-model="bodyRadio" size="mini" @change="bodyRadioChange">
+                <el-radio-group v-model="bodyRadio" :size="addCaseData.size" @change="bodyRadioChange">
                   <el-radio :label="1">none</el-radio>
                   <el-radio :label="2">form-data</el-radio>
                   <el-radio :label="3">x-www-form-urlencoded</el-radio>
                   <el-radio :label="4">raw</el-radio>
                 </el-radio-group>
                 <el-divider content-position="left"></el-divider>
-                <el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="isbodyTextAreaButton" @click="sawpBodyEditButton">Key-Value Edit</el-button>
+                <el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="addCaseData.isbodyTextAreaButton" @click="sawpBodyEditButton">Key-Value Edit</el-button>
                 <!-- 文本域展示 -->
 								<el-input
 									type="textarea"
@@ -231,22 +256,19 @@
 												<span v-else>{{scope.row.DESCRIPTION}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeaderCaseBody">
-											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(3, scope.$index, scope.row)" circle></el-link>
+										<el-table-column label="操作" scoped-slot>
+											<template slot="header">
+                        <el-button-group>
+                          <el-tooltip :disabled="false" placement="bottom" effect="light">批量编辑</el-tooltip>
+                          <el-button size="mini" type="primary" icon="el-icon-s-flag" @click="BodyBulkEditClick">Bulk Edit</el-button>
+                        </el-button-group>
 											</template>
+                      <template slot-scope="scope">
+                        <el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(3, scope.$index, scope.row)" circle></el-link>
+                      </template>
 										</el-table-column>
 								</el-table>
               </el-tab-pane>
-              <el-link type="primary" :underline="false" disabled v-show="ressponseShow">Response</el-link>
-              <el-input
-                type="textarea"
-                :placeholder="placeholderRes"
-                v-model="paramsResTextArea"
-                v-show="ressponseShow" 
-                :autosize="paramsTextAreaLimt"
-                disabled>
-              </el-input>
               <!-- 出参 -->
               <el-tab-pane label="出参" name="output">
 								<el-table :data="outputArgsData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
@@ -258,7 +280,7 @@
 										</el-table-column>
 										<el-table-column prop="source" label="来源">
 											<template slot-scope="scope">
-                        <el-select v-model="scope.row.source" size="mini" @change="outArgsSelectChange">
+                        <el-select v-model="scope.row.source" size="mini" @change="outArgsSelectChange(scope.$index, scope.row)">
                           <el-option
                             v-for="item in outPutArgsOptions"
                             :key="item.value"
@@ -306,7 +328,7 @@
 											<template slot-scope="scope">
 												<el-input v-if="scope.row.edit" v-model="scope.row.checkObject" placeholder="请输入断言对象" v-show="scope.row.assertCheckobjectShow" :disabled="scope.row.assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.checkObject}}</span>
-                        <el-select v-model="scope.row.checkObject" size="mini" v-show="scope.row.assertCheckobjectOptionShow">
+                        <el-select v-model="scope.row.checkObject" size="addCaseData.mini" v-show="scope.row.assertCheckobjectOptionShow">
                           <el-option
                             v-for="item in assertCheckobjectOutArgs"
                             :key="item.value"
@@ -318,7 +340,7 @@
 										</el-table-column>
 										<el-table-column prop="checkCondition" label="断言条件">
 											<template slot-scope="scope">
-                        <el-select v-model="scope.row.checkCondition" size="mini" @change="outArgsSelectChange">
+                        <el-select v-model="scope.row.checkCondition" size="mini" @change="outArgsSelectChange(scope.$index, scope.row)">
                           <el-option
                             v-for="item in assertCondiationOptions"
                             :key="item.value"
@@ -344,10 +366,41 @@
 						</el-tabs>
 					</el-col>
 				</el-row>
+        <el-row>
+          <el-tabs v-model="responseBodyTab" size="mini">
+            <!-- Response body-->
+            <el-tab-pane label="Body" name="responseBody">
+              <el-input
+                type="textarea"
+                :placeholder="placeholderRes"
+                v-model="paramsResTextArea"
+                :autosize="paramsTextAreaLimt"
+                :readonly="responseReadOnly">
+              </el-input>
+            </el-tab-pane>
+            <!-- Response headers -->
+            <el-tab-pane label="Headers" name="responseHeaders">
+              <el-table :data="responseHeaderData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
+										<el-table-column prop="key" label="Key">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.key" v-model="scope.row.key" :size="Paramsize" :readonly="responseReadOnly"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.key}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="value" label="Value">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.value" v-model="scope.row.value" :size="Paramsize" :readonly="responseReadOnly" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<span v-else>{{scope.row.value}}</span>
+											</template>
+										</el-table-column>
+								</el-table>
+            </el-tab-pane>           
+          </el-tabs>
+        </el-row>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addCaseVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addCaseLoading">提交</el-button>
+				<el-button @click.native="addCaseVisible = false" size="mini">取消</el-button>
+				<el-button type="primary" @click.native="addSubmit" :loading="addCaseLoading" size="mini">保存</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -355,10 +408,9 @@
 
 <script>
 	import util from '@/common/js/util'
-
+  import { validateURL } from '@/common/js/validate'
 	//import NProgress from 'nprogress'
 	import { getCaseList, deleteCase, batchRemoveUser, editUser, createCase, debugCase } from '@/api/api';
-
 	export default {
 		data() {
 			return {
@@ -396,17 +448,28 @@
 					age: 0,
 					birth: '',
 					addr: ''
-				},
+        },
+        
+        /**验证规则 */
+        addCaseRules: {
+          method: [
+            // {required: true, message:'请输入正确的url地址', trigger: 'blur'}, 
+            {validator: validateURL, trigger: 'blur'}
+          ],
+
+        },
 
         /**
          * 新增测试用例界面配置
          * @var addCaseLoading: 提交新增时按钮显示loading状态
          * @var addCaseVisible: 新增用例胃里面dialog显示控制
          * @var addCaseSize: 增加界面控件显示size控制
+         * @var visible: 用例ID show
          */
 				addCaseLoading: false,
 				addCaseVisible: false,
-				addCaseSize: 'small',
+        addCaseSize: 'mini',
+        visible: false,
 
         /**
          * 新增测试用例数据
@@ -428,7 +491,8 @@
       },
       outParam: '',
       assertData: '',
-
+      isbodyTextAreaButton: false,
+      size: 'mini',
     },
         /**
          * 新增界面table的一些配置
@@ -459,7 +523,8 @@
 				placeholderReq: "Rows are separated by new lines\nkeys and values are separated by :\nPrepend // to any row you want to add but keep disabled",
 				placeholderRes: "Hit Send to get a response",
 				keyValueBthShow: false,
-				Paramsize: "mini",
+        Paramsize: "mini",
+        requestBodyTab: 'body',
 				tableData: [
 					{
 						key: '',
@@ -729,10 +794,32 @@
 				}
 			],
 			mechodSelectValue: 0,
-			debugRequestLoading: false,
+      debugRequestLoading: false,
+      
+      /**
+       * 响应
+       * @var responseBodyTab 响应body tab选中名称
+       * @var HeadersResTextArea 响应Headers
+       * @var responseHeaderData 响应头数据
+       */
+      responseBodyTab: 'responseBody',
+      HeadersResTextArea: '',
+      responseHeaderData: [
+        {
+          key: '',
+          value: ''
+        }
+      ],
+      responseReadOnly: true,
 			}
 		},
 		methods: {
+      /**
+       * outArgsSelectChange
+       */
+      outArgsSelectChange (index, row) {
+        console.log(index, row);
+      },
       /**
        * 上传文件
        */
@@ -825,18 +912,18 @@
         if (label === 1) {
           this.isBodyTabShowTable = false;
           this.isbodyTextAreaShow = false;
-          this.isbodyTextAreaButton = false;
+          this.addCaseData.isbodyTextAreaButton = false;
 
         } else if(label === 4){
           this.isBodyTabShowTable = false;
           this.isbodyTextAreaShow = true;
-          this.isbodyTextAreaButton = false;
+          this.addCaseData.isbodyTextAreaButton = false;
           this.placeholderReq = '';
 
         }else{
           this.isBodyTabShowTable = true;
           this.isbodyTextAreaShow = false;
-          this.isbodyTextAreaButton = false;
+          this.addCaseData.isbodyTextAreaButton = false;
         };
         
       },
@@ -856,7 +943,16 @@
         let param = this.addCaseData;
         debugCase(param).then((res) => {
           console.log(res.data);
-          this.paramsResTextArea = res.data;
+          this.paramsResTextArea = JSON.stringify(res.data.res.data);
+          let headersMap = res.data.res.headers;
+          for (let key in headersMap) {
+            this.responseHeaderData.push({
+              key: key,
+              value: headersMap[key]
+            });
+          };
+
+          console.log(this.responseHeaderData)
         })
       },
       /**
@@ -921,124 +1017,8 @@
 			 * @param {*} params 表头参数
 			 * @returns div html
 			 */
- 			renderHeaderCaseList(h, params) {
-                let a =  [
-					h('el-button-group',[
-						// 文字提示
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "增加测试用例",
-								placement: "bottom",
-								effect: "light"
-							},
-						},
-						[
-							// 增加按钮
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-document-add"
-								},
-								on: {
-									click: () => {
-										this.handleAddCaseDialog();
-									}
-								}
-							})
-						]),
-						
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "全局变量",
-								placement: "bottom",
-								effect: "light"								
-							}
-						},
-						[
-							// 全局变量按钮
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-share"
-								},
-								on: {
-									click: () => {
-										this.renderAddRow();
-									}
-								}
-							}),
-						]),
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "系统函数",
-								placement: "bottom",
-								effect: "light"								
-							}
-						},
-						[
-							// 系统函数按钮
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-s-flag"
-								},
-								on: {
-									click: () => {
-										this.renderAddRow();
-									}
-								}
-							}),
-						]),
-					])
-				]
-                return h('div', a);
-			},
-
-			/**
-			 * 用例列表，增加用例Params选项卡按钮
-			 * @param {*} h 表头对象
-			 * @param {*} params 表头参数
-			 * @returns div html
-			 */
- 			renderHeaderCaseNew(h, params) {
-                let a =  [
-					h('el-button-group',[
-						// 文字提示
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "批量编辑",
-								placement: "bottom",
-								effect: "light"
-							},
-						},
-						[
-							// 批量编辑
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-s-flag"
-								},
-								on: {
-									click: () => {
-                    this.isParamTextAreaShow = true;
-                    this.isParamTableShow = false;
-                    this.keyValueBthShow = true;
-                    this.resetValParamTextArea(this.tableData, 0);
-									}
-								}
-							}, "Bulk Edit")
-						]),
-					])
-				]
-        return h('div', a);
+      caseListClick() {
+        this.handleAddCaseDialog();  
       },
 			/**
 			 * 用例列表，增加用例Params选项卡按钮
@@ -1046,39 +1026,11 @@
 			 * @param {*} params 表头参数
 			 * @returns div html
 			 */
- 			renderHeaderCaseHeader(h, params) {
-                let a =  [
-					h('el-button-group',[
-						// 文字提示
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "批量编辑",
-								placement: "bottom",
-								effect: "light"
-							},
-						},
-						[
-							// 批量编辑
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-s-flag"
-								},
-								on: {
-									click: () => {
-                    this.isHeaderTextAreaShow = true;
-                    this.isHeaderTabShowTable = false;
-                    this.isHeaderTextAreaButton = true;
-                    this.resetValParamTextArea(this.headerTableData, 1);
-									}
-								}
-							}, "Bulk Edit")
-						]),
-					])
-				]
-        return h('div', a);
+      paramBulkEditClick() {
+        this.isParamTextAreaShow = true;
+        this.isParamTableShow = false;
+        this.keyValueBthShow = true;
+        this.resetValParamTextArea(this.tableData, 0);
       },
 			/**
 			 * 用例列表，增加用例Params选项卡按钮
@@ -1086,39 +1038,23 @@
 			 * @param {*} params 表头参数
 			 * @returns div html
 			 */
- 			renderHeaderCaseBody(h, params) {
-        let a =  [
-					h('el-button-group',[
-						// 文字提示
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "批量编辑",
-								placement: "bottom",
-								effect: "light"
-							},
-						},
-						[
-							// 批量编辑
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-s-flag"
-								},
-								on: {
-									click: () => {
-                    this.isbodyTextAreaShow = true;
-                    this.isBodyTabShowTable = false;
-                    this.isbodyTextAreaButton = true;
-                    this.resetValParamTextArea(this.bodyTableData, 2);
-									}
-								}
-							}, "Bulk Edit")
-						]),
-					])
-				]
-        return h('div', a);
+      headerBulkEditClick() {
+        this.isHeaderTextAreaShow = true;
+        this.isHeaderTabShowTable = false;
+        this.isHeaderTextAreaButton = true;
+        this.resetValParamTextArea(this.headerTableData, 1);       
+      },
+			/**
+			 * 用例列表，增加用例Params选项卡按钮
+			 * @param {*} h 表头对象
+			 * @param {*} params 表头参数
+			 * @returns div html
+			 */
+      BodyBulkEditClick() {
+        this.isbodyTextAreaShow = true;
+        this.isBodyTabShowTable = false;
+        this.addCaseData.isbodyTextAreaButton = true;
+        this.resetValParamTextArea(this.bodyTableData, 2);        
       },
       /**
        * 新增用例tab切换
@@ -1159,7 +1095,7 @@
        */
       sawpBodyEditButton() {
         this.isbodyTextAreaShow = false;
-        this.isbodyTextAreaButton = false;
+        this.addCaseData.isbodyTextAreaButton = false;
 		this.isBodyTabShowTable = true;
 		// 重写状态
 		for(let i=0; i<this.bodyTableData.length; i++) {
