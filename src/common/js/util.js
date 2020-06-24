@@ -6,6 +6,75 @@ function padding(s, len) {
     return s;
 };
 
+
+function repeat (s, count) {
+    return new Array(count + 1).join(s)
+};
+
+function formatJson (json) {
+    var i = 0,
+        il = 0,
+        tab = "    ",
+        newJson = "",
+        indentLevel = 0,
+        inString = false,
+        currentChar = null;
+    for (i = 0, il = json.length; i < il; i += 1) {
+        currentChar = json.charAt(i);
+        switch (currentChar) {
+        case '{':
+        case '[':
+            if (!inString) {
+            newJson += currentChar + "\n" + repeat(tab, indentLevel + 1);
+            indentLevel += 1
+            } else {
+            newJson += currentChar
+            } break;
+        case '}':
+        case ']':
+            if (!inString) {
+            indentLevel -= 1;
+            newJson += "\n" + repeat(tab, indentLevel) + currentChar
+            } else {
+            newJson += currentChar
+            }
+            break;
+        case ',':
+            if (!inString) {
+            newJson += ",\n" + repeat(tab, indentLevel)
+            } else {
+            newJson += currentChar
+            }
+            break;
+        case ':':
+            if (!inString) {
+            newJson += ": "
+            } else {
+            newJson += currentChar
+            }
+            break;
+        case ' ':
+        case "\n":
+        case "\t":
+            if (inString) {
+            newJson += currentChar
+            }
+            break;
+        case '"':
+            if (i > 0 && json.charAt(i - 1) !== '\\') {
+            inString = !inString
+            }
+            newJson += currentChar;
+            break;
+        default:
+            newJson += currentChar;
+            break
+        }
+    }
+    return newJson
+};
+
+
 export default {
     getQueryStringByName: function (name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -18,7 +87,6 @@ export default {
         return context == null || context == "" || context == "undefined" ? "" : context;
     },
     formatDate: {
-
 
         format: function (date, pattern) {
             pattern = pattern || DEFAULT_PATTERN;
@@ -54,8 +122,16 @@ export default {
                 return _date;
             }
             return null;
-        }
-
-    }
-
+        },
+    },
+    formatJson:{
+        format (json) {
+            var json = json + "";
+            if (json.indexOf('{') == -1 && json.indexOf('[') == -1) {
+                return json;
+            } else {
+                return (formatJson(json));
+            }
+        },
+    },
 };

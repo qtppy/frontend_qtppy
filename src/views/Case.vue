@@ -479,21 +479,21 @@
          * @var baseURl: 存储初始化url
          * @var header: 请求头信息
          */
-		addCaseData: {
-			method: '',
-			url: '',
-			urlIndex: 0,
-      baseUrl: '',
-      header: '',
-      body: {
-        how: '',
-        body: ''
-      },
-      outParam: '',
-      assertData: '',
-      isbodyTextAreaButton: false,
-      size: 'mini',
-    },
+        addCaseData: {
+          method: '',
+          url: '',
+          urlIndex: 0,
+          baseUrl: '',
+          header: '',
+          body: {
+            how: '',
+            body: ''
+          },
+          outParam: '',
+          assertData: '',
+          isbodyTextAreaButton: false,
+          size: 'mini',
+        },
         /**
          * 新增界面table的一些配置
          * @var isParamTableShow: Param显示table
@@ -731,87 +731,87 @@
          * @var mechodSelectValue: 列表默认值
          * @var debugRequestLoading：点调试按钮加载状态
          */
-			methodOptions: [
-				{
-					value: 0,
-					label: 'GET'
-				},
-				{
-					value: 1,
-					label: 'POST'
-				},
-				{
-					value: 2,
-					label: 'PUT'
-				},
-				{
-					value: 3,
-					label: 'PATCH'
-				},
-				{
-					value: 4,
-					label: 'DELETE'
-				},
-				{
-					value: 5,
-					label: 'COPY'
-				},
-				{
-					value: 6,
-					label: 'HEAD'
-				},
-				{
-					value: 7,
-					label: 'OPTIONS'
-				},
-				{
-					value: 8,
-					label: 'LINK'
-				},
-				{
-					value: 9,
-					label: 'UNLINK'
-				},
-				{
-					value: 10,
-					label: 'PURGE'
-				},
-				{
-					value: 11,
-					label: 'LOCK'
-				},
-				{
-					value: 12,
-					label: 'UNLOCK'
-				},
-				{
-					value: 13,
-					label: 'PROPFIND'
-				},
-				{
-					value: 14,
-					label: 'VIEW'
-				}
-			],
-			mechodSelectValue: 0,
-      debugRequestLoading: false,
+			  methodOptions: [
+          {
+            value: 0,
+            label: 'GET'
+          },
+          {
+            value: 1,
+            label: 'POST'
+          },
+          {
+            value: 2,
+            label: 'PUT'
+          },
+          {
+            value: 3,
+            label: 'PATCH'
+          },
+          {
+            value: 4,
+            label: 'DELETE'
+          },
+          {
+            value: 5,
+            label: 'COPY'
+          },
+          {
+            value: 6,
+            label: 'HEAD'
+          },
+          {
+            value: 7,
+            label: 'OPTIONS'
+          },
+          {
+            value: 8,
+            label: 'LINK'
+          },
+          {
+            value: 9,
+            label: 'UNLINK'
+          },
+          {
+            value: 10,
+            label: 'PURGE'
+          },
+          {
+            value: 11,
+            label: 'LOCK'
+          },
+          {
+            value: 12,
+            label: 'UNLOCK'
+          },
+          {
+            value: 13,
+            label: 'PROPFIND'
+          },
+          {
+            value: 14,
+            label: 'VIEW'
+          }
+        ],
+        mechodSelectValue: 0,
+        debugRequestLoading: false,
       
-      /**
-       * 响应
-       * @var responseBodyTab 响应body tab选中名称
-       * @var HeadersResTextArea 响应Headers
-       * @var responseHeaderData 响应头数据
-       */
-      responseBodyTab: 'responseBody',
-      HeadersResTextArea: '',
-      responseHeaderData: [
-        {
-          key: '',
-          value: ''
-        }
-      ],
-      responseReadOnly: true,
-			}
+        /**
+         * 响应
+         * @var responseBodyTab 响应body tab选中名称
+         * @var HeadersResTextArea 响应Headers
+         * @var responseHeaderData 响应头数据
+         */
+        responseBodyTab: 'responseBody',
+        HeadersResTextArea: '',
+        responseHeaderData: [
+          {
+            key: '',
+            value: ''
+          }
+        ],
+        responseReadOnly: true,
+      }
 		},
 		methods: {
       /**
@@ -835,8 +835,6 @@
           })
           row.file = '';
         };
-
-
         console.log(this.bodyTableData);
       },
       /**
@@ -947,7 +945,13 @@
           this.paramsResTextArea = '';
           this.responseHeaderData = [];
 
-          this.paramsResTextArea = JSON.stringify(res.data.res.data);
+          // 转换成格式化json输出到文本域
+          // this.paramsResTextArea = this.getFormatData(
+          //   JSON.stringify(res.data.res.data)
+          // );
+          this.paramsResTextArea = util.formatJson.format(
+            JSON.stringify(res.data.res.data)
+          );
           let headersMap = res.data.res.headers;
           for (let key in headersMap) {
             this.responseHeaderData.push({
@@ -1014,7 +1018,6 @@
         // 断言数据
         this.addCaseData.assertData = this.assertData;
       },
-
 			/**
 			 * 用例列表，表头操作栏按钮
 			 * @param {*} h 表头对象
