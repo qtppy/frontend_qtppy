@@ -152,7 +152,7 @@
                         </el-button-group>  
                       </template>
 											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(1, scope.$index, scope.row)" circle></el-link>
+												<el-link type="info" v-if="tableData.length > 1" :underline="false" icon="el-icon-close" @click.native="deleteRow(1, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 									</el-table>
@@ -196,7 +196,7 @@
                         </el-button-group>                       
                       </template>
 											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(2, scope.$index, scope.row)" circle></el-link>
+												<el-link type="info" v-if="headerTableData.length > 1" :underline="false" icon="el-icon-close" @click.native="deleteRow(2, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
@@ -268,7 +268,7 @@
                         </el-button-group>
 											</template>
                       <template slot-scope="scope">
-                        <el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(3, scope.$index, scope.row)" circle></el-link>
+                        <el-link type="info" v-if="bodyTableData.length > 1" :underline="false" icon="el-icon-close" @click.native="deleteRow(3, scope.$index, scope.row)" circle></el-link>
                       </template>
 										</el-table-column>
 								</el-table>
@@ -358,7 +358,7 @@
 										</el-table-column>
 										<el-table-column label="操作">
 											<template slot-scope="scope">
-												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(4, scope.$index, scope.row)" circle></el-link>
+												<el-link type="danger" v-if="outputArgsData.length > 1" :underline="false" icon="el-icon-delete" @click.native="deleteRow(4, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
@@ -412,7 +412,7 @@
 										</el-table-column>
 										<el-table-column label="操作">
 											<template slot-scope="scope">
-												<el-link type="danger" :underline="false" icon="el-icon-delete" @click.native="deleteRow(5, scope.$index, scope.row)" circle></el-link>
+												<el-link type="danger" v-if="assertData.length > 1" :underline="false" icon="el-icon-delete" @click.native="deleteRow(5, scope.$index, scope.row)" circle></el-link>
 											</template>
 										</el-table-column>
 								</el-table>
@@ -693,7 +693,7 @@
           {
             name: '',
             exp: '',
-            match: '无需填写',
+            match: 0,
             edit: true,
             source: 0,
             expEdit: true,
@@ -917,7 +917,7 @@
           row.matchEdit = false;
           row.match= "无需填写";
         };
-        if( row.source === 1) {
+        if( row.source === 0) {
           row.matchEdit = true;
           row.match = 0;
         };
@@ -1298,11 +1298,12 @@
             this.outputArgsData.push({
               name: '',
               exp: '',
-              match: '',
+              match: '无需填写',
               edit: true,
               source: 0,
               expEdit: true,
-              matchEdit: false,           
+              matchEdit: false,
+
             })
           };
         };
@@ -1332,24 +1333,24 @@
        * @var tableIndex 1:Params
        * @var tableIndex 2:Header
        * @var tableIndex 3:Body
+       * @var tableIndex 3:出参
+       * @var tableIndex 5:断言
 			 */
 			deleteRow(tableIndex, index, row) {
-				if(index !== 0) {
-          if (tableIndex === 1) {
-            this.tableData.splice(index, 1);
-            this.addUrlParams();
-          } else if(tableIndex === 2) {
-            this.headerTableData.splice(index, 1);
-          } else if(tableIndex === 3) {
-            this.bodyTableData.splice(index, 1);
-          };
-          if (tableIndex === 4) {
-            this.outputArgsData.splice(index, 1)
-          };
-          if (tableIndex === 5) {
-            this.assertData.splice(index, 1)
-          };
-				};
+        if (tableIndex === 1) {
+          this.tableData.splice(index, 1);
+          this.addUrlParams();
+        } else if(tableIndex === 2) {
+          this.headerTableData.splice(index, 1);
+        } else if(tableIndex === 3) {
+          this.bodyTableData.splice(index, 1);
+        };
+        if (tableIndex === 4) {
+          this.outputArgsData.splice(index, 1)
+        };
+        if (tableIndex === 5) {
+          this.assertData.splice(index, 1)
+        };
       },
 
       /**
