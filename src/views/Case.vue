@@ -278,7 +278,7 @@
 								<el-table :data="outputArgsData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
 										<el-table-column prop="name" label="出参名">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.name" placeholder="Key" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.name" placeholder="输入出参名称" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.name}}</span>
 											</template>
 										</el-table-column>
@@ -294,15 +294,65 @@
                         </el-select>
 											</template>
 										</el-table-column>
-										<el-table-column prop="exp" label="解析表达式">
+										<el-table-column prop='exp' label="解析表达式" scoped-slot>
+                      <template slot='header'>
+                        <span>解析表达式</span>
+                        <el-tooltip  placement="bottom" effect="light">
+                          <div slot="content">
+                            Example:<br/>
+                            1.Body.Text 正则表达式<br/>
+                            常见正则表达式中使用到的字符范围示例如下:<br/>
+                            英文字母:[a-zA-Z]<br/>
+                            数字:[0-9]<br/>
+                            中文字符范围:[\u4e00-\u9fa5]<br/>
+                            中文、英文、数字：[\u4e00-\u9fa5a-zA-Z0-9]<br/>
+                            指定符合条件的字符个数：[a-zA-Z]{2,4} 表示2-4个字符；{2}表示字符个数为2个。<br/>
+                            注意：尽量不要使用*,否则0个也会匹配到<br/>
+                            <br/>
+                            2.Body.Json JSON串<br/>
+                            示例: result开头<br/>
+                            {"errcode":0, "errmsg": "success", "res":{"cno": 163285, "ak":[1,2,3]}}<br/>
+                            取值字典: result.res.cno<br/>
+                            取值数组: result.res.ak[1]<br/>
+                            <br/>
+                            3.Header: K/V<br/>
+                            header头部取值，输入要取值的key即可<br/>
+                            示例: content-type<br/>
+                            <br/>
+                            4.Cookie: K/V<br/>
+                            cookie取值，输入要取值的key即可<br/>
+                            示例: session<br/>
+                            <br/>
+                            5.响应状态码<br/>
+                            输入整型的状态码即可<br/>
+                            示例: 200
+                          </div>
+                          <el-link type="success" icon="el-icon-question" :underline="false"></el-link>
+                        </el-tooltip>
+                      </template>
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.exp" placeholder="输入出参提取表达式" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.expEdit" v-model="scope.row.exp" placeholder="输入出参提取表达式" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.exp}}</span>
 											</template>
 										</el-table-column>
-										<el-table-column prop="match" label="第几个匹配">
+										<el-table-column prop="match" scope-slot>
+                      <template slot="header">
+                        <span>第几个匹配</span>
+                        <el-tooltip placement="bottom" effect="light">
+                          <div slot="content">
+                            当表达式匹配到多处<br/>
+                            时，指定第几个字符串<br/>
+                            作为出参。从0开始，<br/>
+                            -n表示倒数第n个，<br/>
+                            正负均不可超过99。<br/>
+                            若想随机取匹配对象，<br/>
+                            填写random。
+                          </div>
+                          <el-link type="success" icon="el-icon-question" :underline="false"></el-link>
+                        </el-tooltip>
+                      </template>
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.match" placeholder="" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.matchEdit" v-model="scope.row.match" placeholder="" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.match}}</span>
 											</template>
 										</el-table-column>
@@ -643,11 +693,14 @@
           {
             name: '',
             exp: '',
-            match: '',
+            match: '无需填写',
             edit: true,
             source: 0,
+            expEdit: true,
+            matchEdit: false, 
           },
         ],
+
         /**
          * 断言
          * @var assertData 检查点数据
@@ -847,9 +900,26 @@
 		methods: {
       /**
        * outArgsSelectChange
+       * 出参来源修改时，其它输入项，对应输入状态变更
+       * @param {*} index 所在行索引
+       * @param {*} row 所在行数据
        */
       outArgsSelectChange (index, row) {
         console.log(index, row);
+        // 来源选择了状态码
+        if(row.source === 4) {
+          row.expEdit = false;
+          row.exp = "code";
+        } else {
+          row.expEdit = true;
+          row.exp = "";
+          row.matchEdit = false;
+          row.match= "无需填写";
+        };
+        if( row.source === 1) {
+          row.matchEdit = true;
+          row.match = 0;
+        };
       },
       /**
        * 上传文件
@@ -1213,7 +1283,9 @@
               exp: '',
               match: '',
               edit: true,
-              source: 0,              
+              source: 0,
+              expEdit: true,
+              matchEdit: false,           
             })
           };
         };
