@@ -406,7 +406,7 @@
 										</el-table-column>
 										<el-table-column prop="checkContent" label="断言内容">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.checkContent" placeholder="输入出参提取表达式" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.edit" v-model="scope.row.checkContent" placeholder="输入期望值" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.checkContent}}</span>
 											</template>
 										</el-table-column>
