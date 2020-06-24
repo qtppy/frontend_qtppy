@@ -86,12 +86,12 @@
 		</el-dialog> -->
 
 		<!-- 新增测试用例界面 -->
-		<el-dialog title="新增测试用例" :fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false">
+		<el-dialog :title="addCaseTitle" :fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false">
 			<el-form :model="addCaseData" label-width="3px" ref="addSuiteData">
 				<el-row>
 					<el-col :span="12">
 						<el-form-item prop="method">
-							<el-input placeholder="请输入请求URL" v-model="addCaseData.url" class="input-with-select" @change="baseUrlSet">
+							<el-input placeholder="请输入请求URL" v-model="addCaseData.url" class="input-with-select" @change="baseUrlSet" size="small">
 								<el-select v-model="mechodSelectValue" placeholder="Method" slot="prepend" style="width:120px;">
 									<el-option
 									v-for="item in methodOptions"
@@ -104,6 +104,10 @@
 							</el-input>
 						</el-form-item>
 					</el-col>
+          <el-col :span="6"></el-col>
+          <el-col :span="6">
+            <el-button type="info" icon="el-icon-copy-document" @click.native="addSubmit" :loading="addCaseLoading" plain size="small">保存</el-button>
+          </el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="24">
@@ -367,7 +371,9 @@
 					</el-col>
 				</el-row>
         <el-row>
-          <el-tabs v-model="responseBodyTab" size="mini">
+          <el-tabs v-model="responseBodyTab" size="mini" v-loading="responseLoading"     
+          element-loading-text="Send Request..."
+          element-loading-spinner="el-icon-loading">
             <!-- Response body-->
             <el-tab-pane label="Body" name="responseBody">
               <el-input
@@ -383,25 +389,38 @@
               <el-table :data="responseHeaderData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.key" v-model="scope.row.key" :size="Paramsize" :readonly="responseReadOnly"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.key" v-model="scope.row.key" :size="Paramsize" :readonly="responseReadOnly"></el-input>
 												<span v-else>{{scope.row.key}}</span>
 											</template>
 										</el-table-column>
 										<el-table-column prop="value" label="Value">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.value" v-model="scope.row.value" :size="Paramsize" :readonly="responseReadOnly" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<el-input v-if="scope.row.value" v-model="scope.row.value" :size="Paramsize" :readonly="responseReadOnly"></el-input>
 												<span v-else>{{scope.row.value}}</span>
 											</template>
 										</el-table-column>
 								</el-table>
-            </el-tab-pane>           
+            </el-tab-pane>
+            <!-- Response Cookies-->
+            <el-tab-pane label="Cookies" name="responseCookies">
+              <el-table :data="responseCookiesData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
+										<el-table-column prop="key" label="Key">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.key" v-model="scope.row.key" :size="Paramsize" :readonly="responseReadOnly"></el-input>
+												<span v-else>{{scope.row.key}}</span>
+											</template>
+										</el-table-column>
+										<el-table-column prop="value" label="Value">
+											<template slot-scope="scope">
+												<el-input v-if="scope.row.value" v-model="scope.row.value" :size="Paramsize" :readonly="responseReadOnly"></el-input>
+												<span v-else>{{scope.row.value}}</span>
+											</template>
+										</el-table-column>
+								</el-table>
+            </el-tab-pane>        
           </el-tabs>
         </el-row>
 			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addCaseVisible = false" size="mini">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addCaseLoading" size="mini">保存</el-button>
-			</div>
 		</el-dialog>
 	</section>
 </template>
@@ -428,7 +447,8 @@
 				filters: {
 					name: ''
 				},
-				casesData: [],
+        casesData: [],
+        Paramsize:'mini',
 				total: 0,
 				page: 1,
 				per_page: 10,
@@ -470,6 +490,7 @@
 				addCaseVisible: false,
         addCaseSize: 'mini',
         visible: false,
+        addCaseTitle: '用例管理 / 新增用例',
 
         /**
          * 新增测试用例数据
@@ -801,6 +822,8 @@
          * @var responseBodyTab 响应body tab选中名称
          * @var HeadersResTextArea 响应Headers
          * @var responseHeaderData 响应头数据
+         * @var responseLoading 响应加载
+         * @var responseReadOnly 响应文本只读
          */
         responseBodyTab: 'responseBody',
         HeadersResTextArea: '',
@@ -811,6 +834,14 @@
           }
         ],
         responseReadOnly: true,
+        responseLoading: false,
+        cookiesResTextArea: '',
+        responseCookiesData: [
+          {
+            key: '',
+            value: ''
+          }
+        ],
       }
 		},
 		methods: {
@@ -930,9 +961,11 @@
        * 新增测试用例;调试功能
        */
       sendRequest() {
+        this.responseLoading = true;
         this.initRequestData();
         console.log(this.addCaseData)
         this.debugRequest();
+        this.responseLoading = false;
       },
       /**
        * debug单接口
@@ -944,14 +977,14 @@
           // 初始化响应数据，否则调用多次会累加
           this.paramsResTextArea = '';
           this.responseHeaderData = [];
+          this.responseCookiesData = [];
 
-          // 转换成格式化json输出到文本域
-          // this.paramsResTextArea = this.getFormatData(
-          //   JSON.stringify(res.data.res.data)
-          // );
+          // body转换成格式化json输出到文本域
           this.paramsResTextArea = util.formatJson.format(
             JSON.stringify(res.data.res.data)
           );
+
+          // 请求头数据整理
           let headersMap = res.data.res.headers;
           for (let key in headersMap) {
             this.responseHeaderData.push({
@@ -960,6 +993,14 @@
             });
           };
 
+          // cookies数据整理
+          let cookiesMap = res.data.res.cookies;
+          for (let key in cookiesMap) {
+            this.responseCookiesData.push({
+              key: key,
+              value: cookiesMap[key]
+            });
+          };
           console.log(this.responseHeaderData)
         })
       },
