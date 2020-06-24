@@ -381,7 +381,6 @@
 										<el-table-column prop="checkObject" label="断言对象">
 											<template slot-scope="scope">
 												<el-input v-if="scope.row.objectEdit" v-model="scope.row.checkObject" placeholder="请输入断言对象"  :disabled="scope.row.assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
-												<!-- <span v-else>{{scope.row.checkObject}}</span> -->
                         <el-select v-else v-model="scope.row.checkObject" size="mini">
                           <el-option
                             v-for="item in assertCheckobjectOutArgs"
@@ -404,7 +403,30 @@
                         </el-select>
 											</template>
 										</el-table-column>
-										<el-table-column prop="checkContent" label="断言内容">
+										<el-table-column prop="checkContent">
+                      <template slot="header">
+                        <span>断言内容</span>
+                        <el-tooltip placement="bottom" effect="light">
+                          <div slot="content">
+                            “属于”、“不属于”支持正负整数、0、字符串：<br/>
+                            <br/>
+                            1. 数值：请按照标准的数学表达式规范填写。示例如下：<br/>
+                            <br/>
+                            - 表示闭区间：{[-20,20]}<br/>
+                            <br/>
+                            - 表示集合：{[-200, 200], -1, 2}<br/>
+                            <br/>
+                            说明：当数值集合中不包括负整数时，旧表达式仍然生效，<br/>
+                            <br/>
+                            但不推荐使用。例如，[200-300,1]，可表示包括 1 、200 至 300<br/>
+                            <br/>
+                            闭区间的整数的集合。<br/>
+                            <br/>
+                            2. 字符串示例：{'abc', 'bcd', '200', '-200', '已报名', '报名成功'}
+                          </div>
+                          <el-link type="success" icon="el-icon-question" :underline="false"></el-link>
+                        </el-tooltip>
+                      </template>
 											<template slot-scope="scope">
 												<el-input v-if="scope.row.edit" v-model="scope.row.checkContent" placeholder="输入期望值" :size="Paramsize"  @input="addNewRow(3, scope.$index, scope.row)"></el-input>
 												<span v-else>{{scope.row.checkContent}}</span>
