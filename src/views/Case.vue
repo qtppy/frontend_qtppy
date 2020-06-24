@@ -86,7 +86,10 @@
 		</el-dialog> -->
 
 		<!-- 新增测试用例界面 -->
-		<el-dialog :title="addCaseTitle" :fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false">
+		<el-dialog :fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false">
+      <template slot="title">
+        <el-link type="primary" :underline="false">{{this.addCaseTitle}}</el-link>
+      </template>
 			<el-form :model="addCaseData" label-width="3px" ref="addSuiteData">
 				<el-row>
 					<el-col :span="12">
