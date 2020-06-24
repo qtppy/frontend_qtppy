@@ -274,7 +274,20 @@
 								</el-table>
               </el-tab-pane>
               <!-- 出参 -->
-              <el-tab-pane label="出参" name="output">
+              <el-tab-pane name="output" scope-slot>
+                <template slot="label">
+                  <span>出参</span>
+                  <el-tooltip  placement="bottom" effect="light">
+                    <div slot="content">
+                      出参是从当前请求的 Response 中截取需要的内容，<br/>
+                      <br/>
+                      在后续的请求中作为参数使用。<br/>
+                      <br/>
+                      在一个API请求中,可以定义多个出参。
+                    </div>
+                    <el-link type="success" icon="el-icon-question" :underline="false"></el-link>                 
+                  </el-tooltip>
+                </template>
 								<el-table :data="outputArgsData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
 										<el-table-column prop="name" label="出参名">
 											<template slot-scope="scope">
@@ -364,7 +377,16 @@
 								</el-table>
               </el-tab-pane>
               <!-- 断言tab -->
-              <el-tab-pane label="断言" name="assert">
+              <el-tab-pane name="assert">
+                <template slot="label">
+                  <span>断言</span>
+                  <el-tooltip  placement="bottom" effect="light">
+                    <div slot="content">
+                      断言，用来判断业务是否正常。<br/>
+                    </div>
+                    <el-link type="success" icon="el-icon-question" :underline="false"></el-link>                 
+                  </el-tooltip>
+                </template>
 								<el-table :data="assertData" border stripe style="width: 100%;" :size="Paramsize" v-show="true">
 										<el-table-column prop="checkType" label="断言类型">
 											<template slot-scope="scope">
