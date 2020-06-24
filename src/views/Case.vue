@@ -380,9 +380,9 @@
 										</el-table-column>
 										<el-table-column prop="checkObject" label="断言对象">
 											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.checkObject" placeholder="请输入断言对象" v-show="scope.row.assertCheckobjectShow" :disabled="scope.row.assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.checkObject}}</span>
-                        <el-select v-model="scope.row.checkObject" size="addCaseData.mini" v-show="scope.row.assertCheckobjectOptionShow">
+												<el-input v-if="scope.row.objectEdit" v-model="scope.row.checkObject" placeholder="请输入断言对象"  :disabled="scope.row.assertCheckobjectDisabled" :size="Paramsize" @input="addNewRow(3, scope.$index, scope.row)"></el-input>
+												<!-- <span v-else>{{scope.row.checkObject}}</span> -->
+                        <el-select v-else v-model="scope.row.checkObject" size="mini">
                           <el-option
                             v-for="item in assertCheckobjectOutArgs"
                             :key="item.value"
@@ -715,7 +715,8 @@
             edit: true,
             assertCheckobjectDisabled: false,
             assertCheckobjectOptionShow: false,
-            assertCheckobjectShow: true
+            assertCheckobjectShow: true,
+            objectEdit: true,
           },
         ],
         assertTypeOptions: [
@@ -985,17 +986,33 @@
           row.assertCheckobjectOptionShow = false;
         };
         if (row.checkType === 2) {
-          row.assertCheckobjectShow = true;
+          row.objectEdit = true;
           row.checkObject = '整个body';
           row.assertCheckobjectDisabled = true;
           row.assertCheckobjectOptionShow = false;
         };
+        // 出参
         if (row.checkType === 3) {
-          row.assertCheckobjectShow = false;
-          row.assertCheckobjectOptionShow = true;
+          // 重新初始化参数
+          this.assertCheckobjectOutArgs = [];
+          let outParamData = this.outputArgsData;
+          for (let i=0; i<outParamData.length; i++) {
+            if (outParamData[i].name !== '') {
+              this.assertCheckobjectOutArgs.push(
+                {
+                  value: i,
+                  label: outParamData[i].name,
+                }
+              )
+            };
+          };
+          row.objectEdit = false;
+          row.checkObject = 0;
+          console.log('===>', this.outputArgsData);
+
         };
         if (row.checkType === 4) {
-          row.assertCheckobjectShow = false;
+          row.objectEdit = false;
           row.assertCheckobjectOptionShow = true;
         };
         console.log(this.assertData)
@@ -1300,7 +1317,8 @@
               edit: true,
               assertCheckobjectDisabled: false,
               assertCheckobjectOptionShow: false,
-              assertCheckobjectShow: true         
+              assertCheckobjectShow: true,
+              objectEdit: true,   
             })
           };
         };
