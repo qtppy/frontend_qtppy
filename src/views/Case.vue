@@ -488,21 +488,18 @@
 								</el-table>
             </el-tab-pane>
             <!-- Response 状态 -->
-            <el-tab-pane name="responseStatus" scope-slot>
+            <el-tab-pane name="responseStatus" scope-slot disabled>
               <template slot="label">
-                <i>　　　　　　　　　　　　</i>
+                <span style="padding-left: 750px"></span>
                 <el-link type="info" :underline="false" disabled>
                   Status: {{this.responseStatus.status}}
                   <i v-if="this.responseStatus.status === 200" class="el-icon-circle-check" style="color:#67C23A;"></i>
                   <i v-else class="el-icon-circle-close" style="color:#F56C6C;"></i>
                 </el-link>
-
                 <el-link type="info" :underline="false" disabled>
                   Time: 
                   <i style="color:#67C23A;">{{this.responseStatus.time}} ms</i>
                 </el-link>
-
-
                 <el-link type="info" :underline="false" disabled>
                   Size: 
                   <i style="color:#67C23A;">{{this.responseStatus.size}} kb</i>
