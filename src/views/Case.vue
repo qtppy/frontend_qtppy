@@ -95,6 +95,7 @@
                     <el-dropdown-item  
                       :loading="addCaseLoading"
                     >
+                      <i class="el-icon-collection"></i>
                       调试并保存
                     </el-dropdown-item>
                   </el-dropdown-menu>
