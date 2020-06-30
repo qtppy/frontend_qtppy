@@ -92,7 +92,8 @@
                   <i class="el-icon-share"></i>
                   调试
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item  
+                    <el-dropdown-item
+                      command="debug_and_save"
                       :loading="addCaseLoading"
                     >
                       <i class="el-icon-collection"></i>
@@ -505,10 +506,27 @@
 										</el-table-column>
 								</el-table>
             </el-tab-pane>
+            <!-- Test Result -->
+            <el-tab-pane label="Test Results" name="Test Results">
+              <el-collapse accordion>
+                <el-collapse-item>
+                  <template slot="title">
+                    出参变量
+                  </template>
+                  <div v-for="(item, i) in resOutParamList">{{item.var_name}}:{{item.var_value}}</div>
+                </el-collapse-item>
+                <el-collapse-item>
+                  <template slot="title">
+                    断言结果
+                  </template>
+                  <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
+                </el-collapse-item>
+              </el-collapse>
+            </el-tab-pane>
             <!-- Response 状态 -->
             <el-tab-pane  v-if="responseStatustoolShow" name="responseStatus" scope-slot disabled>
               <template slot="label">
-                <span style="padding-left: 750px"></span>
+                <span style="padding-left: 650px"></span>
                 <el-link type="info" :underline="false" disabled>
                   Status: {{this.responseStatus.status}}
                   <i v-if="this.responseStatus.status === 200" class="el-icon-circle-check" style="color:#67C23A;"></i>
@@ -723,6 +741,7 @@
          * @var outPutArgsOptions 出参来源下拉列表
          * @var outputArgsData 出参数据
          */
+        resOutParamList: [],
         outPutArgsOptions: [
           {
             value: 0,
@@ -753,7 +772,7 @@
             edit: true,
             source: 0,
             expEdit: true,
-            matchEdit: false, 
+            matchEdit: true, 
           },
         ],
 
@@ -973,6 +992,7 @@
         // 来源选择了状态码
         if(row.source === 4) {
           row.expEdit = false;
+          row.matchEdit = false;
           row.exp = "code";
         } else {
           row.expEdit = true;
@@ -1127,6 +1147,9 @@
           // 响应状态
           this.responseStatus.status = res.data.res.status_code;
           this.responseStatus.time = res.data.res.elapsed;
+          // 响应出参数据
+          this.resOutParamList = res.data.res.out_param_list;
+
           // 响应状态栏
           this.responseStatustoolShow = true;
 
@@ -1375,11 +1398,11 @@
             this.outputArgsData.push({
               name: '',
               exp: '',
-              match: '无需填写',
+              match: 0,
               edit: true,
               source: 0,
               expEdit: true,
-              matchEdit: false,
+              matchEdit: true,
 
             })
           };
