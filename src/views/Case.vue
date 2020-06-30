@@ -75,13 +75,30 @@
 									:value="item.value">
 									</el-option>
 								</el-select>
-								<el-button slot="append" icon="el-icon-share" :loading="debugRequestLoading" @click="sendRequest">调试</el-button>
 							</el-input>
 						</el-form-item>
 					</el-col>
           <el-col :span="6"></el-col>
           <el-col :span="6">
-            <el-button type="info" icon="el-icon-copy-document" @click.native="addSubmit" :loading="addCaseLoading" plain size="small">保存</el-button>
+              <el-dropdown 
+                size="small" 
+                split-button 
+                type="primary"
+                trigger="click"
+                :loading="debugRequestLoading"
+                @click="sendRequest"
+                @command="sendRequest"
+              >
+                  <i class="el-icon-share"></i>
+                  调试
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item  
+                      :loading="addCaseLoading"
+                    >
+                      调试并保存
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+              </el-dropdown>
           </el-col>
 				</el-row>
 				<el-row>
@@ -1108,6 +1125,7 @@
           console.log(res.data);
           // 响应状态
           this.responseStatus.status = res.data.res.status_code;
+          this.responseStatus.time = res.data.res.elapsed;
           // 响应状态栏
           this.responseStatustoolShow = true;
 
@@ -1191,7 +1209,15 @@
         this.addCaseData.body.how = this.bodyRadio;
 
         // 出参数据
-        this.addCaseData.outParam = this.outputArgsData;
+        let outParam = [];
+        for(let i=0; i<this.outputArgsData.length; i++) {
+          if(this.outputArgsData[i].name !== '') {
+            outParam.push(
+              this.outputArgsData[i]
+            );
+          };
+        };
+        this.addCaseData.outParam = outParam;
 
         // 断言数据
         this.addCaseData.assertData = this.assertData;
