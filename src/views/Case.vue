@@ -488,7 +488,7 @@
 								</el-table>
             </el-tab-pane>
             <!-- Response 状态 -->
-            <el-tab-pane name="responseStatus" scope-slot disabled>
+            <el-tab-pane  v-if="responseStatustoolShow" name="responseStatus" scope-slot disabled>
               <template slot="label">
                 <span style="padding-left: 750px"></span>
                 <el-link type="info" :underline="false" disabled>
@@ -918,10 +918,11 @@
          * @var responseReadOnly 响应文本只读
          * @var responseStatus 响应状态
          */
+        responseStatustoolShow: false,
         responseStatus: {
-          status: 200,
-          time: 26,
-          size: 1000
+          status: 0,
+          time: 0,
+          size: 0
         },
         responseBodyTab: 'responseBody',
         HeadersResTextArea: '',
@@ -1105,6 +1106,11 @@
         let param = this.addCaseData;
         debugCase(param).then((res) => {
           console.log(res.data);
+          // 响应状态
+          this.responseStatus.status = res.data.res.status_code;
+          // 响应状态栏
+          this.responseStatustoolShow = true;
+
           // 初始化响应数据，否则调用多次会累加
           this.paramsResTextArea = '';
           this.responseHeaderData = [];
