@@ -12,9 +12,9 @@
 				<el-form-item>
 					<el-button type="primary" icon="el-icon-search" size="mini" v-on:click="getCase">查询</el-button>
 				</el-form-item>
-				<el-form-item>
+				<!-- <el-form-item>
 					<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAddCaseDialog">新增</el-button>
-				</el-form-item>
+				</el-form-item> -->
 			</el-form>
 		</el-col>
 
@@ -58,28 +58,52 @@
 		</el-col>
 
 		<!-- 新增测试用例界面 -->
-		<el-dialog :fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false">
+		<el-dialog 
+      :fullscreen="true" 
+      :visible="addCaseVisible" 
+      :close-on-click-modal="false" 
+      @close="addCaseVisible=false"
+    >
       <template slot="title">
-        <el-link type="primary" :underline="false">{{this.addCaseTitle}}</el-link>
+        <el-link 
+         type="primary" 
+         :underline="false"
+        >
+         {{this.addCaseTitle}}
+        </el-link>
       </template>
-			<el-form :model="addCaseData" label-width="3px" ref="addSuiteData">
+			<el-form 
+        :model="addCaseData" 
+        label-width="3px" 
+        ref="addSuiteData"
+      >
 				<el-row>
-					<el-col :span="12">
+					<el-col :span="8">
 						<el-form-item prop="method">
-							<el-input placeholder="请输入请求URL" v-model="addCaseData.url" class="input-with-select" @change="baseUrlSet" size="small">
-								<el-select v-model="mechodSelectValue" placeholder="Method" slot="prepend" style="width:120px;">
+							<el-input 
+                placeholder="请输入请求URL" 
+                v-model="addCaseData.url" 
+                class="input-with-select" 
+                @change="baseUrlSet" 
+                size="small"
+              >
+								<el-select 
+                  v-model="mechodSelectValue" 
+                  placeholder="Method" 
+                  slot="prepend" 
+                  style="width:100px;"
+                >
 									<el-option
-									v-for="item in methodOptions"
-									:key="item.value"
-									:label="item.label"
-									:value="item.value">
+                    v-for="item in methodOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
 									</el-option>
 								</el-select>
 							</el-input>
 						</el-form-item>
 					</el-col>
-          <el-col :span="6"></el-col>
-          <el-col :span="6">
+          <el-col :span="2">
               <el-dropdown 
                 size="small" 
                 split-button 
@@ -102,10 +126,49 @@
                   </el-dropdown-menu>
               </el-dropdown>
           </el-col>
+          <el-col :span="6">
+            <el-input
+              type="text"
+              placeholder="请输入用例名称"
+              prefix-icon="el-icon-edit"
+              size="small"
+              v-model="addCaseData.name"
+              maxlength="50"
+              show-word-limit
+            >
+            <template slot="prepend">
+              <el-link 
+                type="primary" 
+                :underline="false"
+              >
+              用例名称:
+              </el-link>
+            </template>
+            </el-input>
+          </el-col>
+          <el-col :span="8">
+            <el-input
+              type="text"
+              placeholder="请输入用例描述"
+              prefix-icon="el-icon-edit"
+              size="small"
+              v-model="addCaseData.desc"
+              maxlength="100"
+              show-word-limit
+            >
+            <template slot="prepend">
+              <el-link type="primary" :underline="false">用例描述:</el-link>
+            </template>
+            </el-input>
+          </el-col>
 				</el-row>
 				<el-row>
 					<el-col :span="24">
-						<el-tabs v-model="requestBodyTab" @tab-click="handleCaseTabClick" :size="Paramsize">
+						<el-tabs 
+              v-model="requestBodyTab" 
+              @tab-click="handleCaseTabClick" 
+              :size="Paramsize"
+            >
 							<!-- Params参数 -->
 							<el-tab-pane label="Params" name="params">
 								<el-button type="primary" icon="el-icon-share" size="mini" style="float:right;" v-show="keyValueBthShow" @click="swapParamEditButton">Key-Value Edit</el-button>
@@ -623,6 +686,9 @@
          * @var urlIndex: url初始化索引，第一拼接为0
          * @var baseURl: 存储初始化url
          * @var header: 请求头信息
+         * @var debugWay 0调试；1调试并保存
+         * @var name 用例名称
+         * @var desc 用例描述
          */
         addCaseData: {
           method: '',
@@ -638,6 +704,9 @@
           assertData: '',
           isbodyTextAreaButton: false,
           size: 'mini',
+          debugWay: 0,
+          name: '',
+          desc: ''
         },
         /**
          * 新增界面table的一些配置
@@ -1130,10 +1199,21 @@
       /**
        * 新增测试用例;调试功能
        */
-      sendRequest() {
+      sendRequest(command) {
+        // 调试并保存；默认调试
+        if(command === 'debug_and_save') {
+          this.addCaseData.debugWay = 1;
+          // 调用创建用例接口
+          createCase(this.addCaseData).then(res => {
+            console.log(res.data)
+          })
+        }else {
+          this.addCaseData.debugWay = 0;
+        };
         this.responseLoading = true;
         this.initRequestData();
         console.log(this.addCaseData)
+        console.log('->>>>>>>>>>>>>>>>>>>>>>>>>>>', command)
         this.debugRequest();
         this.responseLoading = false;
       },
@@ -1244,7 +1324,15 @@
         this.addCaseData.outParam = outParam;
 
         // 断言数据
-        this.addCaseData.assertData = this.assertData;
+        let checkData = [];
+        for(let i=0; i<this.assertData.length; i++) {
+          if(this.assertData[i].checkType !== '') {
+            checkData.push(
+              this.assertData[i]
+            );
+          }
+        };
+        this.addCaseData.assertData = checkData;
       },
 			/**
 			 * 用例列表，表头操作栏按钮
