@@ -1,16 +1,37 @@
 <template>
 	<section>
 		<!--工具条-->
-		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-			<el-form :inline="true" :model="filters">
+		<el-col 
+      :span="24" 
+      class="toolbar" 
+      style="padding-bottom: 0px;"
+    >
+			<el-form 
+        :inline="true" 
+        :model="filters"
+      >
 				<el-form-item>
-					<el-link type="primary" icon="el-icon-guide" :underline="false">用例查询:</el-link>
+					<el-link 
+            type="primary" 
+            icon="el-icon-guide" 
+            :underline="false"
+          >
+            用例查询:
+          </el-link>
 				</el-form-item>
 				<el-form-item>
-					<el-input v-model="filters.name" placeholder="用例名称" size="mini"></el-input>
+					<el-input 
+            v-model="filters.name" 
+            placeholder="用例名称" 
+            size="mini"></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" icon="el-icon-search" size="mini" v-on:click="getCase">查询</el-button>
+					<el-button 
+            type="primary" 
+            icon="el-icon-search" 
+            size="mini" 
+            v-on:click="getCase"
+          >查询</el-button>
 				</el-form-item>
 				<!-- <el-form-item>
 					<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAddCaseDialog">新增</el-button>
@@ -19,7 +40,13 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="casesData" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;" size="mini">
+		<el-table 
+      :data="casesData" 
+      highlight-current-row 
+      v-loading="listLoading" 
+      @selection-change="selsChange" 
+      style="width: 100%;" 
+      size="mini">
 			<el-table-column type="selection" width="55"></el-table-column>
 			<el-table-column type="index" width="100" label="序号" sortable></el-table-column>
 			<el-table-column prop="id" label="用例ID" width="120" v-if="visible"></el-table-column>
@@ -65,12 +92,25 @@
       @close="addCaseVisible=false"
     >
       <template slot="title">
-        <el-link 
+        <el-breadcrumb separator="/">
+          <el-breadcrumb-item 
+            :to="{ path: '/main' }"
+          >
+            主页
+          </el-breadcrumb-item>
+          <el-breadcrumb-item>
+            用例管理
+          </el-breadcrumb-item>
+          <el-breadcrumb-item>
+            新增用例
+          </el-breadcrumb-item>
+        </el-breadcrumb>
+        <!-- <el-link 
          type="primary" 
          :underline="false"
         >
          {{this.addCaseTitle}}
-        </el-link>
+        </el-link> -->
       </template>
 			<el-form 
         :model="addCaseData" 
