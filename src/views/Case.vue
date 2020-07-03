@@ -34,7 +34,11 @@
           >查询</el-button>
 				</el-form-item>
 				<!-- <el-form-item>
-					<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAddCaseDialog">新增</el-button>
+					<el-button 
+            type="primary" 
+            icon="el-icon-news" 
+            size="mini" 
+            @click="handleAddCaseDialog">新增</el-button>
 				</el-form-item> -->
 			</el-form>
 		</el-col>
@@ -47,43 +51,135 @@
       @selection-change="selsChange" 
       style="width: 100%;" 
       size="mini">
-			<el-table-column type="selection" width="55"></el-table-column>
-			<el-table-column type="index" width="100" label="序号" sortable></el-table-column>
-			<el-table-column prop="id" label="用例ID" width="120" v-if="visible"></el-table-column>
-			<el-table-column prop="name" label="名称" width="120" sortable></el-table-column>
-			<el-table-column prop="url" label="地址" width="120"></el-table-column>
-			<el-table-column prop="method" label="方法" width="100"></el-table-column>
-			<el-table-column prop="desc" label="描述" width="200" ></el-table-column>
-			<el-table-column prop="createtime" label="创建时间" width="100" :formatter="formatDateDMT"></el-table-column>
-			<el-table-column prop="creator" label="创建者" min-width="100"></el-table-column>
+			<el-table-column 
+        type="selection" 
+        width="55"></el-table-column>
+			<el-table-column 
+        type="index" 
+        width="100" 
+        label="序号" 
+        sortable></el-table-column>
+			<el-table-column 
+        prop="id" 
+        label="用例ID" 
+        width="120" 
+        v-if="visible"></el-table-column>
+			<el-table-column 
+        prop="name" 
+        label="名称" 
+        width="120" 
+        sortable></el-table-column>
+			<el-table-column 
+        prop="url" 
+        label="地址" 
+        width="120"></el-table-column>
+			<el-table-column 
+        prop="method" 
+        label="方法" 
+        width="100"></el-table-column>
+			<el-table-column 
+        prop="desc" 
+        label="描述" 
+        width="200" ></el-table-column>
+			<el-table-column 
+      prop="createtime" 
+      label="创建时间" 
+      width="100" 
+      :formatter="formatDateDMT"></el-table-column>
+			<el-table-column 
+        prop="creator" 
+        label="创建者" 
+        min-width="100"></el-table-column>
 			<el-table-column label="操作" width="150">
         <template slot="header" slot-scope>
           <el-button-group>
-            <el-tooltip :disabled="false" placement="bottom" effect="light" content="增加测试用例">
-              <el-button size="mini" type="primary" icon="el-icon-document-add" @click="caseListClick"></el-button>
+            <el-tooltip 
+              :disabled="false" 
+              placement="bottom" 
+              effect="light" 
+              content="增加测试用例">
+              <el-button 
+                size="mini" 
+                type="primary" 
+                icon="el-icon-document-add" 
+                @click="caseListClick"></el-button>
             </el-tooltip>
-            <el-tooltip :disabled="false" placement="bottom" effect="light" content="全局变量">
-              <el-button size="mini" type="primary" icon="el-icon-share" @click="caseListClick"></el-button>
+            <el-tooltip 
+              :disabled="false" 
+              placement="bottom" 
+              effect="light" 
+              content="用例全局设置">
+              <el-button 
+                size="mini" 
+                type="primary" 
+                icon="el-icon-share" 
+                @click="caseGlobalDialog = true"></el-button>
             </el-tooltip>
-            <el-tooltip :disabled="false" placement="bottom" effect="light" content="系统函数">
-              <el-button size="mini" type="primary" icon="el-icon-s-flag" @click="caseListClick"></el-button>
+            <el-tooltip 
+              :disabled="false" 
+              placement="bottom" 
+              effect="light" 
+              content="系统函数">
+              <el-button 
+                size="mini" 
+                type="primary" 
+                icon="el-icon-s-flag" 
+                @click="caseListClick"></el-button>
             </el-tooltip>
           </el-button-group>  
         </template>
 				<template slot-scope="scope">
-					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-button 
+            size="small" 
+            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+					<el-button 
+            type="danger" 
+            size="small" 
+            @click="handleDel(scope.$index, scope.row)">删除</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="per_page" :total="total" style="float:right;">
+			<el-button 
+        type="danger" 
+        @click="batchRemove" 
+        :disabled="this.sels.length===0">批量删除</el-button>
+			<el-pagination 
+        layout="prev, pager, next" 
+        @current-change="handleCurrentChange" 
+        :page-size="per_page" 
+        :total="total" 
+        style="float:right;">
 			</el-pagination>
 		</el-col>
-
+    <!-- 右侧抽屉 -->
+    <el-drawer
+      :visible.sync="caseGlobalDialog"
+      direction="rtl"
+      custom-class="demo-drawer"
+      ref="drawer"
+      :wrapperClosable="false"
+      >
+      <el-collapse v-model="caseGlobalActiveName" accordion>
+        <el-collapse-item name="base">
+          <template slot="title">
+            <i class="header-icon el-icon-info"></i>
+            基本设置
+          </template>
+          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+        </el-collapse-item>
+        <el-collapse-item name="custom">
+          <template slot="title">
+            自定义设置
+          </template>
+          <div>控制反馈：通过界面样式和交互动效让用户可以清晰的感知自己的操作；</div>
+          <div>页面反馈：操作后，通过页面元素的变化清晰地展现当前状态。</div>
+        </el-collapse-item>
+      </el-collapse>
+    </el-drawer>
 		<!-- 新增测试用例界面 -->
 		<el-dialog 
       :fullscreen="true" 
@@ -105,12 +201,6 @@
             新增用例
           </el-breadcrumb-item>
         </el-breadcrumb>
-        <!-- <el-link 
-         type="primary" 
-         :underline="false"
-        >
-         {{this.addCaseTitle}}
-        </el-link> -->
       </template>
 			<el-form 
         :model="addCaseData" 
@@ -1087,9 +1177,35 @@
             value: ''
           }
         ],
+        // 用例全局设置抽屉
+        caseGlobalDialog: false,
+        caseGlobalLoading: false,
+        caseGlobalActiveName: "base",
       }
 		},
 		methods: {
+        handleClose(done) {
+          if (this.caseGlobalLoading) {
+            return;
+          }
+          this.$confirm('确定要提交表单吗？')
+            .then(_ => {
+              this.caseGlobalLoading = true;
+              this.timer = setTimeout(() => {
+                done();
+                // 动画关闭需要一定的时间
+                setTimeout(() => {
+                  this.caseGlobalLoading = false;
+                }, 400);
+              }, 2000);
+            })
+            .catch(_ => {});
+        },
+        cancelForm() {
+          this.caseGlobalLoading = false;
+          this.caseGlobalDialog = false;
+          clearTimeout(this.timer);
+        },
       /**
        * outArgsSelectChange
        * 出参来源修改时，其它输入项，对应输入状态变更
