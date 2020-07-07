@@ -129,13 +129,26 @@
           </el-button-group>  
         </template>
 				<template slot-scope="scope">
-					<el-button 
-            size="small" 
-            @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-					<el-button 
-            type="danger" 
-            size="small" 
-            @click="handleDel(scope.$index, scope.row)">删除</el-button>
+					<el-tooltip 
+            content="编辑" 
+            placement="bottom" 
+            effect="light">
+						<el-button 
+              type="warning" 
+              size="mini" 
+              icon="el-icon-edit" 
+              @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
+					<el-tooltip 
+            content="删除" 
+            placement="bottom" 
+            effect="light">
+						<el-button 
+              type="danger" 
+              size="mini" 
+              icon="el-icon-delete" 
+              @click="handleDel(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -836,7 +849,8 @@
           size: 'mini',
           debugWay: 0,
           name: '',
-          desc: ''
+          desc: '',
+          caseId: '',
         },
         /**
          * 新增界面table的一些配置
@@ -1361,10 +1375,12 @@
           this.addCaseData.debugWay = 1;
           // 调用创建用例接口
           createCase(this.addCaseData).then(res => {
-            console.log(res.data)
+            this.addCaseData.caseId = res.data.res.c_id;
+            console.log(this.addCaseData);
           })
         }else {
           this.addCaseData.debugWay = 0;
+          this.addCaseData.caseId = '';
         };
         this.responseLoading = true;
         this.initRequestData();
@@ -1378,6 +1394,7 @@
        */
       debugRequest() {
         let param = this.addCaseData;
+        console.log("->>>>>>>>>>>>>>>>>param",param);
         debugCase(param).then((res) => {
           console.log(res.data);
           // 响应状态
