@@ -38,7 +38,7 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '用例管理',
+        name: '测试用例',
         iconCls: 'fa fa-briefcase',
         leaf: true,
         children: [
@@ -48,7 +48,7 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '测试场景',
+        name: '场景管理',
         iconCls: 'fa fa-suitcase',
         leaf: true,//只有一个节点
         children: [
@@ -58,7 +58,7 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '测试计划',
+        name: '测试执行',
         iconCls: 'fa fa-plane',
         leaf: true,//只有一个节点
         children: [
@@ -68,7 +68,7 @@ let routes = [
     {
         path: '/',
         component: Home,
-        name: '测试报告',
+        name: '测试结果',
         iconCls: 'fa fa-folder-open',
         leaf: true,
         children: [
