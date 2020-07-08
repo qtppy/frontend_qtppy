@@ -2,7 +2,7 @@
 	<el-row class="container">
 		<el-col :span="24" class="header">
 			<el-col :span="10" class="logo" :class="isCollapse?'logo-collapse-width':'logo-width'">
-				{{isCollapse?'':sysName}}
+				{{isCollapse?'QTPPY':sysName}}
 			</el-col>
 			<el-col :span="10">
 				<div class="tools"  @click.prevent="collapse">
@@ -23,7 +23,6 @@
 
 		<el-col :span="24" class="main">
             <el-scrollbar style="height: 100%">
-				<aside :class="isCollapse?'menu-collapsed':'menu-expanded'">
 				<el-menu
 					default-active="$route.path" 
 					class="el-menu-vertical-demo"
@@ -60,7 +59,6 @@
                         </el-menu-item>
 					</template>
 				</el-menu>
-				</aside>
             </el-scrollbar>
 			<section class="content-container">
 				<div class="grid-content bg-purple-light">
@@ -194,7 +192,7 @@
 				//width:230px;
 				height:60px;
 				font-size: 16px;
-				padding-left:20px;
+				padding-left:8px;
 				padding-right:20px;
 				border-color: rgba(238,241,146,0.3);
 				border-right-width: 1px;
@@ -212,7 +210,7 @@
 				width:230px;
 			}
 			.logo-collapse-width{
-				width:60px
+				width:65px
 			}
 			.tools{
 				padding: 0px 23px;
