@@ -27,9 +27,7 @@
 					default-active="$route.path" 
 					class="el-menu-vertical-demo"
 					router
-					:unique-opened="true"
-					@open="handleOpen" 
-					@close="handleClose" 
+					:unique-opened="true" 
 					:collapse="isCollapse">
 
 					<template v-for="(item, index) in $router.options.routes">

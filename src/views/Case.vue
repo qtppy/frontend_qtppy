@@ -423,8 +423,19 @@
 								<el-table :data="bodyTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isBodyTabShowTable">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-                        <el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @input="addNewRow(2, scope.$index, scope.row)">
-                          <el-select v-model="scope.row.fromSelect" slot="append" style="width: 70px;" @change="formDataSelectChange(scope.$index, scope.row)">
+                        <el-input 
+                          v-if="scope.row.edit" 
+                          v-model="scope.row.key" 
+                          placeholder="Key" 
+                          :size="Paramsize" 
+                          @input="addNewRow(2, scope.$index, scope.row)" 
+                          @click.native="mouseOverHoverShowSelect(scope.row)">
+                          <el-select 
+                            v-model="scope.row.fromSelect" 
+                            v-if="scope.row.fromSelectHide" 
+                            slot="append" 
+                            style="width: 70px;" 
+                            @change="formDataSelectChange(scope.$index, scope.row)">
                             <el-option
                               v-for="item in formDataOptions"
                               :key="item.value"
@@ -939,6 +950,7 @@
           fromSelect: 1,
           fromValSelect: false,
           valueEdit: true,
+          fromSelectHide: false,
           file: {
             key: '',
             name: ''
@@ -1198,7 +1210,17 @@
       }
 		},
 		methods: {
-        handleClose(done) {
+      /**
+       * form-data 鼠标悬停，展示file下拉框
+       */
+      mouseOverHoverShowSelect(row) {
+        row.fromSelectHide = true;
+      },
+
+      /**
+       * 新增用例界面，右侧抽屉
+       */
+      handleClose(done) {
           if (this.caseGlobalLoading) {
             return;
           }
@@ -1646,6 +1668,7 @@
               edit: true,
               fromSelect: 1,
               fromValSelect: false,
+              fromSelectHide: false,
               valueEdit: true,
               file: {
                 key: '',
@@ -1957,14 +1980,15 @@
 			},
 			//批量删除
 			batchRemove: function () {
-				var ids = this.sels.map(item => item.id).toString();
+        var ids = this.sels.map(item => item.id).toString();
+        console.log(ids);
 				this.$confirm('确认删除选中记录吗？', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.listLoading = true;
 					//NProgress.start();
-					let para = { ids: ids };
-					batchRemoveUser(para).then((res) => {
+					let para = { id: ids };
+					deleteCase(para).then((res) => {
 						this.listLoading = false;
 						//NProgress.done();
 						this.$message({
