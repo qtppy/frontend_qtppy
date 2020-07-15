@@ -1,24 +1,86 @@
 <template>
 	<el-row class="container">
-		<el-col :span="24" class="header">
-			<el-col :span="10" class="logo" :class="isCollapse?'logo-collapse-width':'logo-width'">
+		<el-col 
+			:span="24" class="header">
+			<el-col 
+				:span="5" 
+				class="logo" 
+				:class="isCollapse?'logo-collapse-width':'logo-width'">
 				{{isCollapse?'QTPPY':sysName}}
 			</el-col>
-			<el-col :span="10">
-				<div class="tools"  @click.prevent="collapse">
+			<el-col :span="12">
+				<div 
+					class="tools"  
+					@click.prevent="collapse">
 					<i class="fa fa-align-justify"></i>
 				</div>
 			</el-col>
-			<el-col :span="4" class="userinfo">
+			<el-col 
+				:span="7" 
+				class="userinfo">
+				<span>
+					<i class="el-icon-s-operation"></i>
+					<el-button 
+						type="text" 
+						style="color:#FFFFFF;"
+						@click="argsListVisible = true">
+						参数列表
+					</el-button>
+				</span>
+				<span>&nbsp;</span>
+				<span>
+					<i class="el-icon-s-grid"></i>
+					<el-button 
+						type="text" 
+						style="color:#FFFFFF;">
+						系统函数
+					</el-button>
+				</span>
+				<span>&nbsp;</span>
+				<span>
+					<i class="el-icon-coin"></i>
+					<el-button 
+						type="text" 
+						style="color:#FFFFFF;">
+						数据源管理
+					</el-button>
+				</span>
+				<span>&nbsp;&nbsp;</span>
 				<el-dropdown trigger="hover">
-					<span class="el-dropdown-link userinfo-inner"> {{sysUserName}}</span>
+					<span 
+						class="el-dropdown-link userinfo-inner"> 
+						<i class="el-icon-user-solid"></i>
+						{{sysUserName}}
+					</span>
 					<el-dropdown-menu slot="dropdown">
 						<el-dropdown-item>我的消息</el-dropdown-item>
 						<el-dropdown-item>设置</el-dropdown-item>
-						<el-dropdown-item divided @click.native="logout">退出登录</el-dropdown-item>
+						<el-dropdown-item 
+							divided 
+							@click.native="logout">
+							退出登录
+						</el-dropdown-item>
 					</el-dropdown-menu>
 				</el-dropdown>
 			</el-col>
+			<el-drawer
+				:visible.sync="argsListVisible"
+				direction="rtl"
+				size="40%"
+				>
+				<template slot="title">
+					<span>
+						<i class="el-icon-info"></i>
+						自定义参数
+					</span>
+				</template>
+				<el-table :data="gridData">
+					<el-table-column property="date" label="日期" width="150"></el-table-column>
+					<el-table-column property="name" label="姓名" width="200"></el-table-column>
+					<el-table-column property="address" label="地址"></el-table-column>
+				</el-table>
+			</el-drawer>
+
 		</el-col>
 
 		<el-col :span="24" class="main">
@@ -98,7 +160,10 @@
 					type: [],
 					resource: '',
 					desc: ''
-				}
+				},
+				// 
+				argsListVisible: false,
+				gridData: [],
 			}
 		},
 		methods: {

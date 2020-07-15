@@ -119,10 +119,10 @@
               :disabled="false" 
               placement="bottom" 
               effect="light" 
-              content="系统函数">
+              content="执行用例">
               <el-button 
                 size="mini" 
-                type="primary" 
+                type="success" 
                 icon="el-icon-s-flag" 
                 @click="caseListClick"></el-button>
             </el-tooltip>
