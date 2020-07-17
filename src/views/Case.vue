@@ -1399,10 +1399,19 @@
           createCase(this.addCaseData).then(res => {
             this.addCaseData.caseId = res.data.res.c_id;
             console.log(this.addCaseData);
+            this.getCase();
+            this.$message({
+              message: '保存成功',
+              type: 'success'
+            });
           })
         }else {
           this.addCaseData.debugWay = 0;
           this.addCaseData.caseId = '';
+          this.$message({
+            message: '执行调试',
+            type: 'success'
+          });
         };
         this.responseLoading = true;
         this.initRequestData();
@@ -1410,6 +1419,7 @@
         console.log('->>>>>>>>>>>>>>>>>>>>>>>>>>>', command)
         this.debugRequest();
         this.responseLoading = false;
+
       },
       /**
        * debug单接口
