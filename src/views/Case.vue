@@ -1897,7 +1897,7 @@
 				}).then(() => {
 					this.listLoading = true;
 					//NProgress.start();
-					let para = { id: [row.id] };
+					let para = { id: [row.cid] };
 					deleteCase(para).then((res) => {
 						this.listLoading = false;
 						//NProgress.done();
