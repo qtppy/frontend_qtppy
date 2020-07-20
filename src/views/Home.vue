@@ -67,6 +67,8 @@
 				:visible.sync="argsListVisible"
 				direction="rtl"
 				size="40%"
+				:wrapperClosable="true"
+				:withHeader="false"
 				>
 				<template slot="title">
 					<span>
@@ -74,10 +76,36 @@
 						自定义参数
 					</span>
 				</template>
-				<el-table :data="gridData">
-					<el-table-column property="date" label="日期" width="150"></el-table-column>
-					<el-table-column property="name" label="姓名" width="200"></el-table-column>
-					<el-table-column property="address" label="地址"></el-table-column>
+				<el-table :data="globalData">
+					<el-table-column 
+						prop="name" 
+						label="全局参数变量" 
+						width="150">
+						<template slot-scope="scope">
+							{{scope.row.name}}
+						</template>
+					</el-table-column>
+					<el-table-column 
+						prop="value" 
+						label="" 
+						width="200">
+						<template slot-scope="scope">
+							{{scope.row.value}}
+						</template>
+					</el-table-column>
+					<el-table-column label="">
+						<template slot-scope="scope">
+							<el-link
+								type="primary"
+								:underline="false"
+								v-clipboard:copy="'${'+scope.row.name+'}'"
+								v-clipboard:success="onCopy"
+								v-clipboard:error="onError"
+								>
+								<i class="el-icon-document-copy"></i>
+							</el-link>
+						</template>
+					</el-table-column>
 				</el-table>
 			</el-drawer>
 
@@ -163,7 +191,19 @@
 				},
 				// 
 				argsListVisible: false,
-				gridData: [],
+				globalData: [
+					{
+						name: 'name',
+						value: 1
+					},
+					{
+						name: 'aaaa',
+						value: 2
+					}
+				],
+
+				// 复制事件
+				copyLink: null,
 			}
 		},
 		methods: {
@@ -200,7 +240,23 @@
 			},
 			showMenu(i,status){
 				this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-'+i)[0].style.display=status?'block':'none';
-			}
+			},
+
+			/**
+			 * 复制内容到剪贴版
+			 */
+			onCopy(e) {
+				this.$message({
+					message: '内容已复制到剪贴版,请直接粘贴',
+					type: 'success'
+				});
+			},
+			onError(e) {
+				this.$message({
+					message: '复制失败，请手动选择复制',
+					type: 'error'
+				});
+			},
 		},
 		mounted() {
 			var user = sessionStorage.getItem('user');
@@ -208,8 +264,7 @@
 				user = JSON.parse(user);
 				this.sysUserName = user.name || '';
 				this.sysUserAvatar = user.avatar || '';
-			}
-
+			};
 		}
 	}
 

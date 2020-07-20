@@ -12,17 +12,18 @@ import Vuex from 'vuex'
 import routes from './routes'
 // import http from './api/http.js'
 import axios from 'axios'
+import VueClipboard  from 'vue-clipboard2'
 
 // import Mock from './mock'
 // Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
 
 
-
 Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
 
+Vue.use(VueClipboard)
 Vue.use(ElementUI)
 Vue.use(VueRouter)
 Vue.use(Vuex)
