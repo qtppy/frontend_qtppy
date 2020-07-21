@@ -32,7 +32,8 @@
 					<i class="el-icon-s-grid"></i>
 					<el-button 
 						type="text" 
-						style="color:#FFFFFF;">
+						style="color:#FFFFFF;"
+						@click="systemFunctionVisible = true">
 						系统函数
 					</el-button>
 				</span>
@@ -95,20 +96,119 @@
 					</el-table-column>
 					<el-table-column label="">
 						<template slot-scope="scope">
-							<el-link
-								type="primary"
-								:underline="false"
-								v-clipboard:copy="'${'+scope.row.name+'}'"
-								v-clipboard:success="onCopy"
-								v-clipboard:error="onError"
-								>
-								<i class="el-icon-document-copy"></i>
-							</el-link>
+							<el-tooltip
+								content="点击复制" 
+								placement="bottom" 
+								effect="light">
+								<el-link
+									type="primary"
+									:underline="false"
+									v-clipboard:copy="'${'+scope.row.name+'}'"
+									v-clipboard:success="onCopy"
+									v-clipboard:error="onError"
+									>
+									<i class="el-icon-document-copy"></i>
+								</el-link>
+							</el-tooltip>
 						</template>
 					</el-table-column>
 				</el-table>
 			</el-drawer>
-
+			<!-- 系统函数 -->
+			<el-drawer
+				:visible.sync="systemFunctionVisible"
+				direction="rtl"
+				size="40%"
+				:wrapperClosable="true"
+				:withHeader="false"
+				>
+				<el-collapse 
+					v-model="activeName" 
+					accordion>
+					<el-collapse-item name="1">
+						<template slot="title">
+							<span>
+								<i class="el-icon-share"></i>
+								常用函数
+							</span>
+						</template>
+						<el-table 
+							:data="sysCommonUseTable"
+							:show-header="false"
+							:highlight-current-row="true">
+							<el-table-column prop="name">
+								<template slot-scope="scope">
+									<span>{{scope.row.name}}</span>
+								</template>
+							</el-table-column>
+							<el-table-column prop="value">
+								<template slot-scope="scope">
+									<span>{{scope.row.value}}</span>
+								</template>
+							</el-table-column>
+							<el-table-column  fixed="right" width="40">
+								<template slot-scope="scope">
+									<el-tooltip 
+										content="点击复制" 
+										placement="bottom" 
+										effect="light">
+										<el-link
+											type="primary"
+											:underline="false"
+											v-clipboard:copy="scope.row.value.substr(2)"
+											v-clipboard:success="onCopy"
+											v-clipboard:error="onError"
+											>
+											<i class="el-icon-document-copy"></i>
+									</el-link>
+									</el-tooltip>
+								</template>
+							</el-table-column>
+						</el-table>
+					</el-collapse-item>
+					<el-collapse-item name="2">
+						<template slot="title">
+							<span>
+								<i class="el-icon-lock"></i>
+								加密函数
+							</span>
+						</template>
+						<el-table 
+							:data="sysEncryptTable"
+							:show-header="false"
+							:highlight-current-row="true">
+							<el-table-column prop="name">
+								<template slot-scope="scope">
+									{{scope.row.name}}
+								</template>
+							</el-table-column>
+							<el-table-column prop="value">
+								<template slot-scope="scope">
+									{{scope.row.value}}
+								</template>
+							</el-table-column>
+							<el-table-column  fixed="right" width="40">
+								<template slot-scope="scope">
+									<el-tooltip 
+										content="点击复制" 
+										placement="bottom" 
+										effect="light">
+										<el-link
+											type="primary"
+											:underline="false"
+											v-clipboard:copy="scope.row.value.substr(2)"
+											v-clipboard:success="onCopy"
+											v-clipboard:error="onError"
+											>
+											<i class="el-icon-document-copy"></i>
+									</el-link>
+									</el-tooltip>
+								</template>
+							</el-table-column>
+						</el-table>
+					</el-collapse-item>
+				</el-collapse>
+			</el-drawer>
 		</el-col>
 
 		<el-col :span="24" class="main">
@@ -170,7 +270,7 @@
 </template>
 
 <script>
-	import { logout } from '@/api/api'
+	import { logout, getVarByUid, getSystemFunc } from '@/api/api'
 	export default {
 		data() {
 			return {
@@ -189,21 +289,15 @@
 					resource: '',
 					desc: ''
 				},
-				// 
+				// 全局参数
 				argsListVisible: false,
-				globalData: [
-					{
-						name: 'name',
-						value: 1
-					},
-					{
-						name: 'aaaa',
-						value: 2
-					}
-				],
+				globalData: [],
+				// 系统函数
+				systemFunctionVisible: false,
+				sysCommonUseTable: [],
+				sysEncryptTable: [],
+				activeName: '1',
 
-				// 复制事件
-				copyLink: null,
 			}
 		},
 		methods: {
@@ -257,6 +351,35 @@
 					type: 'error'
 				});
 			},
+
+			/**
+			 * 获取全局变量
+			 */
+			getVar() {
+				// 全局变量
+				getVarByUid().then(res => {
+					this.globalData = res.res;
+				});
+				// 系统函数
+				getSystemFunc().then(res =>{
+					for(let i=0; i<res.res.length;i++){
+						// 常用函数
+						if (res.res[i].type === 1) {
+							this.sysCommonUseTable.push(
+								res.res[i]
+							);
+						};
+						// 加密函数
+						if (res.res[i].type === 2) {
+							this.sysEncryptTable.push(
+								res.res[i]
+							);
+						};
+					};
+				});
+
+			},
+
 		},
 		mounted() {
 			var user = sessionStorage.getItem('user');
@@ -265,6 +388,7 @@
 				this.sysUserName = user.name || '';
 				this.sysUserAvatar = user.avatar || '';
 			};
+			this.getVar();
 		}
 	}
 

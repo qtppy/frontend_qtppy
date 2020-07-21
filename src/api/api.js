@@ -63,3 +63,10 @@ export const registerUser = params => { return axios.post(`/api/auth/register`, 
 
 // 登出
 export const logout = params => { return axios.post('/api/auth/logout'); }; 
+
+
+// 根据uid获取全局变量
+export const getVarByUid = params => { return axios.post(`/api/var/getVarByUid`, params).then(res => res.data); };
+
+//获取系统函数映射关系
+export const getSystemFunc = params => { return axios.post(`/api/var/getSystemFunc`).then(res => res.data); };
