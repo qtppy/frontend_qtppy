@@ -207,6 +207,90 @@
 							</el-table-column>
 						</el-table>
 					</el-collapse-item>
+					<!-- 随机函数 -->
+					<el-collapse-item name="3">
+						<template slot="title">
+							<span>
+								<i class="el-icon-s-grid"></i>
+								随机函数
+							</span>
+						</template>
+						<el-table 
+							:data="sysRandomTable"
+							:show-header="false"
+							:highlight-current-row="true">
+							<el-table-column prop="name">
+								<template slot-scope="scope">
+									{{scope.row.name}}
+								</template>
+							</el-table-column>
+							<el-table-column prop="value">
+								<template slot-scope="scope">
+									{{scope.row.value}}
+								</template>
+							</el-table-column>
+							<el-table-column  fixed="right" width="40">
+								<template slot-scope="scope">
+									<el-tooltip 
+										content="点击复制" 
+										placement="bottom" 
+										effect="light">
+										<el-link
+											type="primary"
+											:underline="false"
+											v-clipboard:copy="scope.row.value.substr(2)"
+											v-clipboard:success="onCopy"
+											v-clipboard:error="onError"
+											>
+											<i class="el-icon-document-copy"></i>
+									</el-link>
+									</el-tooltip>
+								</template>
+							</el-table-column>
+						</el-table>
+					</el-collapse-item>
+					<!-- 四则运算 -->
+					<el-collapse-item name="3">
+						<template slot="title">
+							<span>
+								<i class="el-icon-mobile-phone"></i>
+								四则运算
+							</span>
+						</template>
+						<el-table 
+							:data="sysCountTable"
+							:show-header="false"
+							:highlight-current-row="true">
+							<el-table-column prop="name">
+								<template slot-scope="scope">
+									{{scope.row.name}}
+								</template>
+							</el-table-column>
+							<el-table-column prop="value">
+								<template slot-scope="scope">
+									{{scope.row.value}}
+								</template>
+							</el-table-column>
+							<el-table-column  fixed="right" width="40">
+								<template slot-scope="scope">
+									<el-tooltip 
+										content="点击复制" 
+										placement="bottom" 
+										effect="light">
+										<el-link
+											type="primary"
+											:underline="false"
+											v-clipboard:copy="scope.row.value.substr(2)"
+											v-clipboard:success="onCopy"
+											v-clipboard:error="onError"
+											>
+											<i class="el-icon-document-copy"></i>
+									</el-link>
+									</el-tooltip>
+								</template>
+							</el-table-column>
+						</el-table>
+					</el-collapse-item>
 				</el-collapse>
 			</el-drawer>
 		</el-col>
@@ -296,6 +380,8 @@
 				systemFunctionVisible: false,
 				sysCommonUseTable: [],
 				sysEncryptTable: [],
+				sysRandomTable: [],
+				sysCountTable: [],
 				activeName: '1',
 
 			}
@@ -372,6 +458,18 @@
 						// 加密函数
 						if (res.res[i].type === 2) {
 							this.sysEncryptTable.push(
+								res.res[i]
+							);
+						};
+						// 加密函数
+						if (res.res[i].type === 3) {
+							this.sysRandomTable.push(
+								res.res[i]
+							);
+						};
+						// 加密函数
+						if (res.res[i].type === 4) {
+							this.sysCountTable.push(
 								res.res[i]
 							);
 						};

@@ -1391,14 +1391,14 @@
       /**
        * 新增测试用例;调试功能
        */
-      sendRequest(command) {
+      async sendRequest(command) {
         // 调试并保存；默认调试
         if(command === 'debug_and_save') {
           this.addCaseData.debugWay = 1;
           // 调用创建用例接口
-          createCase(this.addCaseData).then(res => {
+          await createCase(this.addCaseData).then(res => {
             this.addCaseData.caseId = res.data.res.c_id;
-            console.log(this.addCaseData);
+            console.log("_+_+_+_+_+_+_+",this.addCaseData);
             this.getCase();
             this.$message({
               message: '保存成功',
