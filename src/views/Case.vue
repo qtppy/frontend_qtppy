@@ -33,13 +33,6 @@
             v-on:click="getCase"
           >查询</el-button>
 				</el-form-item>
-				<!-- <el-form-item>
-					<el-button 
-            type="primary" 
-            icon="el-icon-news" 
-            size="mini" 
-            @click="handleAddCaseDialog">新增</el-button>
-				</el-form-item> -->
 			</el-form>
 		</el-col>
 
@@ -66,20 +59,20 @@
         v-if="visible"></el-table-column>
 			<el-table-column 
         prop="name" 
-        label="名称" 
+        label="用例名称" 
         width="120" 
         sortable></el-table-column>
 			<el-table-column 
         prop="url" 
-        label="地址" 
+        label="请求地址" 
         width="120"></el-table-column>
 			<el-table-column 
         prop="method" 
-        label="方法" 
+        label="请求方法" 
         width="100"></el-table-column>
 			<el-table-column 
         prop="desc" 
-        label="描述" 
+        label="用例描述" 
         width="200" ></el-table-column>
 			<el-table-column 
       prop="createtime" 
@@ -102,7 +95,7 @@
                 size="mini" 
                 type="primary" 
                 icon="el-icon-document-add" 
-                @click="caseListClick"></el-button>
+                @click="caseListClick(0, '')"></el-button>
             </el-tooltip>
             <el-tooltip 
               :disabled="false" 
@@ -124,7 +117,7 @@
                 size="mini" 
                 type="success" 
                 icon="el-icon-s-flag" 
-                @click="caseListClick"></el-button>
+                ></el-button>
             </el-tooltip>
           </el-button-group>  
         </template>
@@ -136,8 +129,9 @@
 						<el-button 
               type="warning" 
               size="mini" 
-              icon="el-icon-edit" 
-              @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+              icon="el-icon-edit"
+              circle
+              @click="caseListClick(1, scope.row)"></el-button>
 					</el-tooltip>
 					<el-tooltip 
             content="删除" 
@@ -194,11 +188,12 @@
       </el-collapse>
     </el-drawer>
 		<!-- 新增测试用例界面 -->
-		<el-dialog 
-      :fullscreen="true" 
-      :visible="addCaseVisible" 
+		<el-dialog
+      :fullscreen="true"
+      :visible.sync="addCaseVisible" 
+      v-if="addCaseVisible"
       :close-on-click-modal="false" 
-      @close="addCaseVisible=false"
+      @close="closeDestroy"
     >
       <template slot="title">
         <el-breadcrumb separator="/">
@@ -211,7 +206,7 @@
             用例管理
           </el-breadcrumb-item>
           <el-breadcrumb-item>
-            新增用例
+            {{breadcrumbTitle}}
           </el-breadcrumb-item>
         </el-breadcrumb>
       </template>
@@ -231,7 +226,7 @@
                 size="small"
               >
 								<el-select 
-                  v-model="mechodSelectValue" 
+                  v-model="addCaseData.method" 
                   placeholder="Method" 
                   slot="prepend" 
                   style="width:100px;"
@@ -403,7 +398,7 @@
 							</el-tab-pane>
               <!-- Body tab -->
 							<el-tab-pane label="Body" name="body">
-                <el-radio-group v-model="bodyRadio" :size="addCaseData.size" @change="bodyRadioChange">
+                <el-radio-group v-model="addCaseData.body.how" :size="addCaseData.size" @change="bodyRadioChange">
                   <el-radio :label="1">none</el-radio>
                   <el-radio :label="2">form-data</el-radio>
                   <el-radio :label="3">x-www-form-urlencoded</el-radio>
@@ -423,7 +418,7 @@
 								<el-table :data="bodyTableData" border stripe style="width: 100%;" :size="Paramsize" v-show="isBodyTabShowTable">
 										<el-table-column prop="key" label="Key">
 											<template slot-scope="scope">
-                        <el-input 
+                        <el-input
                           v-if="scope.row.edit" 
                           v-model="scope.row.key" 
                           placeholder="Key" 
@@ -770,7 +765,7 @@
 	import util from '@/common/js/util'
   import { validateURL } from '@/common/js/validate'
 	//import NProgress from 'nprogress'
-	import { getCaseList, deleteCase, batchRemoveUser, editUser, createCase, debugCase } from '@/api/api';
+	import { getCaseList, deleteCase, batchRemoveUser, editUser, createCase, debugCase, editCase } from '@/api/api';
 	export default {
 		data() {
 			return {
@@ -845,13 +840,13 @@
          * @var desc 用例描述
          */
         addCaseData: {
-          method: '',
+          method: 0,
           url: '',
           urlIndex: 0,
           baseUrl: '',
           header: '',
           body: {
-            how: '',
+            how: 1,
             body: ''
           },
           outParam: '',
@@ -863,6 +858,7 @@
           desc: '',
           caseId: '',
         },
+        breadcrumbTitle: '新增用例',
         /**
          * 新增界面table的一些配置
          * @var isParamTableShow: Param显示table
@@ -1218,6 +1214,44 @@
       },
 
       /**
+       * 关闭时销毁，新增，修改界面数据
+       */
+      closeDestroy() {
+        // 窗口隐藏
+        this.addCaseVisible=false
+        // // 初始化数据
+        // this.addCaseData = {
+        //   method: 0,
+        //   url: '',
+        //   urlIndex: 0,
+        //   baseUrl: '',
+        //   header: '',
+        //   body: {
+        //     how: 1,
+        //     body: ''
+        //   },
+        //   outParam: '',
+        //   assertData: '',
+        //   isbodyTextAreaButton: false,
+        //   size: 'mini',
+        //   debugWay: 0,
+        //   name: '',
+        //   desc: '',
+        //   caseId: '',
+        // };
+        // this.tableData = [];
+        // this.bodyTableData = [];
+        // this.outputArgsData = [];
+        // this.assertData = [];
+        // this.responseCookiesData = [];
+        // this.responseHeaderData = [];
+        // this.resOutParamList = [];
+
+
+
+      },
+
+      /**
        * 新增用例界面，右侧抽屉
        */
       handleClose(done) {
@@ -1486,12 +1520,12 @@
         // method数据
         let obj = {};
         obj = this.methodOptions.find((item) => {
-          return item.value === this.mechodSelectValue;
+          return item.value === this.addCaseData.method;
         })
         this.addCaseData.method = obj.label;
 
         // body数据
-        if (this.bodyRadio === 4) {
+        if (this.addCaseData.body.how === 4) {
           this.addCaseData.body.body = this.bodyTextArea;
         }else {
           let bodyArr = this.bodyTableData;
@@ -1499,7 +1533,7 @@
             data: {},
             files: []
           };
-          console.log('------------------------')
+
           console.log(this.bodyTableData);
           for (let i=0; i<bodyArr.length; i++) {
             if (bodyArr[i].key!=='' && bodyArr[i].file.key==='') {
@@ -1511,11 +1545,10 @@
                 });
             };
           };
-          console.log('------------------------')
-          console.log(bodyMap);
+
           this.addCaseData.body.body = bodyMap;
         };
-        this.addCaseData.body.how = this.bodyRadio;
+        // this.addCaseData.body.how = this.bodyRadio;
 
         // 出参数据
         let outParam = [];
@@ -1545,8 +1578,80 @@
 			 * @param {*} params 表头参数
 			 * @returns div html
 			 */
-      caseListClick() {
-        this.handleAddCaseDialog();  
+      caseListClick(index, row) {
+        // 更改标题
+        if (index === 1) {
+          this.breadcrumbTitle='编辑用例';
+
+          let obj = {};
+          obj = this.methodOptions.find((item) => {
+            return item.label === row.method;
+          })
+
+          // 编辑展示数据
+          this.addCaseData = {
+            method: obj.value,
+            url: row.url,
+            urlIndex: 0,
+            baseUrl: '',
+            header: row.headers,
+            body: row.body,
+            outParam: '',
+            assertData: '',
+            isbodyTextAreaButton: false,
+            size: 'mini',
+            debugWay: 0,
+            name: row.name,
+            desc: row.desc,
+            caseId: row.cid,
+          };
+          this.bodyRadioChange(row.body.how);
+          // body数据初始化
+          let tableT = row.body.body.data;
+
+          this.bodyTableData = [];
+          let files = row.body.body.files;
+          for(let f in files) {
+            this.bodyTableData.push(
+              {
+                key: f,
+                value: tableT[f],
+                DESCRIPTION: '',
+                edit: true,
+                fromSelect: 1,
+                fromValSelect: false,
+                valueEdit: true,
+                fromSelectHide: false,
+                file: {
+                  key: '',
+                  name: ''
+                },
+              }
+            );
+          }
+          for(let k in tableT) {
+            this.bodyTableData.push(
+              {
+                key: k,
+                value: tableT[k],
+                DESCRIPTION: '',
+                edit: true,
+                fromSelect: 1,
+                fromValSelect: false,
+                valueEdit: true,
+                fromSelectHide: false,
+                file: {
+                  key: '',
+                  name: ''
+                },
+              }
+            );
+          };
+
+          console.log('=======>>>>>>>>>>>>', this.tableData);
+
+        };
+        this.handleAddCaseDialog();
       },
 			/**
 			 * 用例列表，增加用例Params选项卡按钮

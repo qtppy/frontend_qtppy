@@ -46,6 +46,9 @@ export const updateSuiteInfo = params => { return axios.post(`/api/project/suite
 // 获取测试用例
 export const getCaseList = params => { return axios.post(`/api/case/getcaselist`, params); };
 
+// 修改测试用例
+export const editCase = params => { return axios.post(`/api/case/edit`, params).then(res => res.data); };
+
 // 删除测试用例
 export const deleteCase = params => { return axios.post('/api/case/delete', params) };
 

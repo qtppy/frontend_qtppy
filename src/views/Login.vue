@@ -1,34 +1,76 @@
 <template>
   <section>
-    <el-form :model="ruleForm2" :rules="rules2" ref="ruleForm2" label-position="left" label-width="0px" class="demo-ruleForm login-container">
+    <el-form 
+    :model="ruleForm2" 
+    :rules="rules2" 
+    ref="ruleForm2" 
+    label-position="left" 
+    label-width="0px" 
+    class="demo-ruleForm login-container">
       <h3 class="title">QTPPY自动化平台系统登录</h3>
       <el-form-item prop="account">
-        <el-input type="text" v-model="ruleForm2.account" auto-complete="off" placeholder="账号"></el-input>
+        <el-input 
+        type="text" 
+        v-model="ruleForm2.account" 
+        auto-complete="off" 
+        placeholder="账号"></el-input>
       </el-form-item>
       <el-form-item prop="checkPass">
-        <el-input type="password" v-model="ruleForm2.checkPass" auto-complete="off" placeholder="密码"></el-input>
+        <el-input 
+        type="password" 
+        v-model="ruleForm2.checkPass" 
+        auto-complete="off" 
+        placeholder="密码"></el-input>
       </el-form-item>
-      <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
-      <el-button type="text" icon="el-icon-edit" class="register"  @click="handleRegDialog">注册</el-button>
+      <el-checkbox 
+      v-model="checked" 
+      checked class="remember">记住密码</el-checkbox>
+      <el-button 
+      type="text" 
+      icon="el-icon-edit" 
+      class="register"  
+      @click="handleRegDialog">注册</el-button>
       <el-form-item style="width:100%;">
-        <el-button type="primary" style="width:100%;" @click.native.prevent="handleSubmit2" :loading="logining">登录</el-button>
-        <!-- <el-button @click.native.prevent="handleReset2">重置</el-button> -->
+        <el-button 
+        type="primary" 
+        style="width:100%;" 
+        @click.native.prevent="handleSubmit2" 
+        :loading="logining">登录</el-button>
       </el-form-item>
     </el-form>
 
     <!--注册界面-->
-    <el-dialog title="注册" width="350px" :visible="regFormVisible"  :close-on-click-modal="false" @close="regFormVisible = false">
-      <el-form :model="regFormData" label-width="80px" :rules="regRule" ref="regForm">
+    <el-dialog 
+    title="注册" 
+    width="350px" 
+    :visible="regFormVisible"  
+    :close-on-click-modal="false" 
+    @close="regFormVisible = false">
+      <el-form 
+      :model="regFormData" 
+      label-width="80px" 
+      :rules="regRule" 
+      ref="regForm">
         <el-form-item label="用户名称" prop="username">
-          <el-input v-model="regFormData.username" auto-complete="off" size="small"></el-input>
+          <el-input 
+          v-model="regFormData.username" 
+          auto-complete="off" 
+          size="small"></el-input>
         </el-form-item>
         <el-form-item label="用户密码" prop="password">
-          <el-input type="password" v-model="regFormData.password" auto-complete="off" size="small"></el-input>
+          <el-input 
+          type="password" 
+          v-model="regFormData.password" 
+          auto-complete="off" 
+          size="small"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="regFormVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="regSubmit" :loading="regLoading">提交</el-button>
+        <el-button 
+        type="primary" 
+        @click.native="regSubmit" 
+        :loading="regLoading">提交</el-button>
       </div>
     </el-dialog>
   </section>
