@@ -58,7 +58,7 @@
 						<el-dropdown-item>设置</el-dropdown-item>
 						<el-dropdown-item 
 							divided 
-							@click.native="logout">
+							@click.native="loginOut">
 							退出登录
 						</el-dropdown-item>
 					</el-dropdown-menu>
@@ -399,7 +399,7 @@
 			handleselect: function (a, b) {
 			},
 			//退出登录
-			logout: function () {
+			loginOut: function () {
 				var _this = this;
 				this.$confirm('确认退出吗?', '提示', {
 					//type: 'warning'

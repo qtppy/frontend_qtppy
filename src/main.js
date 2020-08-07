@@ -7,19 +7,18 @@ import 'element-ui/lib/theme-chalk/index.css'
 import VueRouter from 'vue-router'
 import store from './vuex/store'
 import Vuex from 'vuex'
+import caseStore from './store/case'
 //import NProgress from 'nprogress'
 //import 'nprogress/nprogress.css'
 import routes from './routes'
 // import http from './api/http.js'
-import axios from 'axios'
+
 import VueClipboard  from 'vue-clipboard2'
 
 // import Mock from './mock'
 // Mock.bootstrap();
 import 'font-awesome/css/font-awesome.min.css'
 
-
-Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
 
@@ -58,6 +57,7 @@ new Vue({
   //template: '<App/>',
   router,
   store,
+  caseStore,
   //components: { App }
   render: h => h(App)
 }).$mount('#app')
