@@ -45,7 +45,7 @@
                 v-for="item in add.methodOptions"
                 :key="item.value"
                 :label="item.label"
-                :value="item.value">
+                :value="item.label">
               </el-option>
             </el-select>
             </el-input>
@@ -112,7 +112,7 @@
       <el-row>
         <el-col :span="24">
           <el-tabs 
-            v-model="add.body.tabTab" 
+            v-model="add.body.tab" 
             @tab-click="handleCaseTabClick" 
             :size="add.size">
 
@@ -215,21 +215,21 @@
                 icon="el-icon-share" 
                 size="mini" 
                 style="float:right;" 
-                v-show="add.headers.isAreaShow" 
+                v-show="add.headers.isAreaBtnShow" 
                 @click="sawpHeaderEditButton">Key-Value Edit</el-button>
               <!-- 文本域展示 -->
               <el-input
                 type="textarea"
                 :placeholder="add.params.placeholderReq"
                 v-model="add.headers.headerTextArea"
-                v-show="add.headers.isHeaderTextAreaShow" 
+                v-show="add.headers.isAreaShow" 
                 :autosize="add.params.paramsTextAreaLimt"
                 @change="setCaseRequestData(add.headers.headerTextArea, 1)"/>
                 <el-table 
                   :data="add.headers.table" 
                   border stripe style="width: 100%;" 
                   :size="add.size" 
-                  v-show="add.headers.isHeaderTabShowTable">
+                  v-show="add.headers.isTableShow">
 
                     <el-table-column prop="key" label="Key">
                         <template slot-scope="scope">
@@ -552,7 +552,7 @@
                 </template>
 
                 <el-table 
-                  :data="add.assertData.data" 
+                  :data="add.assert.data" 
                   border stripe style="width: 100%;" 
                   :size="add.size" 
                   v-show="true">
@@ -563,7 +563,7 @@
                         size="mini" 
                         @change="assertSelectChange(scope.$index, scope.row)">
                         <el-option
-                          v-for="item in assertTypeOptions"
+                          v-for="item in add.assert.options"
                           :key="item.value"
                           :label="item.label"
                           :value="item.value"/>
@@ -582,7 +582,7 @@
                         @input="addNewRow(3, scope.$index, scope.row)"/>
                         <el-select v-else v-model="scope.row.checkObject" size="mini">
                             <el-option
-                            v-for="item in add.assertData.checkObject"
+                            v-for="item in add.assert.checkObject"
                             :key="item.value"
                             :label="item.label"
                             :value="item.value">
@@ -598,7 +598,7 @@
                         size="mini" 
                         @change="outArgsSelectChange(scope.$index, scope.row)">
                         <el-option
-                        v-for="item in assertCondiationOptions"
+                        v-for="item in add.assert.condiationOptions"
                         :key="item.value"
                         :label="item.label"
                         :value="item.value">
@@ -647,7 +647,7 @@
                     <template slot-scope="scope">
                       <el-link 
                         type="danger" 
-                        v-if="add.assertData.data.length > 1" 
+                        v-if="add.assert.data.length > 1" 
                         :underline="false" 
                         icon="el-icon-delete" 
                         @click.native="deleteRow(5, scope.$index, scope.row)" 
@@ -783,14 +783,14 @@
 
 <script>
   import util from '@/common/js/util'
-  import { debugCase } from '@/api/api';
+  import { debugCase, createCase } from '@/api/api';
   export default {
       name: 'contacts11',
       props: [],
       data() {
         return {
           add: {
-            method: 0,
+            method: 'GET',
             url: '',
             urlIndex: 0,
             baseUrl: '',
@@ -868,9 +868,9 @@
             ],
             // 头信息
             headers:{
+              isAreaBtnShow: false,
+              isTableShow: true,
               isAreaShow: false,
-              isHeaderTabShowTable: true,
-              isHeaderTextAreaShow: false,
               headerTextArea: '',
               table: [
                 {
@@ -979,9 +979,22 @@
                 }
               ],
             },
-            assertData: {
-              data: [],
-              assertTypeOptions: [
+            assert: {
+              data: [
+                {
+                  type: 0,
+                  checkObject: '',
+                  checkCondition: 0,
+                  checkContent: '',
+                  checkType: '',
+                  edit: true,
+                  assertCheckobjectDisabled: false,
+                  assertCheckobjectOptionShow: false,
+                  assertCheckobjectShow: true,
+                  objectEdit: true,
+                },
+              ],
+              options: [
                 {
                   value: 0,
                   label: '响应header'
@@ -1005,6 +1018,60 @@
                   label: 'code'
                 }
               ],
+              condiationOptions: [
+                {
+                  value: 0,
+                  label: '大于'
+                },
+                {
+                  value: 1,
+                  label: '大于等于'
+                },
+                {
+                  value: 2,
+                  label: '小于'
+                },
+                {
+                  value: 3,
+                  label: '小于等于'
+                },
+                {
+                  value: 4,
+                  label: '等于'
+                },
+                {
+                  value: 5,
+                  label: '不等于'
+                },
+                {
+                  value: 6,
+                  label: '包含'
+                },
+                {
+                  value: 7,
+                  label: '不包含'
+                },
+                {
+                  value: 8,
+                  label: '属于'
+                },
+                {
+                  value: 9,
+                  label: '不属于'
+                },
+                {
+                  value: 10,
+                  label: '存在'
+                },
+                {
+                  value: 11,
+                  label: '不存在'
+                },
+                {
+                  value: 12,
+                  label: '正则匹配'
+                }
+              ]
             },
             // 响应Response
             responses: {
@@ -1064,8 +1131,8 @@
             // 调用创建用例接口
             await createCase(this.add).then(res => {
               this.add.caseId = res.data.res.c_id;
-              console.log("_+_+_+_+_+_+_+",this.add);
-              this.getCase();
+              // 调用父组件，刷新用例列表
+              this.$parent.getCase();
               this.$message({
                 message: '保存成功',
                 type: 'success'
@@ -1081,8 +1148,7 @@
           };
           this.add.responses.loading = true;
           this.initRequestData();
-          console.log(this.add)
-          console.log('->>>>>>>>>>>>>>>>>>>>>>>>>>>', command)
+
           this.debugRequest();
           this.add.responses.loading = false;
 
@@ -1091,9 +1157,8 @@
          */
         debugRequest() {
           let param = this.add;
-          console.log("->>>>>>>>>>>>>>>>>param",param);
+
           debugCase(param).then((res) => {
-            console.log(res.data);
             // 响应状态
             this.add.responses.tool.status = res.data.res.status_code;
             this.add.responses.tool.time = res.data.res.elapsed;
@@ -1147,13 +1212,6 @@
           };
           this.add.header = headerMap;
 
-          // method数据
-          let obj = {};
-          obj = this.add.methodOptions.find((item) => {
-            return item.value === this.add.method;
-          })
-          this.add.method = obj.label;
-
           // body数据
           if (this.add.body.how === 4) {
             this.add.body.body = this.add.body.txtArea;
@@ -1164,7 +1222,6 @@
               files: []
             };
 
-            console.log(this.add.body.table);
             for (let i=0; i<bodyArr.length; i++) {
               if (bodyArr[i].key!=='' && bodyArr[i].file.key==='') {
                 bodyMap['data'][bodyArr[i].key] = bodyArr[i].value;
@@ -1189,18 +1246,23 @@
               );
             };
           };
-          this.add.outParam = outParam;
-
+          if(outParam) {
+            this.add.outParam.data = outParam;
+          }
+          
           // 断言数据
           let checkData = [];
-          for(let i=0; i<this.add.assertData.data.length; i++) {
-            if(this.add.assertData.data[i].checkType !== '') {
+          for(let i=0; i<this.add.assert.data.length; i++) {
+            if(this.add.assert.data[i].checkType !== '') {
               checkData.push(
-                this.add.assertData.data[i]
+                this.add.assert.data[i]
               );
             }
           };
-          this.add.assertData.data = checkData;
+          if(checkData) {
+            this.add.assert.data = checkData;
+          }
+          
         },
         /** 新增用例tab切换
          * @param {string} tab 标签lable名称
@@ -1376,8 +1438,8 @@
             };
           };
           if (tabIndex === 4) { // 断言数据
-            if(index ==this.add.assertData.data.length - 1) {
-              this.add.assertData.data.push({
+            if(index ==this.add.assert.data.length - 1) {
+              this.add.assert.data.push({
                 type: 0,
                 checkObject: '',
                 checkCondition: 0,
@@ -1426,7 +1488,7 @@
             this.add.outParam.data.splice(index, 1)
           };
           if (tableIndex === 5) { // 断言
-            this.add.assertData.data.splice(index, 1)
+            this.add.assert.data.splice(index, 1)
           };
         },
         /** Header Bulk Edit 与 Key-Value Edit切换
@@ -1434,9 +1496,9 @@
          * @returns null
          */
         sawpHeaderEditButton() {
-          this.add.headers.isHeaderTextAreaShow = false;
-          this.add.headers.isHeaderTabShowTable = true;
           this.add.headers.isAreaShow = false;
+          this.add.headers.isTableShow = true;
+          this.add.headers.isAreaBtnShow = false;
         },
         /** ParamTextarea  url拼接
          * @param {*} tableObj params  header数据存储变量this.tabledata
@@ -1480,9 +1542,9 @@
          * @returns div html
          */
         headerBulkEditClick() {
-          this.add.headers.isHeaderTextAreaShow = true;
-          this.add.headers.isHeaderTabShowTable = false;
           this.add.headers.isAreaShow = true;
+          this.add.headers.isTableShow = false;
+          this.add.headers.isAreaBtnShow = true;
           this.resetValParamTextArea(this.add.headers.table, 1);       
         },
         /** body radio change
@@ -1499,7 +1561,7 @@
             this.add.body.tabShowTable = false;
             this.add.body.textAreaShow = true;
             this.add.body.textAreaButton = false;
-            this.addata.params.placeholderReqplaceholderReq = '';
+            this.add.params.placeholderReqplaceholderReq = '';
 
           }else{
             this.add.body.tabShowTable = true;
@@ -1637,30 +1699,41 @@
           // 出参
           if (row.checkType === 3) {
             // 重新初始化参数
-            this.add.assertData.checkObject = [];
-            let outParamData = this.add.outParam.data;
-            for (let i=0; i<outParamData.length; i++) {
-              if (outParamData[i].name !== '') {
-                this.add.assertData.checkObject.push(
-                  {
-                    value: i,
-                    label: outParamData[i].name,
-                  }
-                )
-              };
-            };
-            row.objectEdit = false;
-            row.checkObject = 0;
-            console.log('===>', this.add.outParam.data);
+            this.initOutParams();
 
           };
           if (row.checkType === 4) {
             row.objectEdit = false;
             row.assertCheckobjectOptionShow = true;
           };
-          console.log(this.add.assertData)
-          console.log(row)
+
           this.addNewRow(4, index, row);
+        },
+        /** 初始化出参对象
+         * 
+         */
+        initOutParams() {
+          let data = this.add.assert.data;
+          for(let i=0;i<data.length;i++){
+            if(data[i].checkType === 3) {
+              this.add.assert.checkObject = [];
+              let outParamData = this.add.outParam.data;
+
+              for (let i=0; i<outParamData.length; i++) {
+                if (outParamData[i].name !== '') {
+                  this.add.assert.checkObject.push(
+                    {
+                      value: i,
+                      label: outParamData[i].name,
+                    }
+                  )
+                };
+              };
+              data[i].objectEdit = false;
+              data[i].checkObject = 0;
+              console.log('===>', this.add.outParam.data); 
+            }
+          }         
         },
         /** outArgsSelectChange
          * 出参来源修改时，其它输入项，对应输入状态变更

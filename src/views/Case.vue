@@ -293,9 +293,6 @@
               }
             );
           };
-
-          console.log('=======>>>>>>>>>>>>', this.tableData);
-
         };
         this.handleAddCaseDialog();
       },
