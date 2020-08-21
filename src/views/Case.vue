@@ -340,7 +340,7 @@
 				getCaseList(para).then((res) => {
 					this.total = res.data.res.total;
 					this.per_page = res.data.res.per_page;
-          this.casesData = res.data.res.case;
+                    this.casesData = res.data.res.case;
 					this.listLoading = false;
 					console.log(this.casesData);
 					//NProgress.done();
