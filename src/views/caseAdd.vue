@@ -1,25 +1,14 @@
 <template>
   <!-- 新增测试用例界面 -->
   <el-dialog
+    class="commonDialog"
     :fullscreen="true"
     :visible.sync="add.visible" 
     v-if="add.visible"
     :close-on-click-modal="false" 
     @close="closeDestroy">
     <template slot="title">
-    <el-breadcrumb separator="/">
-        <el-breadcrumb-item 
-        :to="{ path: '/main' }"
-        >
-        主页
-        </el-breadcrumb-item>
-        <el-breadcrumb-item>
-        用例管理
-        </el-breadcrumb-item>
-        <el-breadcrumb-item>
         {{add.breadcrumbTitle}}
-        </el-breadcrumb-item>
-    </el-breadcrumb>
     </template>
     <el-form 
       :model="add" 
@@ -1764,5 +1753,97 @@
       },
   }
 </script>
-<style scoped>
+<style>
+/*head 部分*/
+/* Dialog对话框 公共部分样式 Start*/
+/*蒙层部分*/
+.commonDialog {
+  width: 100%;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 101;
+  overflow: hidden;
+}
+/*框体部分*/
+.commonDialog .content{
+  background: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 9px;
+  box-shadow: 2px 3px 5px #bbb;
+  overflow: hidden;
+  padding-bottom: 25px;
+  margin-bottom: 30px;
+  max-height: 90%;
+  width: 1000px;
+}
+/*head 部分*/
+.commonDialog .content .head{
+  height: 44px;
+  line-height: 44px;
+  background: #efefef;
+  width: 100%;
+  text-align: center;
+  color: #666;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+/*内容区部分*/
+.commonDialog .content .main{
+  width: 100%;
+  max-height: 70vh;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding:25px 20px;
+  box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  margin-bottom: 5px;
+}
+.el-dialog,.el-message-box {
+  border-radius: 9px;
+}
+.el-dialog__headerbtn,.el-message-box__headerbtn {
+  /* top: 5px !important;
+   right: 10px;*/
+  font-size: 18px;
+}
+.el-icon-close {
+  color: #666 !important;
+}
+.el-dialog__header,.el-message-box__header {
+  border-top-left-radius: 9px;
+  border-top-right-radius: 9px;
+  height: 44px;
+  background: #efefef;
+  width: 100%;
+  text-align: center;
+  color: #666;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+.el-dialog__title,.el-message-box__title {
+  color: #666;
+  font-size: 12px !important;
+}
+.coverage-release .el-dialog__body {
+  padding: 20px;
+}
+/* Dialog对话框 公共部分样式 End*/
 </style>
