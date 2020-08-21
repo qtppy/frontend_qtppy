@@ -759,10 +759,6 @@
                   Time: 
                   <i style="color:#67C23A;">{{this.add.responses.tool.time}} ms</i>
               </el-link>
-              <el-link type="info" :underline="false" disabled>
-                  Size: 
-                  <i style="color:#67C23A;">{{this.add.responses.tool.size}} kb</i>
-              </el-link>
             </template> 
           </el-tab-pane>
         </el-tabs>
