@@ -101,7 +101,7 @@
       <el-row>
         <el-col :span="24">
           <el-tabs 
-            v-model="add.body.tab" 
+            v-model="add.body.tab"
             @tab-click="handleCaseTabClick" 
             :size="add.size">
 
@@ -650,8 +650,9 @@
       </el-row>
 
       <el-row>
-        <el-tabs 
-          v-model="add.responses.bodyTab" 
+        <el-tabs
+          v-model="add.responses.bodyTab"
+          type="border-card"
           size="mini" 
           v-loading="add.responses.loading"     
           element-loading-text="Send Request..."
