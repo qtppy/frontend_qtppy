@@ -292,7 +292,6 @@
                 <el-radio :label="3">x-www-form-urlencoded</el-radio>
                 <el-radio :label="4">raw</el-radio>
               </el-radio-group>
-
               <el-divider content-position="left"/>
               <el-button 
                 type="primary" 
@@ -1221,34 +1220,6 @@
 
             this.add.body.body = bodyMap;
           };
-          // this.add.body.how = this.add.body.radio;
-
-          // 出参数据
-          let outParam = [];
-          for(let i=0; i<this.add.outParam.data.length; i++) {
-            if(this.add.outParam.data[i].name !== '') {
-              outParam.push(
-                this.add.outParam.data[i]
-              );
-            };
-          };
-          if(outParam) {
-            this.add.outParam.data = outParam;
-          }
-          
-          // 断言数据
-          let checkData = [];
-          for(let i=0; i<this.add.assert.data.length; i++) {
-            if(this.add.assert.data[i].checkType !== '') {
-              checkData.push(
-                this.add.assert.data[i]
-              );
-            }
-          };
-          if(checkData) {
-            this.add.assert.data = checkData;
-          }
-          
         },
         /** 新增用例tab切换
          * @param {string} tab 标签lable名称
