@@ -67,7 +67,7 @@
 				<template slot="header" slot-scope>
 					<el-button-group>
 						<el-tooltip content="添加用例" placement="bottom" effect="light">
-							<el-button type="success" icon="el-icon-document-add" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
+							<el-button type="success" icon="el-icon-document-add" size="mini" @click="addCaseVisible = true" ></el-button>
 						</el-tooltip>
 
 						<el-tooltip content="上移" placement="bottom" effect="light">
@@ -131,9 +131,36 @@
 				<el-button @click.native="addSuiteVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
-		</el-dialog>		
+		</el-dialog>
+
+		<!-- 添加用例 -->
+		<el-dialog title="添加用例" :close-on-click-modal="false" :visible.sync="addCaseVisible">
+			<el-transfer
+				style="text-align: left; display: inline-block"
+				v-model="value4"
+				filterable
+				:left-default-checked="[2, 3]"
+				:right-default-checked="[1]"
+				:titles="['Source', 'Target']"
+				:format="{
+					noChecked: '${total}',
+					hasChecked: '${checked}/${total}'
+				}"
+				@change="handleChange"
+				:data="data">
+				<span slot-scope="{ option }">{{ option.key }} - {{ option.label }}</span>
+				<el-button class="transfer-footer" slot="left-footer" size="small">操作</el-button>
+				<el-button class="transfer-footer" slot="right-footer" size="small">操作</el-button>
+			</el-transfer>
+			<div slot="footer" class="dialog-footer">
+				<el-button @click="addCaseVisible = false">取 消</el-button>
+				<el-button type="primary" @click="addCaseVisible = false">确 定</el-button>
+			</div>
+		</el-dialog>
 	</section>
+
 </template>
+
 
 <script>
 	import util from '@/common/js/util'
