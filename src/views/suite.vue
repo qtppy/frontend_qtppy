@@ -2,10 +2,10 @@
 	<section>
 		<!--工具条-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-			<el-form :inline="true" :model="filters" ref="searchTool">
+			<el-form :inline="true" :model="filters" ref="searchTool" size="mini">
 				<el-form-item>
 					<el-link type="primary" icon="el-icon-cpu" :underline="false">项目:</el-link>
-					<el-select v-model="projectSelected" filterable  size="small" placeholder="请选择项目" @change="getSuiteList">
+					<el-select v-model="projectSelected" filterable  size="mini" placeholder="请选择项目" @change="getSuiteList">
 						<el-option
 						v-for="item in projectOptions"
 						:key="item.value"
@@ -16,7 +16,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-link type="primary" icon="el-icon-guide" :underline="false">场景:</el-link>
-					<el-select v-model="suiteSelected" filterable size="small" placeholder="请选择场景">
+					<el-select v-model="suiteSelected" filterable size="mini" placeholder="请选择场景">
 						<el-option
 						v-for="item in suiteOptions"
 						:key="item.value"
@@ -28,55 +28,73 @@
 				<el-form-item>
 					<el-tooltip placement="top">
 						<div slot="content">新增场景</div>
-						<el-button type="primary" icon="el-icon-news" size="small" @click="handleAddSuite">新增</el-button>
+						<el-button type="primary" icon="el-icon-news" size="mini" @click="handleAddSuite">新增</el-button>
 					</el-tooltip>
 				</el-form-item>
 				<el-form-item>
 					<el-tooltip placement="top">
 						<div slot="content">编辑场景</div>
-						<el-button type="primary" icon="el-icon-edit" size="small" @click="handleSuiteEdit">编辑</el-button>
+						<el-button type="primary" icon="el-icon-edit" size="mini" @click="handleSuiteEdit">编辑</el-button>
 					</el-tooltip>
 				</el-form-item>
 			</el-form>
 		</el-col>
 
 		<!--列表-->
-		<el-table :data="users" highlight-current-row v-loading="listLoading" @selection-change="selsChange" style="width: 100%;">
+		<el-table 
+			:data="cases" 
+			highlight-current-row 
+			v-loading="listLoading" 
+			@selection-change="selsChange"
+			size="mini"
+			style="width: 100%;">
 			<el-table-column type="selection" width="55">
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
 			</el-table-column>
-			<el-table-column prop="p_id" label="场景ID" width="100" v-if="visible">
+			<el-table-column prop="p_id" label="场景用例ID" width="100" v-if="visible">
 			</el-table-column>
-			<el-table-column prop="p_name" label="场景名称" width="120" >
+			<el-table-column prop="p_name" label="接口名称" width="200" >
 			</el-table-column>
-			<el-table-column prop="p_status" label="状态" width="100" :formatter="formatStatus" >
+			<el-table-column prop="p_status" label="接口地址" width="200" :formatter="formatStatus" >
 			</el-table-column>
-			<el-table-column prop="p_creator" label="创建人" width="100" >
+			<el-table-column prop="p_creator" label="请求方法" width="100" >
 			</el-table-column>
 			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" >
 			</el-table-column>
-			<el-table-column prop="p_desc" label="描述" min-width="180" >
-			</el-table-column>
-			<el-table-column label="操作" :render-header="renderHeader" width="150">
-				<template slot-scope="scope">
-					<el-tooltip content="编辑" placement="bottom" effect="light">
-						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
-					</el-tooltip>
-					<el-tooltip content="详情" placement="bottom" effect="light">
-						<el-button type="primary" icon="el-icon-chat-line-round" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
-					</el-tooltip>
-					<el-tooltip content="删除" placement="bottom" effect="light">
-						<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
-					</el-tooltip>
+
+			<el-table-column label="操作" :render-header="renderHeader" width="300">
+				<template slot="header" slot-scope>
+					<el-button-group>
+						<el-tooltip content="添加用例" placement="bottom" effect="light">
+							<el-button type="success" icon="el-icon-document-add" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
+						</el-tooltip>
+
+						<el-tooltip content="上移" placement="bottom" effect="light">
+							<el-button type="primary" icon="el-icon-top" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
+						</el-tooltip>
+
+						<el-tooltip content="下移" placement="bottom" effect="light">
+							<el-button type="primary" icon="el-icon-bottom" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
+						</el-tooltip>
+					</el-button-group>  
 				</template>
+				
+				<el-tooltip content="编辑" placement="bottom" effect="light">
+					<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+				</el-tooltip>
+
+				<el-tooltip content="删除" placement="bottom" effect="light">
+					<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+				</el-tooltip>
+
 			</el-table-column>
 		</el-table>
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
-			<el-pagination layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="per_page" :total="total" style="float:right;">
+			<el-button type="danger" size="mini" @click="batchRemove" :disabled="this.sels.length===0">批量删除</el-button>
+			<el-pagination layout="prev, pager, next" size="mini" @current-change="handleCurrentChange" :page-size="per_page" :total="total" style="float:right;">
 			</el-pagination>
 		</el-col>
 
@@ -113,96 +131,6 @@
 				<el-button @click.native="addSuiteVisible = false">取消</el-button>
 				<el-button type="primary" @click.native="addSubmit" :loading="addLoading">提交</el-button>
 			</div>
-		</el-dialog>
-
-		<!-- 新增测试用例 -->
-		<el-dialog title="新增测试用例" fullscreen="true" :visible="addCaseVisible" :close-on-click-modal="false" @close="addCaseVisible = false" :size="addCaseSize">
-			<el-form :model="addCaseData" label-width="3px" :rules="addFormRules" ref="addSuiteData">
-				<el-row>
-					<el-col span="12">
-						<el-form-item prop="method">
-							<el-input placeholder="请输入请求URL" v-model="addCaseData.url" class="input-with-select" @change="baseUrlSet">
-								<el-select v-model="mechodSelectValue" placeholder="Method" slot="prepend" :size="addCaseSize" style="width:120px;">
-									<el-option
-									v-for="item in methodOptions"
-									:key="item.value"
-									:label="item.label"
-									:value="item.value">
-									</el-option>
-								</el-select>
-								<el-button slot="append" icon="el-icon-share" :loading="debugRequestLoading">调试</el-button>
-							</el-input>
-						</el-form-item>
-					</el-col>
-				</el-row>
-				<el-row>
-					<el-col span="24">
-						<el-tabs v-model="activeName" @tab-click="handleClick" :size="Paramsize">
-							<!-- Params参数 -->
-							<el-tab-pane label="Params" name="first">
-								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
-										<el-table-column prop="key" label="Key">
-											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.key}}</span>
-											</template>
-										</el-table-column>
-										<el-table-column prop="value" label="Value">
-											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.value}}</span>
-											</template>
-										</el-table-column>
-										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
-											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.DESCRIPTION}}</span>
-											</template>
-										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeader" >
-											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
-											</template>
-										</el-table-column>
-									</el-table>
-
-							</el-tab-pane>
-							<el-tab-pane label="Headers" name="headers">
-								<el-table :data="tableData" border stripe style="width: 100%;" :size="Paramsize">
-										<el-table-column prop="key" label="Key">
-											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.key" placeholder="Key" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.key}}</span>
-											</template>
-										</el-table-column>
-										<el-table-column prop="value" label="Value">
-											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.value" placeholder="Value" :size="Paramsize" @change="addUrlParams(scope.$index, scope.row)" @input="addNewRow(scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.value}}</span>
-											</template>
-										</el-table-column>
-										<el-table-column prop="DESCRIPTION" label="DESCRIPTION">
-											<template slot-scope="scope">
-												<el-input v-if="scope.row.edit" v-model="scope.row.DESCRIPTION" placeholder="DESCRIPTION" :size="Paramsize"  @input="addNewRow(scope.$index, scope.row)"></el-input>
-												<span v-else>{{scope.row.DESCRIPTION}}</span>
-											</template>
-										</el-table-column>
-										<el-table-column label="操作" :render-header="renderHeader" >
-											<template slot-scope="scope">
-												<el-link type="info" :underline="false" icon="el-icon-close" @click.native="deleteRow(scope.$index, scope.row)" circle></el-link>
-											</template>
-										</el-table-column>
-									</el-table>
-							</el-tab-pane>
-							<el-tab-pane label="Body" name="body">Body</el-tab-pane>
-						</el-tabs>
-					</el-col>
-				</el-row>
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="addCaseVisible = false">取消</el-button>
-				<el-button type="primary" @click.native="addSubmit" :loading="addCaseLoading">提交</el-button>
-			</div>
 		</el-dialog>		
 	</section>
 </template>
@@ -218,7 +146,7 @@
 				filters: {
 					p_name: ''
 				},
-				users: [],
+				cases: [],
 				total: 0,
 				per_page: 10,
 				page: 1,
@@ -245,11 +173,6 @@
 					name: [
 						{ required: true, message: '请输入项目名称', trigger: 'blur' }
 					]
-				},
-				//新增界面数据
-				addForm: {
-					p_name: '',
-					p_desc: ''
 				},
 				// 项目列表
 				projectOptions:[], //项目列表
@@ -286,80 +209,6 @@
 				},
 				// table data
 				Paramsize: "mini",
-				tableData: [
-					{
-						key: '',
-						value: '',
-						DESCRIPTION: '',
-						edit: true,
-					},
-				],
-
-				// method选项
-				methodOptions: [
-					{
-						value: 0,
-						label: 'POST'
-					},
-					{
-						value: 1,
-						label: 'GET'
-					},
-					{
-						value: 2,
-						label: 'PUT'
-					},
-					{
-						value: 3,
-						label: 'PATCH'
-					},
-					{
-						value: 4,
-						label: 'DELETE'
-					},
-					{
-						value: 5,
-						label: 'COPY'
-					},
-					{
-						value: 6,
-						label: 'HEAD'
-					},
-					{
-						value: 7,
-						label: 'OPTIONS'
-					},
-					{
-						value: 8,
-						label: 'LINK'
-					},
-					{
-						value: 9,
-						label: 'UNLINK'
-					},
-					{
-						value: 10,
-						label: 'PURGE'
-					},
-					{
-						value: 11,
-						label: 'LOCK'
-					},
-					{
-						value: 12,
-						label: 'UNLOCK'
-					},
-					{
-						value: 13,
-						label: 'PROPFIND'
-					},
-					{
-						value: 14,
-						label: 'VIEW'
-					}
-				],
-				mechodSelectValue: '',
-				debugRequestLoading: false,
 			}
 		},
 		created() {
@@ -434,89 +283,7 @@
 				this.page = val;
 				this.getProjects();
 			},
-			// 表头操作栏按钮
- 			renderHeader(h, params) {
-                let a =  [
-					h('el-button-group',[
-						// 文字提示
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "增加测试用例",
-								placement: "bottom",
-								effect: "light"
-							},
-						},
-						[
-							// 增加按钮
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-document-add"
-								},
-								on: {
-									click: () => {
-										this.handleAddCaseDialog();
-									}
-								}
-							})
-						]),
-						
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "全局变量",
-								placement: "bottom",
-								effect: "light"								
-							}
-						},
-						[
-							// 全局变量按钮
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-share"
-								},
-								on: {
-									click: () => {
-										this.renderAddRow();
-									}
-								}
-							}),
-						]),
-						h('el-tooltip',{
-							props: {
-								disabled: false,
-								content: "系统函数",
-								placement: "bottom",
-								effect: "light"								
-							}
-						},
-						[
-							// 系统函数按钮
-							h('el-button', {
-								props: {
-									size: "mini",
-									type: "primary",
-									icon: "el-icon-s-flag"
-								},
-								on: {
-									click: () => {
-										this.renderAddRow();
-									}
-								}
-							}),
-						]),
-					])
-				]
-                return h('div', a);
-			},
-			// 显示增加case
-			handleAddCaseDialog() {
-				this.addCaseVisible = true;
-			},
+
 			// 获取项目
 			getProjectSelect () {
 				this.projectOptions = [] //初始化列表
@@ -565,7 +332,7 @@
 					this.per_page = res.data.res.per_page;
 					this.page = res.data.res.page;
 					this.next = res.data.res.next_page;
-					this.users = res.data.res.project;
+					this.cases = res.data.res.project;
 					this.listLoading = false;
 					//NProgress.done();
 				});
