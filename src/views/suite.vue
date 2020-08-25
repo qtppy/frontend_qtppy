@@ -476,6 +476,11 @@
 
 </script>
 
-<style scoped-slot>
+<style>
+	/* el-select解决下拉显示不全问题 */
+	.el-select-dropdown .el-scrollbar .el-scrollbar__wrap
+	{
+		overflow: scroll!important;
+	}
 
 </style>
