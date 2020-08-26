@@ -37,7 +37,7 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table 
+	<el-table 
       :data="casesData" 
       highlight-current-row 
       v-loading="listLoading" 
@@ -138,10 +138,11 @@
 
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-button 
-        type="danger" 
-        @click="batchRemove" 
-        :disabled="this.sels.length===0">批量删除</el-button>
+			<el-button
+				v-show="toolbarVisable"
+				type="danger" 
+				@click="batchRemove" 
+				:disabled="this.sels.length===0">批量删除</el-button>
 			<el-pagination 
         layout="prev, pager, next" 
         @current-change="handleCurrentChange" 
@@ -214,7 +215,8 @@
         // 用例全局设置抽屉
         caseGlobalDialog: false,
         caseGlobalLoading: false,
-        caseGlobalActiveName: "base",
+		caseGlobalActiveName: "base",
+		toolbarVisable: true,
       }
 		},
 		methods: {
