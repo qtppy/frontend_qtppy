@@ -42,9 +42,9 @@
 
 		<!--列表-->
 		<el-table 
-			:data="cases" 
+			:data="scene.table.data" 
 			highlight-current-row 
-			v-loading="listLoading" 
+			v-loading="scene.table.loading" 
 			@selection-change="selsChange"
 			size="mini"
 			style="width: 100%;">
@@ -52,7 +52,7 @@
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
 			</el-table-column>
-			<el-table-column prop="p_id" label="场景用例ID" width="100" v-if="visible">
+			<el-table-column prop="p_id" label="场景用例ID" width="100" v-if="scene.table.colVisible">
 			</el-table-column>
 			<el-table-column prop="p_name" label="接口名称" width="200" >
 			</el-table-column>
@@ -63,11 +63,11 @@
 			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" >
 			</el-table-column>
 
-			<el-table-column label="操作" :render-header="renderHeader" width="300">
+			<el-table-column label="操作"  width="300">
 				<template slot="header" slot-scope>
 					<el-button-group>
 						<el-tooltip content="添加用例" placement="bottom" effect="light">
-							<el-button type="success" icon="el-icon-document-add" size="mini" @click="addCaseVisible = true" ></el-button>
+							<el-button type="success" icon="el-icon-document-add" size="mini" @click="addCaseDialog.visible = true" ></el-button>
 						</el-tooltip>
 
 						<el-tooltip content="上移" placement="bottom" effect="light">
@@ -99,21 +99,21 @@
 		</el-col>
 
 		<!-- 编辑界面 -->
-		<el-dialog title="编辑" :visible="editSuitevisible" :close-on-click-modal="false" @close="editSuitevisible = false">
-			<el-form :model="editSuiteData" label-width="80px" :rules="editFormRules" ref="editForm">
+		<el-dialog title="编辑" :visible="scene.edit.visible" :close-on-click-modal="false" @close="scene.edit.visible = false">
+			<el-form :model="scene.edit.data" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="场景ID" prop="sid">
-					<el-input v-model="editSuiteData.sid" auto-complete="off" :readonly="editSuiteSidVisible"></el-input>
+					<el-input v-model="scene.edit.data.sid" auto-complete="off" :readonly="scene.edit.sidvisible"></el-input>
 				</el-form-item>
 				<el-form-item label="场景名称" prop="s_name">
-					<el-input v-model="editSuiteData.s_name" auto-complete="off"></el-input>
+					<el-input v-model="scene.edit.data.s_name" auto-complete="off"></el-input>
 				</el-form-item>
 				<el-form-item label="描述">
-					<el-input type="textarea" v-model="editSuiteData.s_desc"></el-input>
+					<el-input type="textarea" v-model="scene.edit.data.s_desc"></el-input>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="editSuitevisible = false">取消</el-button>
-				<el-button type="primary" @click.native="editSubmit" :loading="editLoading">提交</el-button>
+				<el-button @click.native="scene.edit.visible = false">取消</el-button>
+				<el-button type="primary" @click.native="editSubmit" :loading="scene.edit.loading">提交</el-button>
 			</div>
 		</el-dialog>
 
@@ -134,27 +134,31 @@
 		</el-dialog>
 
 		<!-- 添加用例 -->
-		<el-dialog title="添加用例" :close-on-click-modal="false" :visible.sync="addCaseVisible">
+		<el-dialog title="添加用例" :close-on-click-modal="false" :visible.sync="addCaseDialog.visible">
 			<el-transfer
 				style="text-align: left; display: inline-block"
-				v-model="value4"
+				v-model="addCaseDialog.transfer.model"
 				filterable
 				:left-default-checked="[2, 3]"
 				:right-default-checked="[1]"
-				:titles="['Source', 'Target']"
+				:titles="['全局用例库', '场景用例']"
 				:format="{
 					noChecked: '${total}',
 					hasChecked: '${checked}/${total}'
 				}"
 				@change="handleChange"
-				:data="data">
+				:data="addCaseDialog.transfer.data"
+				size="mini">
 				<span slot-scope="{ option }">{{ option.key }} - {{ option.label }}</span>
 				<el-button class="transfer-footer" slot="left-footer" size="small">操作</el-button>
-				<el-button class="transfer-footer" slot="right-footer" size="small">操作</el-button>
+				<el-button-group class="transfer-footer" slot="right-footer">
+					<el-button  size="mini" icon="el-icon-top"/>
+					<el-button  size="mini" icon="el-icon-bottom"/>
+				</el-button-group>
 			</el-transfer>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click="addCaseVisible = false">取 消</el-button>
-				<el-button type="primary" @click="addCaseVisible = false">确 定</el-button>
+				<el-button @click="addCaseDialog.visible = false" size="mini">取 消</el-button>
+				<el-button type="primary" @click="addCaseDialog.visible = false" size="mini">确 定</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -173,11 +177,9 @@
 				filters: {
 					p_name: ''
 				},
-				cases: [],
 				total: 0,
 				per_page: 10,
 				page: 1,
-				listLoading: false,
 				sels: [],//列表选中列
 				projectIdShow: "visible", //项目Id列是否显示
 				editProjectId: true, //编辑界面项目Id是否只读 true只读
@@ -214,89 +216,51 @@
 					s_desc: '',
 					project_id: ''
 				},
-				// 场景编辑
-				editSuitevisible: false, //场景编辑是否显示
-				editSuiteSidVisible: true,
-				editSuiteData: {
-					sid: '',
-					s_desc: '',
-					s_name: ''
+				// 场景数据
+				scene: {
+					table: {
+						loading: false,
+						data: [],
+						colVisible: false,
+					},
+					edit:{
+						loading: false,
+						visible: false,
+						sidVisible: false,
+						data: {
+							sid: '',
+							s_desc: '',
+							s_name: ''
+						},
+					},
 				},
-				// 新增测试用例
-				addCaseLoading: false,
-				addCaseVisible: false,
-				addCaseSize: 'small',
-				// 新增测试用例数据
-				addCaseData: {
-					method: '',
-					url: '',
-					urlIndex: 0,
-					baseUrl: '',
 
+				// 场景添加用例
+				addCaseDialog: {
+					visible: false,
+					transfer:{
+						data: [
+							{
+								key: 'abc',
+								label: 'aaaa'
+							},
+							{
+								key: 'ddd',
+								label: 'bbbb'
+							}
+						],
+						model: [1],
+					},
 				},
-				// table data
-				Paramsize: "mini",
 			}
 		},
 		created() {
-			this.getProjectSelect(), //初始化加载项目列表
-			this.projectSelected = this.projectOptions[0].p_id
+			this.getProjectSelect()//初始化加载项目列表
 		},
 		methods: {
-
-			// Params选项卡增加新行
-			addNewRow(index, row) {
-				if(index == this.tableData.length - 1) {
-					this.tableData.push({
-						key: '',
-						value: '',
-						DESCRIPTION: '',
-						edit: true,					
-					});
-				};
+			handleChange(value, direction, movedKeys) {
+				console.log(value, direction, movedKeys);
 			},
-			// 删除行
-			deleteRow(index, row) {
-				if(index !== 0) {
-					this.tableData.splice(index, 1);
-					this.addUrlParams(index, row);
-				};
-			},
-			baseUrlSet() {
-				this.addCaseData.baseUrl = this.addCaseData.url;
-			},
-			// 输入框输入焦点
-			addUrlParams(index, row) {
-				let flag = 0; //key和value全填标记0全填1相反
-				let joinUrl = ''
-				// 初始化url
-				this.addCaseData.url = ''
-
-				// key和value全填才执行拼接
-				for (let i=0; i<this.tableData.length-1; i++) {
-					if (this.tableData[i].key ==='' && this.tableData[i].value ==='') {
-						flag = 1
-						break
-					};
-				};
-				// 拼接
-				if (flag === 0) {
-					for (let j=0; j<this.tableData.length; j++) {
-						if (this.tableData[j].key !=='' && this.tableData[j].value !=='') {
-							if (this.addCaseData.urlIndex === 0) {
-								joinUrl = '?' + this.tableData[j].key + '=' + this.tableData[j].value
-								this.addCaseData.urlIndex = 1
-							} else {
-								joinUrl = joinUrl + '&' + this.tableData[j].key + '=' + this.tableData[j].value
-							}
-						}
-					}
-					
-				};
-				this.addCaseData.urlIndex = 0
-				this.addCaseData.url = this.addCaseData.baseUrl + joinUrl
-			},
-
 
 			// 项目创建日期转换
 			formatDateDMT: function (row, column) {
@@ -323,7 +287,7 @@
 							value: projectArr[i].p_id
 						})
 					};
-					console.log(this.projectOptions)
+					this.projectSelected = this.projectOptions[0].p_id
 				});
 				
 			},
@@ -343,8 +307,8 @@
 						})
 					};
 					console.log(this.suiteOptions)
+					this.suiteSelected = this.suiteOptions[0].sid
 				});
-				this.suiteSelected = this.suiteOptions[0].s_id
 			},
 			//获取用户列表
 			getProjects() {
@@ -352,15 +316,15 @@
 					page: this.page,
 					p_name: this.filters.p_name
 				};
-				this.listLoading = true;
+				this.scene.table.loading = true;
 				//NProgress.start();
 				getProjectList(para).then((res) => {
 					this.total = res.data.res.total;
 					this.per_page = res.data.res.per_page;
 					this.page = res.data.res.page;
 					this.next = res.data.res.next_page;
-					this.cases = res.data.res.project;
-					this.listLoading = false;
+					this.scene.table.data = res.data.res.project;
+					this.scene.table.loading = false;
 					//NProgress.done();
 				});
 			},
@@ -370,11 +334,11 @@
 				this.$confirm('确认删除该记录吗?', '提示', {
 					type: 'warning'
 				}).then(() => {
-					this.listLoading = true;
+					this.scene.table.loading = true;
 					//NProgress.start();
 					let para = { p_id: [row.p_id] };
 					deleteProject(para).then((res) => {
-						this.listLoading = false;
+						this.scene.table.loading = false;
 						//NProgress.done();
 						this.$message({
 							message: '删除成功',
@@ -399,13 +363,13 @@
 				};
 				getSuiteByID(para).then(res => {
 					let data = res.data.res
-					this.editSuiteData = {
+					this.scene.edit.data = {
 						sid: data.sid,
 						s_name: data.s_name,
 						s_desc: data.s_desc
 					}
 				});
-				this.editSuitevisible = true
+				this.scene.edit.visible = true
 
 			},
 			//显示新增界面
@@ -424,7 +388,7 @@
 						this.$confirm('确认提交吗？', '提示', {}).then(() => {
 							this.editLoading = true;
 							//NProgress.start();
-							let para = Object.assign({}, this.editSuiteData);
+							let para = Object.assign({}, this.scene.edit.data);
 							para.create_time = (!para.create_time || para.create_time == '') ? '' : util.formatDate.format(new Date(para.create_time), 'yyyy-MM-dd');
 							updateSuiteInfo(para).then((res) => {
 								this.editLoading = false;
@@ -433,8 +397,8 @@
 									message: '提交成功',
 									type: 'success'
 								});
-								this.editSuitevisible = false;
-								getSuiteList(this.projectSelected);
+								this.scene.edit.visible = false;
+								this.getSuiteList(this.projectSelected);
 							});
 						});
 					}
@@ -479,11 +443,11 @@
 				this.$confirm('确认删除选中记录吗？', '提示', {
 					type: 'warning'
 				}).then(() => {
-					this.listLoading = true;
+					this.scene.table.loading = true;
 					//NProgress.start();
 					let para = { p_id: ids };
 					deleteProject(para).then((res) => {
-						this.listLoading = false;
+						this.scene.table.loading = false;
 						//NProgress.done();
 						this.$message({
 							message: '删除成功',
