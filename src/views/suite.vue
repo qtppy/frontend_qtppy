@@ -67,7 +67,7 @@
 				<template slot="header" slot-scope>
 					<el-button-group>
 						<el-tooltip content="添加用例" placement="bottom" effect="light">
-							<el-button type="success" icon="el-icon-document-add" size="mini" @click="addCaseDialog.visible = true" ></el-button>
+							<el-button type="success" icon="el-icon-document-add" size="mini" @click="addCaseToList()" ></el-button>
 						</el-tooltip>
 
 						<el-tooltip content="上移" placement="bottom" effect="light">
@@ -178,7 +178,7 @@
 					suite: {
 						loading: false,
 						options: [],
-						selected: [],
+						selected: '',
 						visible: false,
 						data:{
 							s_name: '',
@@ -241,6 +241,27 @@
 			this.getProjectSelect()//初始化加载项目列表
 		},
 		methods: {
+      addCaseToList() {
+        // 先选择项目及场景之后，才可以增加步骤
+        let ops = this.projects;
+        if( ops.project.options.length <= 0) {
+          this.$message(
+            {
+              message: '请选择项目',
+              type: 'warning'
+            }
+          )
+        } else if( ops.suite.selected === '') {
+          this.$message(
+            {
+              message: '请选择场景',
+              type: 'warning'
+            }
+          )
+        }else{
+          this.addCaseDialog.visible = true;
+        }
+      },
 			insertCases() {
 				console.log('=-=-=-=->', this.$refs.caseCom.sels)
 			},
@@ -346,19 +367,36 @@
 			},
 			// 显示场景编辑
 			handleSuiteEdit: function () {
-				let para = {
-					"sid": this.projects.suite.selected
-				};
-				getSuiteByID(para).then(res => {
-					let data = res.data.res
-					this.scene.edit.data = {
-						sid: data.sid,
-						s_name: data.s_name,
-						s_desc: data.s_desc
-					}
-				});
-				this.scene.edit.visible = true
-
+        // 先选择项目及场景之后，才可以增加步骤
+        let ops = this.projects;
+        if( ops.project.options.length <= 0) {
+          this.$message(
+            {
+              message: '请选择项目',
+              type: 'warning'
+            }
+          )
+        } else if( ops.suite.selected === '') {
+          this.$message(
+            {
+              message: '请选择场景',
+              type: 'warning'
+            }
+          )
+        }else{
+          let para = {
+            "sid": this.projects.suite.selected
+          };
+          getSuiteByID(para).then(res => {
+            let data = res.data.res
+            this.scene.edit.data = {
+              sid: data.sid,
+              s_name: data.s_name,
+              s_desc: data.s_desc
+            }
+          });
+          this.scene.edit.visible = true
+        }
 			},
 			//显示新增界面
 			handleAddSuite: function () {
