@@ -73,3 +73,6 @@ export const getVarByUid = params => { return axios.post(`/api/var/getVarByUid`,
 
 //获取系统函数映射关系
 export const getSystemFunc = params => { return axios.post(`/api/var/getSystemFunc`).then(res => res.data); };
+
+//获取场景case ID
+export const getSuiteCaseById = params => { return axios.post(`/api/project/suite/getSuiteCaseById`, params).then(res => res.data) };

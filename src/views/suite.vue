@@ -16,7 +16,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-link type="primary" icon="el-icon-guide" :underline="false">场景:</el-link>
-					<el-select v-model="projects.suite.selected" filterable size="mini" placeholder="请选择场景">
+					<el-select v-model="projects.suite.selected" filterable size="mini" placeholder="请选择场景" @change="getProjects">
 						<el-option
 						v-for="item in projects.suite.options"
 						:key="item.value"
@@ -52,13 +52,13 @@
 			</el-table-column>
 			<el-table-column type="index" label="序号" width="100">
 			</el-table-column>
-			<el-table-column prop="p_id" label="场景用例ID" width="100" v-if="scene.table.colVisible">
+			<el-table-column prop="scid" label="场景用例ID" width="100" v-if="scene.table.colVisible">
 			</el-table-column>
-			<el-table-column prop="p_name" label="接口名称" width="200" >
+			<el-table-column prop="scName" label="接口名称" width="200" >
 			</el-table-column>
-			<el-table-column prop="p_status" label="接口地址" width="200" :formatter="formatStatus" >
+			<el-table-column prop="scUrl" label="接口地址" width="200" :formatter="formatStatus" >
 			</el-table-column>
-			<el-table-column prop="p_creator" label="请求方法" width="100" >
+			<el-table-column prop="scMethod" label="请求方法" width="100" >
 			</el-table-column>
 			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" >
 			</el-table-column>
@@ -141,7 +141,7 @@
 			<case-module ref="caseCom" />
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="addCaseDialog.visible = false" size="mini">取 消</el-button>
-				<el-button type="primary" @click="addCaseDialog.visible = false; insertCases()" size="mini" :loading="addCaseDialog.loading">添 加</el-button>
+				<el-button type="primary" @click="addCaseDialog.visible = false" size="mini" :loading="addCaseDialog.loading">添 加</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -152,7 +152,7 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getProjectList, getSuiteByID} from '@/api/api';
+	import { getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getSuiteCaseById, getSuiteByID} from '@/api/api';
 	import CASE from '@/views/Case'
 	export default {
 		components: { 
@@ -262,8 +262,16 @@
           this.addCaseDialog.visible = true;
         }
       },
-			insertCases() {
-				console.log('=-=-=-=->', this.$refs.caseCom.sels)
+			getSuiteCase() {
+        // console.log('=-=-=-=->', this.$refs.caseCom.sels)
+        // console.log('场景ID', this.projects.suite.selected)
+        // 根据场景ID，场景用例ID查询场景下用例
+        let para = {
+          sid: this.projects.suite.selected
+        }
+        getSuiteCaseById(para).then((res) => {
+          this.scene.table = res.case;
+        });
 			},
 			handleChange(value, direction, movedKeys) {
 				console.log(value, direction, movedKeys);
@@ -322,20 +330,24 @@
 			},
 			//获取用户列表
 			getProjects() {
-				let para = {
-					page: this.pages.page,
-				};
-				this.scene.table.loading = true;
+
+        this.scene.table.loading = true;
+        let para = {
+          sid: this.projects.suite.selected
+        }
+
 				//NProgress.start();
-				getProjectList(para).then((res) => {
-					this.pages.total = res.data.res.total;
-					this.pages.per_page = res.data.res.per_page;
-					this.pages.page = res.data.res.page;
-					this.pages.next = res.data.res.next_page;
-					this.scene.table.data = res.data.res.project;
-					this.scene.table.loading = false;
-					//NProgress.done();
-				});
+        getSuiteCaseById(para).then((res) => {
+          console.log('9999999====>', res)
+          this.scene.table.data = res.res.case;
+					this.pages.total = res.res.total;
+					this.pages.per_page = res.res.per_page;
+					this.pages.page = res.res.page;
+					this.pages.next = res.res.next_page;
+        });
+        this.scene.table.loading = false;
+				//NProgress.done();
+
 			},
 
 			//删除
@@ -487,7 +499,7 @@
 			}
 		},
 		mounted() {
-			this.getProjects();
+			// this.getProjects();
 		}
 	}
 
