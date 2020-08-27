@@ -141,7 +141,7 @@
 			<case-module ref="caseCom" />
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="addCaseDialog.visible = false" size="mini">取 消</el-button>
-				<el-button type="primary" @click="addCaseDialog.visible = false" size="mini" :loading="addCaseDialog.loading">添 加</el-button>
+				<el-button type="primary" @click="insertCase" size="mini" :loading="addCaseDialog.loading">添 加</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -262,16 +262,18 @@
           this.addCaseDialog.visible = true;
         }
       },
-			getSuiteCase() {
+			insertCase() {
         // console.log('=-=-=-=->', this.$refs.caseCom.sels)
         // console.log('场景ID', this.projects.suite.selected)
         // 根据场景ID，场景用例ID查询场景下用例
-        let para = {
-          sid: this.projects.suite.selected
+        if(this.$refs.caseCom.sels.length <=0) {
+          this.$message({
+            message: '请勾选，选择用例',
+            type: 'warning'
+          })
+        }else {
+          this.addCaseDialog.visible = false; 
         }
-        getSuiteCaseById(para).then((res) => {
-          this.scene.table = res.case;
-        });
 			},
 			handleChange(value, direction, movedKeys) {
 				console.log(value, direction, movedKeys);
