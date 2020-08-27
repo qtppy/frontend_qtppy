@@ -1,9 +1,9 @@
 <template>
-	<section>
-		<!--工具条-->
-		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
-			<el-form :inline="true" size="mini">
-				<el-form-item>
+  <section>
+    <!--工具条-->
+    <el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
+      <el-form :inline="true" size="mini">
+        <el-form-item>
 					<el-link type="primary" icon="el-icon-cpu" :underline="false">项目:</el-link>
 					<el-select v-model="projects.project.selected" filterable  size="mini" placeholder="请选择项目" @change="getSuiteList">
 						<el-option
@@ -141,7 +141,7 @@
 			<case-module ref="caseCom" />
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="addCaseDialog.visible = false" size="mini">取 消</el-button>
-				<el-button type="primary" @click="addCaseDialog.visible = false" size="mini">确 定</el-button>
+				<el-button type="primary" @click="addCaseDialog.visible = false; insertCases()" size="mini" :loading="addCaseDialog.loading">添 加</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -219,6 +219,7 @@
 
 				// 场景添加用例
 				addCaseDialog: {
+					loading: false,
 					visible: false,
 					transfer:{
 						data: [
@@ -240,9 +241,8 @@
 			this.getProjectSelect()//初始化加载项目列表
 		},
 		methods: {
-			changeSubs() {
-				// console.log('====>', this.$refs.CASE.toolbarVisable)
-				this.$refs.caseCom.toolbarVisable = false
+			insertCases() {
+				console.log('=-=-=-=->', this.$refs.caseCom.sels)
 			},
 			handleChange(value, direction, movedKeys) {
 				console.log(value, direction, movedKeys);

@@ -46,7 +46,7 @@
       size="mini">
 			<el-table-column 
         type="selection" 
-        width="55"></el-table-column>
+        width="55" fixed="left"></el-table-column>
 			<el-table-column 
         type="index" 
         width="100" 
@@ -182,26 +182,26 @@
         casesData: [],
         visible: false,
         Paramsize:'mini',
-				total: 0,
-				page: 1,
-				per_page: 10,
-				listLoading: false,
-				sels: [],
-				editFormVisible: false,
-				editLoading: false,
-				editFormRules: {
-					name: [
-						{ required: true, message: '请输入姓名', trigger: 'blur' }
-					]
-				},
-				editForm: {
-					id: 0,
-					name: '',
-					sex: -1,
-					age: 0,
-					birth: '',
-					addr: ''
-        },
+		total: 0,
+		page: 1,
+		per_page: 10,
+		listLoading: false,
+		sels: [],
+		editFormVisible: false,
+		editLoading: false,
+		editFormRules: {
+			name: [
+				{ required: true, message: '请输入姓名', trigger: 'blur' }
+			]
+		},
+		editForm: {
+			id: 0,
+			name: '',
+			sex: -1,
+			age: 0,
+			birth: '',
+			addr: ''
+},
         
         /**验证规则 */
         addCaseRules: {

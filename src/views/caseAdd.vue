@@ -6,7 +6,8 @@
     :visible.sync="add.visible" 
     v-if="add.visible"
     :close-on-click-modal="false" 
-    @close="closeDestroy">
+    @close="closeDestroy"
+    append-to-body>
     <template slot="title">
         {{add.breadcrumbTitle}}
     </template>
