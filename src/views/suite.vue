@@ -56,7 +56,7 @@
 			</el-table-column>
 			<el-table-column prop="scName" label="接口名称" width="200" >
 			</el-table-column>
-			<el-table-column prop="scUrl" label="接口地址" width="200" :formatter="formatStatus" >
+			<el-table-column prop="scUrl" label="接口地址" width="200">
 			</el-table-column>
 			<el-table-column prop="scMethod" label="请求方法" width="100" >
 			</el-table-column>
@@ -152,7 +152,7 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getSuiteCaseById, getSuiteByID} from '@/api/api';
+	import { addSuiteCase, getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getSuiteCaseById, getSuiteByID} from '@/api/api';
 	import CASE from '@/views/Case'
 	export default {
 		components: { 
@@ -244,17 +244,10 @@
       addCaseToList() {
         // 先选择项目及场景之后，才可以增加步骤
         let ops = this.projects;
-        if( ops.project.options.length <= 0) {
+        if( ops.suite.selected === '') {
           this.$message(
             {
-              message: '请选择项目',
-              type: 'warning'
-            }
-          )
-        } else if( ops.suite.selected === '') {
-          this.$message(
-            {
-              message: '请选择场景',
+              message: '请选择项目及场景',
               type: 'warning'
             }
           )
@@ -262,7 +255,7 @@
           this.addCaseDialog.visible = true;
         }
       },
-			insertCase() {
+			async insertCase() {
         // console.log('=-=-=-=->', this.$refs.caseCom.sels)
         // console.log('场景ID', this.projects.suite.selected)
         // 根据场景ID，场景用例ID查询场景下用例
@@ -272,7 +265,17 @@
             type: 'warning'
           })
         }else {
+          this.addCaseDialog.visible = true;
+          let param = {
+            data: this.$refs.caseCom.sels,
+            sid: this.projects.suite.selected
+          };
+          await addSuiteCase(param).then(res => {
+            this.getProjects();
+          });
           this.addCaseDialog.visible = false; 
+          // 清除子组件case列表选择状态
+          this.$refs.caseCom.$refs.caseTable.clearSelection();
         }
 			},
 			handleChange(value, direction, movedKeys) {

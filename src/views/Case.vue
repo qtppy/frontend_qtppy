@@ -43,7 +43,8 @@
       v-loading="listLoading" 
       @selection-change="selsChange" 
       style="width: 100%;" 
-      size="mini">
+      size="mini"
+	  ref="caseTable">
 			<el-table-column 
         type="selection" 
         width="55" fixed="left"></el-table-column>
@@ -142,7 +143,8 @@
 				v-show="toolbarVisable"
 				type="danger" 
 				@click="batchRemove" 
-				:disabled="this.sels.length===0">批量删除</el-button>
+				:disabled="this.sels.length===0"
+				size="mini">批量删除</el-button>
 			<el-pagination 
         layout="prev, pager, next" 
         @current-change="handleCurrentChange" 

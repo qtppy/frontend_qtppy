@@ -76,3 +76,6 @@ export const getSystemFunc = params => { return axios.post(`/api/var/getSystemFu
 
 //获取场景case ID
 export const getSuiteCaseById = params => { return axios.post(`/api/project/suite/getSuiteCaseById`, params).then(res => res.data) };
+
+// 为场景增加测试步骤
+export const addSuiteCase = params => { return axios.post(`/api/project/suite/addCase`, params).then(res => res.data) };
