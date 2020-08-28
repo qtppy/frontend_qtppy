@@ -1,22 +1,45 @@
 import axios from 'axios';
 
-let base = '';
 
-let tmp_ip = 'http://127.0.0.1:5000';
+// 请求拦截器
+axios.interceptors.request.use(function (config) {
+    // Do something before request is sent
+    return config
+}, function (error) {
+    // Do something with request error
+    return Promise.reject(error)
+});
 
-export const requestLogin = params => { return axios.post(`${base}/login`, params).then(res => res.data); };
+//响应拦截器
+axios.interceptors.response.use(function (response) {
+    //Do something with response data
+    return response
+}, function (error) {
+    //Do something with response error
+    return Promise.reject(error)
+})
 
-export const getUserList = params => { return axios.get(`${base}/user/list`, { params: params }); };
 
-export const getUserListPage = params => { return axios.get(`${base}/user/listpage`, { params: params }); };
 
-export const removeUser = params => { return axios.get(`${base}/user/remove`, { params: params }); };
 
-export const batchRemoveUser = params => { return axios.get(`${base}/user/batchremove`, { params: params }); };
 
-export const editUser = params => { return axios.get(`${base}/user/edit`, { params: params }); };
+// let base = '';
 
-export const addUser = params => { return axios.get(`${base}/user/add`, { params: params }); };
+// let tmp_ip = 'http://127.0.0.1:5000';
+
+export const requestLogin = params => { return axios.post(`/api/login`, params).then(res => res.data); };
+
+export const getUserList = params => { return axios.get(`/api/user/list`, { params: params }); };
+
+export const getUserListPage = params => { return axios.get(`/api/user/listpage`, { params: params }); };
+
+export const removeUser = params => { return axios.get(`/api/user/remove`, { params: params }); };
+
+export const batchRemoveUser = params => { return axios.get(`/api/user/batchremove`, { params: params }); };
+
+export const editUser = params => { return axios.get(`/api/user/edit`, { params: params }); };
+
+export const addUser = params => { return axios.get(`/api/user/add`, { params: params }); };
 
 
 
@@ -69,7 +92,7 @@ export const logout = params => { return axios.post('/api/auth/logout'); };
 
 
 // 根据uid获取全局变量
-export const getVarByUid = params => { return axios.post(`/api/var/getVarByUid`, params).then(res => res.data); };
+export const getVarByUid = params => { return axios.post(`/api/var/getVarByUid`).then(res => res.data); };
 
 //获取系统函数映射关系
 export const getSystemFunc = params => { return axios.post(`/api/var/getSystemFunc`).then(res => res.data); };
@@ -79,3 +102,5 @@ export const getSuiteCaseById = params => { return axios.post(`/api/project/suit
 
 // 为场景增加测试步骤
 export const addSuiteCase = params => { return axios.post(`/api/project/suite/addCase`, params).then(res => res.data) };
+
+
