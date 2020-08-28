@@ -67,7 +67,7 @@
 				<template slot="header" slot-scope>
 					<el-button-group>
 						<el-tooltip content="添加用例" placement="bottom" effect="light">
-							<el-button type="success" icon="el-icon-document-add" size="mini" @click="addCaseToList()" ></el-button>
+							<el-button type="warning" icon="el-icon-document-add" size="mini" @click="addCaseToList()" ></el-button>
 						</el-tooltip>
 
 						<el-tooltip content="上移" placement="bottom" effect="light">
@@ -77,6 +77,10 @@
 						<el-tooltip content="下移" placement="bottom" effect="light">
 							<el-button type="primary" icon="el-icon-bottom" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
 						</el-tooltip>
+
+                        <el-tooltip content="执行场景用例" placement="bottom" effect="light">
+                          <el-button type="success" icon="el-icon-s-flag" size="mini" @click="addCaseToList()" ></el-button>
+                        </el-tooltip>
 					</el-button-group>  
 				</template>
 				
@@ -100,7 +104,7 @@
 
 		<!-- 编辑界面 -->
 		<el-dialog title="编辑" :visible="scene.edit.visible" :close-on-click-modal="false" @close="scene.edit.visible = false">
-			<el-form :model="scene.edit.data" label-width="80px" :rules="scene.edit.rules" ref="editForm">
+			<el-form :model="scene.edit.data" label-width="80px" :rules="scene.edit.rules" ref="editForm" >
 				<el-form-item label="场景ID" prop="sid">
 					<el-input v-model="scene.edit.data.sid" auto-complete="off" :readonly="scene.edit.sidvisible"></el-input>
 				</el-form-item>
@@ -112,7 +116,7 @@
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-				<el-button @click.native="scene.edit.visible = false">取消</el-button>
+				<el-button @click.native="scene.edit.visible = false" >取消</el-button>
 				<el-button type="primary" @click.native="editSubmit" :loading="scene.edit.loading">提交</el-button>
 			</div>
 		</el-dialog>
