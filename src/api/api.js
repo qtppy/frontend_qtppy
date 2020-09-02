@@ -47,9 +47,9 @@ export const createProject = params => { return axios.post(`${base}/project/crea
 
 export const getProjectList = params => { return axios.post(`${base}/project/getlist`, params) };
 
-export const editProject = params => { return axios.post('${base}/project/update',  params) };
+export const editProject = params => { return axios.post(`${base}/project/update`,  params) };
 
-export const deleteProject = params => { return axios.post('${base}/project/delete', params) };
+export const deleteProject = params => { return axios.post(`${base}/project/delete`, params) };
 
 // 新建测试集
 export const createSuite = params => { return axios.post(`${base}/project/suite/create`, params); };
@@ -73,10 +73,10 @@ export const getCaseList = params => { return axios.post(`${base}/case/getcaseli
 export const editCase = params => { return axios.post(`${base}/case/edit`, params).then(res => res.data); };
 
 // 删除测试用例
-export const deleteCase = params => { return axios.post('${base}/case/delete', params) };
+export const deleteCase = params => { return axios.post(`${base}/case/delete`, params) };
 
 // 新建测试用例
-export const createCase = params => { return axios.post('${base}/case/create', params) };
+export const createCase = params => { return axios.post(`${base}/case/create`, params) };
 
 // debug测试用例
 export const debugCase = params => { return axios.post(`${base}/run/debug`, params); };
@@ -88,7 +88,7 @@ export const reqLogin = params => { return axios.post(`${base}/auth/login`, para
 export const registerUser = params => { return axios.post(`${base}/auth/register`, params); };
 
 // 登出
-export const logout = params => { return axios.post('${base}/auth/logout'); }; 
+export const logout = params => { return axios.post(`${base}/auth/logout`); }; 
 
 
 // 根据uid获取全局变量
