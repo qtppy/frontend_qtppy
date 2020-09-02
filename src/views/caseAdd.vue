@@ -727,7 +727,7 @@
               <template slot="title">
                 出参变量
               </template>
-              <div v-for="item in add.result.outList.outList" :key="item.var_name">
+              <div v-for="item in add.result.outList" :key="item.var_name">
                 {{item.var_name}}:{{item.var_value}}
               </div>
             </el-collapse-item>
