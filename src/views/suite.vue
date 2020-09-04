@@ -39,7 +39,7 @@
 				</el-form-item>
 			</el-form>
 		</el-col>
-
+		<case-add ref="addCom"></case-add>
 		<!--列表-->
 		<el-table 
 			:data="scene.table.data" 
@@ -48,23 +48,16 @@
 			@selection-change="selsChange"
 			size="mini"
 			style="width: 100%;">
-			<el-table-column type="selection" width="55">
-			</el-table-column>
-			<el-table-column type="index" label="序号" width="100">
-			</el-table-column>
-			<el-table-column prop="scid" label="场景用例ID" width="100" v-if="scene.table.colVisible">
-			</el-table-column>
-			<el-table-column prop="scName" label="接口名称" width="200" >
-			</el-table-column>
-			<el-table-column prop="scUrl" label="接口地址" width="200">
-			</el-table-column>
-			<el-table-column prop="scMethod" label="请求方法" width="100" >
-			</el-table-column>
-			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" >
-			</el-table-column>
+			<el-table-column type="selection" width="55" />
+			<el-table-column type="index" label="序号" width="100" />
+			<el-table-column prop="scid" label="场景用例ID" width="100" v-if="scene.table.colVisible" />
+			<el-table-column prop="scName" label="接口名称" width="200" />
+			<el-table-column prop="scUrl" label="接口地址" width="200" />
+			<el-table-column prop="scMethod" label="请求方法" width="100" />
+			<el-table-column prop="create_time" label="创建日期" width="120" :formatter="formatDateDMT" />
 
 			<el-table-column label="操作"  width="300">
-				<template slot="header" slot-scope>
+				<template slot="header" slot-scope="scope">
 					<el-button-group>
 						<el-tooltip content="添加用例" placement="bottom" effect="light">
 							<el-button type="warning" icon="el-icon-document-add" size="mini" @click="addCaseToList()" ></el-button>
@@ -85,7 +78,7 @@
 				</template>
 				<template slot-scope="scope">
 					<el-tooltip content="编辑" placement="bottom" effect="light">
-						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleAddCaseDialog(scope.$index + 1, scope.row)" circle></el-button>
 					</el-tooltip>
 
 					<el-tooltip content="删除" placement="bottom" effect="light">
@@ -106,7 +99,7 @@
 		<el-dialog title="编辑" :visible="scene.edit.visible" :close-on-click-modal="false" @close="scene.edit.visible = false">
 			<el-form :model="scene.edit.data" label-width="80px" :rules="scene.edit.rules" ref="editForm" >
 				<el-form-item label="场景ID" prop="sid">
-					<el-input v-model="scene.edit.data.sid" auto-complete="off" :readonly="scene.edit.sidvisible"></el-input>
+					<el-input v-model="scene.edit.data.sid" auto-complete="off" :readonly="scene.edit.sidVisible"></el-input>
 				</el-form-item>
 				<el-form-item label="场景名称" prop="s_name">
 					<el-input v-model="scene.edit.data.s_name" auto-complete="off"></el-input>
@@ -148,6 +141,8 @@
 				<el-button type="primary" @click="insertCase" size="mini" :loading="addCaseDialog.loading">添 加</el-button>
 			</div>
 		</el-dialog>
+
+
 	</section>
 
 </template>
@@ -158,9 +153,11 @@
 	//import NProgress from 'nprogress'
 	import { deleteSuiteCase, addSuiteCase, getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getSuiteCaseById, getSuiteByID} from '@/api/api';
 	import CASE from '@/views/Case'
+    import ADDCOM from '@/views/caseAdd'
 	export default {
 		components: { 
-			"case-module": CASE, 
+			"case-module": CASE,
+			"case-add": ADDCOM,
 		},
 		data() {
 			return {
@@ -207,7 +204,7 @@
 					edit:{
 						loading: false,
 						visible: false,
-						sidVisible: false,
+						sidVisible: true,
 						data: {
 							sid: '',
 							s_desc: '',
@@ -245,6 +242,15 @@
 			this.getProjectSelect()//初始化加载项目列表
 		},
 		methods: {
+			/**
+			 * 显示编辑case
+			 * @param {*} null
+			 * @returns null
+			 */
+			handleAddCaseDialog(index, row) {
+				this.$refs.addCom.add.breadcrumbTitle = "编辑用例  -  " + index  +'  -  '  + row.scName;
+                this.$refs.addCom.add.visible = true;
+            },
             addCaseToList() {
                 // 先选择项目及场景之后，才可以增加步骤
                 let ops = this.projects;
