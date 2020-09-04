@@ -16,7 +16,7 @@
 				</el-form-item>
 				<el-form-item>
 					<el-link type="primary" icon="el-icon-guide" :underline="false">场景:</el-link>
-					<el-select v-model="projects.suite.selected" filterable size="mini" placeholder="请选择场景" @change="getProjects">
+					<el-select v-model="projects.suite.selected" filterable size="mini" placeholder="请选择场景" @change="getSuite">
 						<el-option
 						v-for="item in projects.suite.options"
 						:key="item.value"
@@ -83,15 +83,15 @@
                         </el-tooltip>
 					</el-button-group>  
 				</template>
-				
-				<el-tooltip content="编辑" placement="bottom" effect="light">
-					<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
-				</el-tooltip>
+				<template slot-scope="scope">
+					<el-tooltip content="编辑" placement="bottom" effect="light">
+						<el-button type="warning" size="mini" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
 
-				<el-tooltip content="删除" placement="bottom" effect="light">
-					<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
-				</el-tooltip>
-
+					<el-tooltip content="删除" placement="bottom" effect="light">
+						<el-button type="danger" icon="el-icon-delete" size="mini" @click="handleDel(scope.$index, scope.row)" circle></el-button>
+					</el-tooltip>
+				</template>
 			</el-table-column>
 		</el-table>
 
@@ -156,7 +156,7 @@
 <script>
 	import util from '@/common/js/util'
 	//import NProgress from 'nprogress'
-	import { addSuiteCase, getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getSuiteCaseById, getSuiteByID} from '@/api/api';
+	import { deleteSuiteCase, addSuiteCase, getProjectAllList, getSuiteAllList, createSuite, updateSuiteInfo, getSuiteCaseById, getSuiteByID} from '@/api/api';
 	import CASE from '@/views/Case'
 	export default {
 		components: { 
@@ -245,42 +245,42 @@
 			this.getProjectSelect()//初始化加载项目列表
 		},
 		methods: {
-      addCaseToList() {
-        // 先选择项目及场景之后，才可以增加步骤
-        let ops = this.projects;
-        if( ops.suite.selected === '') {
-          this.$message(
-            {
-              message: '请选择项目及场景',
-              type: 'warning'
-            }
-          )
-        }else{
-          this.addCaseDialog.visible = true;
-        }
-      },
+            addCaseToList() {
+                // 先选择项目及场景之后，才可以增加步骤
+                let ops = this.projects;
+                if( ops.suite.selected === '') {
+                    this.$message(
+                        {
+                            message: '请选择项目及场景',
+                            type: 'warning'
+						}
+					)
+                }else{
+                    this.addCaseDialog.visible = true;
+                }
+            },
 			async insertCase() {
-        // console.log('=-=-=-=->', this.$refs.caseCom.sels)
-        // console.log('场景ID', this.projects.suite.selected)
-        // 根据场景ID，场景用例ID查询场景下用例
-        if(this.$refs.caseCom.sels.length <=0) {
-          this.$message({
-            message: '请勾选，选择用例',
-            type: 'warning'
-          })
-        }else {
-          this.addCaseDialog.visible = true;
-          let param = {
-            data: this.$refs.caseCom.sels,
-            sid: this.projects.suite.selected
-          };
-          await addSuiteCase(param).then(res => {
-            this.getProjects();
-          });
-          this.addCaseDialog.visible = false; 
-          // 清除子组件case列表选择状态
-          this.$refs.caseCom.$refs.caseTable.clearSelection();
-        }
+                // console.log('=-=-=-=->', this.$refs.caseCom.sels)
+                // console.log('场景ID', this.projects.suite.selected)
+                // 根据场景ID，场景用例ID查询场景下用例
+                if(this.$refs.caseCom.sels.length <=0) {
+                    this.$message({
+                        message: '请勾选，选择用例',
+                        type: 'warning'
+                    })
+                }else {
+                    this.addCaseDialog.visible = true;
+                    let param = {
+                        data: this.$refs.caseCom.sels,
+                        sid: this.projects.suite.selected
+                    };
+                    await addSuiteCase(param).then(res => {
+                        this.getSuite();
+                    });
+                    this.addCaseDialog.visible = false; 
+                    // 清除子组件case列表选择状态
+                    this.$refs.caseCom.$refs.caseTable.clearSelection();
+                }
 			},
 			handleChange(value, direction, movedKeys) {
 				console.log(value, direction, movedKeys);
@@ -296,7 +296,7 @@
 			},
 			handleCurrentChange(val) {
 				this.pages.page = val;
-				this.getProjects();
+				this.getSuite();
 			},
 
 			// 获取项目
@@ -312,8 +312,7 @@
 						})
 					};
 					this.projects.project.selected = this.projects.project.options[0].p_id
-				});
-				
+				});	
 			},
 			// 根据项目获取测试集
 			getSuiteList (value) {
@@ -338,26 +337,24 @@
 				}
 			},
 			//获取用户列表
-			getProjects() {
+            getSuite() {
 
-        this.scene.table.loading = true;
-        let para = {
-          sid: this.projects.suite.selected
-        }
+                this.scene.table.loading = true;
+                let para = {
+                    sid: this.projects.suite.selected
+                }
 
-				//NProgress.start();
-        getSuiteCaseById(para).then((res) => {
-          console.log('9999999====>', res)
-          this.scene.table.data = res.res.case;
+                //NProgress.start();
+                getSuiteCaseById(para).then((res) => {
+                    this.scene.table.data = res.res.case;
 					this.pages.total = res.res.total;
 					this.pages.per_page = res.res.per_page;
 					this.pages.page = res.res.page;
 					this.pages.next = res.res.next_page;
-        });
-        this.scene.table.loading = false;
+                });
+                this.scene.table.loading = false;
 				//NProgress.done();
-
-			},
+            },
 
 			//删除
 			handleDel: function (index, row) {
@@ -366,15 +363,15 @@
 				}).then(() => {
 					this.scene.table.loading = true;
 					//NProgress.start();
-					let para = { p_id: [row.p_id] };
-					deleteProject(para).then((res) => {
+					let para = { scid: [row.scid] };
+					deleteSuiteCase(para).then((res) => {
 						this.scene.table.loading = false;
 						//NProgress.done();
 						this.$message({
 							message: '删除成功',
 							type: 'success'
 						});
-						this.getProjects();
+						this.getSuite();
 					});
 				}).catch(() => {
 
@@ -388,36 +385,36 @@
 			},
 			// 显示场景编辑
 			handleSuiteEdit: function () {
-        // 先选择项目及场景之后，才可以增加步骤
-        let ops = this.projects;
-        if( ops.project.options.length <= 0) {
-          this.$message(
-            {
-              message: '请选择项目',
-              type: 'warning'
-            }
-          )
-        } else if( ops.suite.selected === '') {
-          this.$message(
-            {
-              message: '请选择场景',
-              type: 'warning'
-            }
-          )
-        }else{
-          let para = {
-            "sid": this.projects.suite.selected
-          };
-          getSuiteByID(para).then(res => {
-            let data = res.data.res
-            this.scene.edit.data = {
-              sid: data.sid,
-              s_name: data.s_name,
-              s_desc: data.s_desc
-            }
-          });
-          this.scene.edit.visible = true
-        }
+                // 先选择项目及场景之后，才可以增加步骤
+                let ops = this.projects;
+                if( ops.project.options.length <= 0) {
+                    this.$message(
+                        {
+                            message: '请选择项目',
+                            type: 'warning'
+                        }
+                    )
+                } else if( ops.suite.selected === '') {
+                    this.$message(
+                        {
+                            message: '请选择场景',
+                            type: 'warning'
+                        }
+                    )
+                }else{
+                    let para = {
+                        "sid": this.projects.suite.selected
+                    };
+                    getSuiteByID(para).then(res => {
+                        let data = res.data.res
+                        this.scene.edit.data = {
+                            sid: data.sid,
+                            s_name: data.s_name,
+                            s_desc: data.s_desc
+                        }
+                    });
+                    this.scene.edit.visible = true
+                }
 			},
 			//显示新增界面
 			handleAddSuite: function () {
@@ -486,29 +483,29 @@
 			},
 			//批量删除
 			batchRemove: function () {
-				var ids = this.sels.map(item => item.p_id);
+				var ids = this.pages.sels.map(item => item.scid);
 				this.$confirm('确认删除选中记录吗？', '提示', {
 					type: 'warning'
 				}).then(() => {
 					this.scene.table.loading = true;
 					//NProgress.start();
-					let para = { p_id: ids };
-					deleteProject(para).then((res) => {
+					let para = { scid: ids };
+					deleteSuiteCase(para).then((res) => {
 						this.scene.table.loading = false;
 						//NProgress.done();
 						this.$message({
 							message: '删除成功',
 							type: 'success'
 						});
-						this.getProjects();
+						this.getSuite();
 					});
 				}).catch(() => {
 
 				});
-			}
+			},
 		},
 		mounted() {
-			// this.getProjects();
+			// this.getSuite();
 		}
 	}
 

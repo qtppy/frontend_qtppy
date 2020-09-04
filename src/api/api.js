@@ -102,5 +102,6 @@ export const getSuiteCaseById = params => { return axios.post(`${base}/project/s
 
 // 为场景增加测试步骤
 export const addSuiteCase = params => { return axios.post(`${base}/project/suite/addCase`, params).then(res => res.data) };
-
+// 删除场景中的用例
+export const deleteSuiteCase = params => { return axios.post(`${base}/project/suite/deleteSenceCase`, params).then(res => res.data) }
 
