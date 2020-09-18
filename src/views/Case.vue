@@ -231,72 +231,11 @@
       caseListClick(index, row) {
         // 更改标题
         if (index === 1) {
-          this.breadcrumbTitle='编辑用例';
-
-          let obj = {};
-          obj = this.methodOptions.find((item) => {
-            return item.label === row.method;
-          })
-
-          // 编辑展示数据
-          this.addCaseData = {
-            method: obj.value,
-            url: row.url,
-            urlIndex: 0,
-            baseUrl: '',
-            header: row.headers,
-            body: row.body,
-            outParam: '',
-            assertData: '',
-            isbodyTextAreaButton: false,
-            size: 'mini',
-            debugWay: 0,
-            name: row.name,
-            desc: row.desc,
-            caseId: row.cid,
-          };
-          this.bodyRadioChange(row.body.how);
-          // body数据初始化
-          let tableT = row.body.body.data;
-
-          this.bodyTableData = [];
-          let files = row.body.body.files;
-          for(let f in files) {
-            this.bodyTableData.push(
-              {
-                key: f,
-                value: tableT[f],
-                DESCRIPTION: '',
-                edit: true,
-                fromSelect: 1,
-                fromValSelect: false,
-                valueEdit: true,
-                fromSelectHide: false,
-                file: {
-                  key: '',
-                  name: ''
-                },
-              }
-            );
-          }
-          for(let k in tableT) {
-            this.bodyTableData.push(
-              {
-                key: k,
-                value: tableT[k],
-                DESCRIPTION: '',
-                edit: true,
-                fromSelect: 1,
-                fromValSelect: false,
-                valueEdit: true,
-                fromSelectHide: false,
-                file: {
-                  key: '',
-                  name: ''
-                },
-              }
-            );
-          };
+		  this.$refs.caseAddCom.add.breadcrumbTitle = "编辑用例";
+		  this.$refs.caseAddCom.add.desc = row.desc;
+		  this.$refs.caseAddCom.add.name = row.name;
+		  this.$refs.caseAddCom.add.url = row.url;
+		  this.$refs.caseAddCom.add.method = row.method;
         };
         this.handleAddCaseDialog();
       },

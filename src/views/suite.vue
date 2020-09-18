@@ -49,7 +49,7 @@
 			size="mini"
 			style="width: 100%;">
 			<el-table-column type="selection" width="55" />
-			<el-table-column type="index" label="序号" width="100" />
+			<el-table-column type="index" label="步   骤" width="100" />
 			<el-table-column prop="scid" label="场景用例ID" width="100" v-if="scene.table.colVisible" />
 			<el-table-column prop="scName" label="接口名称" width="200" />
 			<el-table-column prop="scUrl" label="接口地址" width="200" />
@@ -248,8 +248,14 @@
 			 * @returns null
 			 */
 			handleAddCaseDialog(index, row) {
+				console.log('----->>>>>>', row)
 				this.$refs.addCom.add.breadcrumbTitle = "编辑用例  -  " + index  +'  -  '  + row.scName;
-                this.$refs.addCom.add.visible = true;
+				this.$refs.addCom.add.visible = true;
+
+				this.$refs.addCom.add.url = row.scUrl;
+				this.$refs.addCom.add.name = row.scName;
+				this.$refs.addCom.add.desc = row.scDesc;
+				this.$refs.addCom.add.body.how = row.scBody.how;
             },
             addCaseToList() {
                 // 先选择项目及场景之后，才可以增加步骤
