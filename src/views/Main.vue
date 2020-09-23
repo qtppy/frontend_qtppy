@@ -10,8 +10,9 @@
 
 <style>
   .we-alert {
-    margin-bottom: 60px;
+    margin-bottom: 1px;
     margin-left: 1px;
+	margin-top: 35px;
     padding: 20px 50px;
     border-color: #d5eafb;
     background-color: #ecf8fd;
