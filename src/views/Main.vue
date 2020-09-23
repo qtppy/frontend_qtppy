@@ -1,32 +1,24 @@
-
-
 <template>
-  <!-- <el-carousel :interval="4000" type="card" height="200px">
-    <el-carousel-item v-for="item in itemArr" :key="item.title"> -->
-      <!-- <h3 class="medium">{{ item.text }}</h3> -->
-	  <!-- <img :src="item.src"/> -->
-	  <!-- <span>{{ item.title }}</span> -->
-	  <!-- <p>{{ item.text }}</p> -->
-    <!-- </el-carousel-item>
-  </el-carousel> -->
-  <span ><p v-for="item in itemArr" :key="item.title">{{item.title}}: {{item.text}}</p></span>
+  <div class="we-alert">
+	  <div v-for="item in itemArr" :key="item.title">
+		  <h6>{{item.title}}</h6>
+		  <p>{{item.text}}</p>
+	  </div>
+
+  </div>
 </template>
 
 <style>
-  .el-carousel__item h3 {
-    color: #475669;
+  .we-alert {
+    margin-bottom: 60px;
+    margin-left: 1px;
+    padding: 20px 50px;
+    border-color: #d5eafb;
+    background-color: #ecf8fd;
     font-size: 14px;
-    opacity: 0.75;
-    line-height: 200px;
-    margin: 0;
-  }
-  
-  .el-carousel__item:nth-child(2n) {
-    background-color: #99a9bf;
-  }
-  
-  .el-carousel__item:nth-child(2n+1) {
-    background-color: #d3dce6;
+	line-height: 27px;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+	letter-spacing: 2px;
   }
 </style>
 
