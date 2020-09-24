@@ -13,12 +13,13 @@
     margin-bottom: 1px;
     margin-left: 1px;
 	margin-top: 25px;
-    padding: 20px 50px;
+    padding: 11px 40px;
+	border: 1px solid #dde9ed;
     border-color: #d5eafb;
     background-color: #fcfdfd;
     font-size: 14px;
 	line-height: 27px;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	letter-spacing: 2px;
   }
 </style>
