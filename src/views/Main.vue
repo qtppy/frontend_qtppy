@@ -8,14 +8,14 @@
   </div>
 </template>
 
-<style>
+<style scoped>
   .we-alert {
     margin-bottom: 1px;
     margin-left: 1px;
-	margin-top: 35px;
+	margin-top: 25px;
     padding: 20px 50px;
     border-color: #d5eafb;
-    background-color: #ecf8fd;
+    background-color: #fcfdfd;
     font-size: 14px;
 	line-height: 27px;
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; 
