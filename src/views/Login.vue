@@ -7,8 +7,11 @@
     label-position="left" 
     label-width="0px" 
     class="demo-ruleForm login-container">
-      <h3 class="title">QTPPY自动化平台系统登录</h3>
-      <el-form-item prop="account">
+      <div>
+        <img style="vertical-align:middle" src="static/js/favicon.ico">
+        <a class="title">QTPPY自动化平台系统登录</a>
+      </div>
+      <el-form-item class="form" prop="account">
         <el-input 
         type="text" 
         v-model="ruleForm2.account" 
@@ -202,15 +205,24 @@
     border: 1px solid #eaeaea;
     box-shadow: 0 0 25px #cac6c6;
     .title {
-      margin: 0px auto 40px auto;
+      margin: 0px auto 50px 35px;
       text-align: center;
       color: #505458;
+      font-size: 16px;
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-weight: bold;
+    }
+    .logo {
+      vertical-align:middle;
     }
     .remember {
       margin: 0px 0px 35px 0px;
     }
     .register {
       margin: 0px 0px 0px 40px;
+    }
+    .form {
+      margin-top: 25px;
     }
   }
 </style>

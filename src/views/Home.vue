@@ -6,7 +6,10 @@
 				:span="5" 
 				class="logo" 
 				:class="isCollapse?'logo-collapse-width':'logo-width'">
-				{{isCollapse?'QTPPY':sysName}}
+				<div>
+					<img style="vertical-align:middle" src="static/js/favicon.ico">
+					<a>{{sysName}}</a>
+				</div>
 			</el-col>
 			<el-col :span="12">
 				<div 
@@ -532,15 +535,15 @@
 				//width:230px;
 				height:60px;
 				font-size: 16px;
-				padding-left:8px;
-				padding-right:20px;
+				padding-left:0px;
+				padding-right:0px;
 				border-color: rgba(238,241,146,0.3);
 				border-right-width: 1px;
 				border-right-style: solid;
 				img {
-					width: 40px;
+					width: 28px;
 					float: left;
-					margin: 10px 10px 10px 18px;
+					margin: 15px 10px 10px 14px;
 				}
 				.txt {
 					color:#fff;
