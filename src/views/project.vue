@@ -2,7 +2,7 @@
 	<section>
 		<!--工具条-->
 		<el-col :span="24" class="toolbar">
-			<el-form class="toolform" :inline="true" :model="filters">
+			<el-form class="toolform" :inline="true" :model="filters" size="mini">
 				<el-form-item>
 					<el-link type="primary" icon="el-icon-guide" :underline="false">项目查询:</el-link>
 				</el-form-item>
@@ -371,7 +371,7 @@
 <style scoped-slot>
 	.toolbar {
 		height: 50px;
-		padding-bottom: 1px;
+		padding-bottom: 0px;
 	}
 	.toolform {
 		margin: 0px 10px 10px 10px;

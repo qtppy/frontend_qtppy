@@ -9,6 +9,7 @@
 			<el-form 
         :inline="true" 
         :model="filters"
+		size="mini"
       >
 				<el-form-item>
 					<el-link 
