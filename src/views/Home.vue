@@ -504,6 +504,7 @@
 	.el-menu-vertical-demo:not(.el-menu--collapse) {
 		width: 230px;
 		min-height: 400px;
+		// background: #3C526A; //左侧边栏背景颜色
 	}		
 	.container {
 		position: absolute;
@@ -513,7 +514,7 @@
 		.header {
 			height: 60px;
 			line-height: 60px;
-			background: $color-primary;
+			background: #3C526A; // $color-primary 蓝色最上边导航栏，背景颜色
 			color:#fff;
 			.userinfo {
 				text-align: right;
@@ -576,6 +577,7 @@
 				// position: absolute;
 				// top: 0px;
 				// bottom: 0px;
+				
 				.el-menu{
 					height: 100%;
 				}
