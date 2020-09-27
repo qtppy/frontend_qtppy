@@ -501,9 +501,11 @@
 	.el-scrollbar__wrap {
 		overflow-x: hidden;
 	}
+	// 侧边栏
 	.el-menu-vertical-demo:not(.el-menu--collapse) {
 		width: 230px;
 		min-height: 400px;
+		height: 100vh;
 		// background: #3C526A; //左侧边栏背景颜色
 	}		
 	.container {
