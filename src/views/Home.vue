@@ -7,7 +7,9 @@
 				class="logo" 
 				:class="isCollapse?'logo-collapse-width':'logo-width'">
 				<div>
-					<img style="vertical-align:middle" src="static/js/favicon.ico">
+					<a href="/main">
+					    <img style="vertical-align:middle" src="static/js/favicon.ico">
+					</a>
 					<a>{{sysName}}</a>
 				</div>
 			</el-col>
