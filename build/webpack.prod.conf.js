@@ -31,9 +31,12 @@ var webpackConfig = merge(baseWebpackConfig, {
     }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
-        warnings: false
+        warnings: false,
+        drop_debugger: true,
+        drop_console: true,
       },
-      sourceMap: true
+      sourceMap: config.build.productionSourceMap,
+      parallel: true,
     }),
     // extract css into its own file
     new ExtractTextPlugin({
@@ -81,7 +84,7 @@ var webpackConfig = merge(baseWebpackConfig, {
     // prevent vendor hash from being updated whenever app bundle is updated
     new webpack.optimize.CommonsChunkPlugin({
       name: 'manifest',
-      chunks: ['vendor']
+      chunks: ['vendor'],
     }),
     // copy custom static assets
     new CopyWebpackPlugin([
