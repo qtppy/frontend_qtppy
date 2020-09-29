@@ -21,7 +21,7 @@ axios.interceptors.response.use(function (response) {
 
 
 // 请求超时，时间ms
-axios.defaults.timeout = 10000
+axios.defaults.timeout = 60000
 
 
 let base = '/api';

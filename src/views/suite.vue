@@ -51,6 +51,7 @@
 			<el-table-column type="selection" width="55" />
 			<el-table-column type="index" label="步   骤" width="100" />
 			<el-table-column prop="scid" label="场景用例ID" width="100" v-if="scene.table.colVisible" />
+			<el-table-column prop="scno" label="场景用例后台顺序ID" width="100" v-if="scene.table.colVisible" />
 			<el-table-column prop="scName" label="接口名称" width="200" />
 			<el-table-column prop="scUrl" label="接口地址" width="200" />
 			<el-table-column prop="scMethod" label="请求方法" width="100" />
@@ -64,11 +65,11 @@
 						</el-tooltip>
 
 						<el-tooltip content="上移" placement="bottom" effect="light">
-							<el-button type="primary" icon="el-icon-top" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
+							<el-button type="primary" icon="el-icon-top" size="mini" :disabled="projects.suite.upMoveDisabled"></el-button>
 						</el-tooltip>
 
 						<el-tooltip content="下移" placement="bottom" effect="light">
-							<el-button type="primary" icon="el-icon-bottom" size="mini" @click="handleDel(scope.$index, scope.row)" ></el-button>
+							<el-button type="primary" icon="el-icon-bottom" size="mini" :disabled="projects.suite.downMoveDisabled" ></el-button>
 						</el-tooltip>
 
                         <el-tooltip content="执行场景用例" placement="bottom" effect="light">
@@ -181,6 +182,8 @@
 						options: [],
 						selected: '',
 						visible: false,
+						upMoveDisabled: true,
+						downMoveDisabled: true,
 						data:{
 							s_name: '',
 							s_desc: '',
@@ -358,7 +361,7 @@
 
                 //NProgress.start();
                 getSuiteCaseById(para).then((res) => {
-                    this.scene.table.data = res.res.case;
+					this.scene.table.data = res.res.case;
 					this.pages.total = res.res.total;
 					this.pages.per_page = res.res.per_page;
 					this.pages.page = res.res.page;
@@ -491,7 +494,36 @@
 				});
 			},
 			selsChange: function (sels) {
+				// 选择的行数据
 				this.pages.sels = sels;
+
+				// 每次只允许移动，一条用例
+				if (sels.length > 1){
+					this.projects.suite.upMoveDisabled = true;
+					this.projects.suite.downMoveDisabled = true;
+					this.$message({
+						message: '每次只能移动一条用例',
+						type: 'warning'
+					});
+				}else if(sels.length === 1){
+					// 第一位不允许上移，上移按钮置灰
+					if (sels[0].scno === 1){
+						this.projects.suite.upMoveDisabled = true;
+
+					}else{
+						this.projects.suite.upMoveDisabled = false;
+					}
+					// 最后一位不允许，下移
+					if (sels[0].scno === this.scene.table.data.length){
+						this.projects.suite.downMoveDisabled = true;
+
+					}else{
+						this.projects.suite.downMoveDisabled = false;
+					}
+				}else {
+					this.projects.suite.upMoveDisabled = true;
+					this.projects.suite.downMoveDisabled = true;
+				}
 			},
 			//批量删除
 			batchRemove: function () {
