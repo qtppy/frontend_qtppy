@@ -1,8 +1,16 @@
 <template>
 	<div id="app">
-		<transition name="fade"
-		            mode="out-in">
-			<router-view></router-view>
+		<!-- 路由组件缓存 -->
+		<transition name="fade" mode="out-in">
+			<keep-alive>
+			    <router-view v-if="$route.meta.KeepAlive"></router-view>
+			</keep-alive>
+		</transition>
+		<!-- 路由组件不缓存 -->
+		<transition name="fade1" mode="out-in">
+			<keep-alive>
+			    <router-view v-if="!$route.meta.KeepAlive"></router-view>
+			</keep-alive>
 		</transition>
 	</div>
 </template>
