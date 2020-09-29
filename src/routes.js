@@ -13,7 +13,7 @@ let routes = [
     },
     {
         path: '/404',
-        component: NotFound,
+        component:  Main =>require(['@/views/Main'], Main),
         name: '',
         hidden: true
     },
