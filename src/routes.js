@@ -20,7 +20,7 @@ let routes = [
         name: '',
         hidden: true,
         meta: {
-            KeepAlive: false
+            KeepAlive: true
         }
     },
     //{ path: '/main', component: Main },

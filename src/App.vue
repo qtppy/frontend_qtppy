@@ -7,7 +7,7 @@
 			</keep-alive>
 		</transition>
 		<!-- 路由组件不缓存 -->
-		<transition name="fade1" mode="out-in">
+		<transition name="fade" mode="out-in">
 			<keep-alive>
 			    <router-view v-if="!$route.meta.KeepAlive"></router-view>
 			</keep-alive>
@@ -63,13 +63,13 @@ body {
 	}
 }
 
-.fade-enter-active,
-.fade-leave-active {
-	transition: all .2s ease;
-}
 
-.fade-enter,
-.fade-leave-active {
+// 淡入淡出
+.fade-enter, .fade-leave-active {
 	opacity: 0;
+}
+.fade-enter-active, .fade-leave-active {
+	transition: opacity .2s;
+	-webkit-transition: opacity .2s;
 }
 </style>
